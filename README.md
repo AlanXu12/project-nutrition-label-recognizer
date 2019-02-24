@@ -1,7 +1,7 @@
 # CSCC09 Final Project Proposal
 
  ### __Project Title:__
-  ###### &nbsp;NuXpert
+  ###### &nbsp;&nbsp;&nbsp;NuXpert
 
 * __Team Members:__
     -- Wanjing Huang
