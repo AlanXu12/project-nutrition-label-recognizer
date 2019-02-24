@@ -4,7 +4,7 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert
 
 - __Team Members:__
-    ⋅⋅⋅ Wanjing Huang
+    ⋅⋅* Wanjing Huang
     -- Siyang Shen
     -- Pingfan Xu
 
