@@ -1,7 +1,7 @@
 # CSCC09 Final Project Proposal
 
 1. __Project Title:__
-NuXpert
+###### NuXpert
 
 2. __Team Members:__
    * Wanjing Huang
@@ -9,7 +9,7 @@ NuXpert
    * Pingfan Xu
 
 3. __Description of the web application:__
-We see nutrition labels everywhere everyday, but from reading the label not all people really understand the nutrition facts: what they do to your body, what is the suggested daily amount for your body. Thus here we want to provide a tool that helps people comprehend the nutrition label easily and more precisely.
+>We see nutrition labels everywhere everyday, but from reading the label not all people really understand the nutrition >facts: what they do to your body, what is the suggested daily amount for your body. Thus here we want to provide a tool >that helps people comprehend the nutrition label easily and more precisely.
 
 4. __Key features:__
     * Recognizing nutrition fact label from input image
