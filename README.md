@@ -1,6 +1,6 @@
 # CSCC09 Final Project Proposal
 
- ## __Project Title:__
+ ### __Project Title:__
   ###### NuXpert
 
 * __Team Members:__
