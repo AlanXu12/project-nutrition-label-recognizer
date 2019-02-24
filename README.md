@@ -3,8 +3,8 @@
  ## __Project Title:__
   ###### NuXpert
 
-*__Team Members:__
-    * Wanjing Huang
+* __Team Members:__
+    -- Wanjing Huang
     -- Siyang Shen
     -- Pingfan Xu
 
