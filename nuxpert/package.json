@@ -5,11 +5,15 @@
   "kartik-v/bootstrap-fileinput": "dev-master",
   "dependencies": {
     "bootstrap-fileinput": "^4.5.2",
+    "node-sass": "^4.11.0",
     "react": "^16.8.4",
     "react-dnd": "^7.3.1",
     "react-dom": "^16.8.4",
+    "react-dropzone": "^10.0.0",
+    "react-file-drop": "^0.2.7",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.8"
+    "react-scripts": "2.1.8",
+    "superagent": "^4.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -25,5 +29,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "sass-loader": "^7.1.0"
+  }
 }
