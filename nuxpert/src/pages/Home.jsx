@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import FileDrop from 'react-file-drop';
+
 import './Home.css'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import SearchBar from '../components/Search_bar'
 import Intro from '../components/Intro'
-import NutritionLabel from '../components/NutritionLabel'
+import SearchImage from '../components/Search_image'
 class Home extends Component {
     
     state = {
@@ -30,12 +30,7 @@ class Home extends Component {
                 <SearchBar />
                 <br></br>
                 {/* drag and drop upload */}
-                <div id="react-file-drop-demo" >
-                    <NutritionLabel file={this.state.image}/>
-                    <FileDrop className="dnd" onDrop={this.FileDrop}></FileDrop>
-                    <br></br>
-                    <button className="sumbit-btn">See Report</button>
-                </div>
+                <SearchImage />
             </div>
         );
     }
