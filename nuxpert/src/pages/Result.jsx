@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 // import {BrowserRouter as Router, Route} from 'react-router-dom';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
 import './Result.css';
 import './styles.css';
+
+import NavBar from '../components/Navigation.jsx';
 
 import sampleImg from '../media/sample-nutrition-label-ca.png';
 
@@ -24,8 +26,12 @@ class Result extends Component {
   }
 
   render() {
+    // get all saved data
+    
     return (
       <div className="container">
+
+        <NavBar/>
 
         <button className="btn btn-primary btn-lg mt-2 btn-report" type="button">Report</button>
 
