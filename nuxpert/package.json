@@ -2,9 +2,13 @@
   "name": "nuxpert",
   "version": "0.1.0",
   "private": true,
+  "kartik-v/bootstrap-fileinput": "dev-master",
   "dependencies": {
+    "bootstrap-fileinput": "^4.5.2",
     "react": "^16.8.4",
+    "react-dnd": "^7.3.1",
     "react-dom": "^16.8.4",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.8"
   },
   "scripts": {
