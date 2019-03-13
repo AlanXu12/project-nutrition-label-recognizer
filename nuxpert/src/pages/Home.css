@@ -1,0 +1,32 @@
+.search{
+    width: 600px;
+    border: transparent;
+    border-bottom: 2px solid grey;
+    
+}
+  
+.search-icon{
+    background-repeat: no-repeat;
+    background-position: center;
+    background: transparent;
+    border: transparent;
+    width: 29px;
+    height: 26px;
+    border: 1px 0 0 #4dd0e1;
+    background-image: url('../media/research-icon.png');
+}
+
+.dnd{
+    width: 630px;
+    height: 200px;
+    padding: 20px;
+    background-image: url('../media/upload-box.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.submit-btn{
+
+}
+
+  
