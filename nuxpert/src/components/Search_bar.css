@@ -1,22 +1,17 @@
-.search_bar{
+.search-form{
+    border: none;
+    background-color:transparent;
+    background-position: center;
+    background-repeat: no-repeat;
     width: 600px;
-    border: transparent;
     border-bottom: 2px solid grey;
-    
 }
 
-.search-input{
-    width: 600px;
-    border: transparent;
-}
-  
 .search-icon{
     background-repeat: no-repeat;
     background-position: center;
     background: transparent;
     border: transparent;
-    width: 29px;
-    height: 26px;
-    border: 1px 0 0 #4dd0e1;
     background-image: url('../media/research-icon.png');
+    background-size: 30px;
 }
