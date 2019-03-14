@@ -18,19 +18,6 @@ const vision = require('@google-cloud/vision');
 // Creates a client
 const client = new vision.ImageAnnotatorClient();
 
-// Performs label detection on the image file
-// client
-//   .textDetection('./resources/wakeupcat.jpg')
-//   .then(results => {
-//     //   console.log(results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox);
-//     // const labels = results[0].labelAnnotations;
-
-//     // console.log('Labels:');
-//     // labels.forEach(label => console.log(label.description));
-//   })
-//   .catch(err => {
-//     console.error('ERROR:', err);
-//   });
 
 let mongoClient = require('mongodb').MongoClient;
 let dbUrl = "mongodb://" + process.env.IPADDRESS + ":27017/mydb";
@@ -41,13 +28,51 @@ var upload = multer({ dest: 'uploads/' });
 // upload image and return text
 app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
     let path = req.file.path;
+    let nutrients = [];
     client.textDetection(path).then(results => {
         let vertices = results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox.vertices;
         // console.log(results[0]);
         // console.log(vertices);
-        console.log(results[0].textAnnotations);
-        // console.log(results[0].textAnnotations[0].description.split("\n"));
-        return res.json(results[0]);
+        // console.log(results[0].textAnnotations);
+        // console.log(results[0].textAnnotations[0].description);
+
+        // find all the nutrients detected by Google Vision API
+        let raw = results[0].textAnnotations[0].description.split("\n").filter(phrase => !(/^\d+$/.test(phrase)) && !(/pour/.test(phrase)) && !(/Per/.test(phrase)) && (/\d/.test(phrase)) && !(/%/.test(phrase)));
+        raw.forEach(function(phrase) {
+            let basic = phrase.split("/")[0];
+            let filtered = basic.split(/(\d+)/)[0].trim()
+            if (filtered != "Calories") nutrients.push(filtered);
+        });
+        // for each nutrient, find their corresponding coordinates
+        // console.log(nutrients);
+        let json_result = {};
+        let keywords = results[0].textAnnotations.slice(1);
+        nutrients.forEach(function(nutrient) {
+            // basic scenario
+            let detail = keywords.filter(keyword => keyword.description == nutrient);
+            // handle situation where the detected text contains '/' in the end
+            if(detail.length == 0){
+                detail = keywords.filter(keyword => keyword.description == nutrient+"\/");
+            }
+            // handle the situation where the nutrient contains at least two words
+            // if(detail.length == 0){
+            //     console.log(nutrient);
+            //     let splited = nutrient.split(" ");
+            //     console.log(keywords.filter(keyword => keyword.description == splited[0]));
+            //     let index = keywords.indexOf(keywords.filter(keyword => keyword.description == splited[0]), 2);
+            //     console.log(index);
+            //     // detail = keywords.filter();
+            // }
+
+            // pack the nutrient with the coordinates
+            if (detail.length != 0){
+                json_result[nutrient] = detail[0].boundingPoly.vertices;
+            }
+            // console.log(detail);
+        });
+        // console.log(json_result);
+        // return res.json(results[0]);
+        return res.json(json_result);
         // return res.json(results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox);
         // labels.forEach(label => console.log(label.description));
     }).catch(err => {
