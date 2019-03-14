@@ -4,6 +4,8 @@ import { Redirect } from 'react-router-dom';
 import './Result.css';
 import './styles.css';
 
+import Test from './Test.jsx'
+
 import NavBar from '../components/Navigation.jsx';
 
 import sampleImg from '../media/sample-nutrition-label-ca.png';
@@ -27,7 +29,8 @@ class Result extends Component {
 
   render() {
     // get all saved data
-    
+    console.log(this.props);
+
     return (
       <div className="container">
 
