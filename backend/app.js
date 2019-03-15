@@ -105,7 +105,7 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
         //     db.close();
         //     return res.json(nutrient);
         // });
-        nutrients.findOne({name: req.params.name}, {fields:{_id: 0, name: 1, details: 1}}, function(err, nutrient) {
+        nutrients.findOne({name: req.params.name}, {projection: {_id: 0, name: 1, details: 1}}, function(err, nutrient) {
             db.close();
             return res.json(nutrient);
         });
