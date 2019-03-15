@@ -53,10 +53,16 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
 
         // find all the nutrients detected by Google Vision API
         let raw = results[0].textAnnotations[0].description.split("\n").filter(phrase => !(/^\d+$/.test(phrase)) && !(/pour/.test(phrase)) && !(/Per/.test(phrase)) && (/\d/.test(phrase)) && !(/%/.test(phrase)));
+        // handle the situation where the detected looks like this --- Iron/Fer, in long-text spliting
+        let eng_fr = raw.filter(phrase => /\w\/\w/.test(phrase));
         raw.forEach(function(phrase) {
+            // console.log(phrase);
             let basic = phrase.split("/")[0];
             let filtered = basic.split(/(\d+)/)[0].trim()
             if (filtered != "Calories") nutrients.push(filtered);
+        });
+        eng_fr.forEach(function(phrase) {
+            if(phrase.split(" ")[0].includes("/")) nutrients.push(phrase.split(" ")[0]);
         });
         // for each nutrient, find their corresponding coordinates
         // console.log(nutrients);
@@ -81,7 +87,8 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
 
             // pack the nutrient with the coordinates
             if (detail.length != 0){
-                json_result[nutrient] = detail[0].boundingPoly.vertices;
+                // get rid off the '/' in some phrases like 'Iron/Fer'
+                json_result[nutrient.split("/")[0]] = detail[0].boundingPoly.vertices;
             }
             // console.log(detail);
         });
