@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import './Navigation.css'
 class Navigation extends Component {
     render() {
         return (
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-                <a className="navbar-brand" href="/">logo</a>
+                <a className="navbar-brand logo" href="/"></a>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
                     <span className="navbar-toggler-icon"></span>
                 </button>
