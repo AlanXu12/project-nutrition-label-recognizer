@@ -11,8 +11,8 @@ Use [http://localhost:8080](http://localhost:8080) as the address and port.
 
 ### API Resources
 
-  - [POST /api/search/image/](#post-api/search/image/)
-  - [POST /api/nutrient/](#get-/api/nutrient/)
+  - [POST /api/search/image/](#post-apisearchimage/)
+  - [POST /api/nutrient/](#get-apinutrient)
 
 ### POST /api/search/image/
 - description: analyze an uploaded image
