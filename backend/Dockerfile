@@ -1,17 +1,17 @@
 FROM node:8
 
 # Downloading gcloud package
-RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
+# RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
 
 # Installing the package
-RUN mkdir -p /usr/local/gcloud \
-  && tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz \
-  && /usr/local/gcloud/google-cloud-sdk/install.sh
+# RUN mkdir -p /usr/local/gcloud \
+#   && tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz \
+#   && /usr/local/gcloud/google-cloud-sdk/install.sh
 
 # Adding the package path to local
-ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
+# ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 
-RUN gcloud auth configure-docker
+# RUN gcloud auth configure-docker
 
 
 # Create app directory
@@ -26,6 +26,8 @@ RUN npm install
 
 # Bundle app source
 COPY . .
+
+# RUN export GOOGLE_APPLICATION_CREDENTIALS="/usr/src/app/JSON_Credential/kubernetes-11ff0109cbb4.json"
 
 EXPOSE 8080
 
