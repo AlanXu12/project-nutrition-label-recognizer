@@ -1,50 +1,65 @@
-import React, { Component } from 'react';
+// import PropTypes from 'prop-types';
+import axios from 'axios'
+import React from 'react';
 import './Search_bar.css'
+class SearchBar extends React.Component {
+    constructor(props) {
+        super(props);
 
-class Search extends Component {
-    state = {
-        query: '',
-        results: {}
+        this.state = { selectedFile: null, loaded: 0, }
+
     }
 
-    // getResult = () => {
-    //     axios.get(`${API_URL}?api_key=${API_KEY}&prefix=${this.state.query}&limit=7`)
-    //         .then(({ data }) => {
-    //             this.setState({
-    //                 results: data.data
-    //             })
-    //         })
-    // }
+    handleUpload = () => {
+        const data = new FormData()
+        const endpoint = 'http://localhost:3000'
+        data.append('file', this.state.selectedFile, this.state.selectedFile.name)
 
-    handleInputChange = () => {
+        axios
+            .post(endpoint, data, {
+                onUploadProgress: ProgressEvent => {
+                    this.setState({
+                        loaded: (ProgressEvent.loaded / ProgressEvent.total * 100),
+                    })
+                },
+            })
+            .then(res => {
+                console.log(res.statusText)
+            })
+
+    }
+
+    handleKeyDown(event) {
+        switch (event.key) {
+            case 'Enter':
+                console.log("searching...");
+                // this.search();
+                break;
+        }
+    }
+
+    handleselectedFile = event => {
         this.setState({
-            query: this.search.value
-        });
-        console.log(this.state.query);
-        // this.setState({
-        //     query: this.search.value
-        // }, () => {
-        //     if (this.state.query && this.state.query.length > 1) {
-        //         if (this.state.query.length % 2 === 0) {
-        //             this.getResult()
-        //         }
-        //     } else if (!this.state.query) {
-        //     }
-        // })
+            selectedFile: event.target.files[0],
+            loaded: 0,
+        })
     }
 
     render() {
         return (
             <form>
-                <input
-                    placeholder="Search for..."
-                    ref={input => this.search = input}
-                    onChange={this.handleInputChange}
-                />
-                {/* <Suggestions results={this.state.results} /> */}
+                {/* <input
+                    {...this.attributes}
+                    type="text"
+                    ref={ref => (this.input = ref)}
+                    value={state.value}
+                    onChange={this.handleselectedFile}
+                /> */}
+                <input type="file" name="" id="" onChange={this.handleselectedFile} />
+                <button onClick={this.handleUpload}>Upload</button>
             </form>
         )
     }
 }
 
-export default Search
+export default SearchBar;
