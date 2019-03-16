@@ -5,6 +5,7 @@
   "kartik-v/bootstrap-fileinput": "dev-master",
   "dependencies": {
     "bootstrap-fileinput": "^4.5.2",
+    "concurrently": "^4.1.0",
     "mdbreact": "^4.11.0",
     "node-sass": "^4.11.0",
     "react": "^16.8.4",
@@ -12,12 +13,18 @@
     "react-dom": "^16.8.4",
     "react-dropzone": "^10.0.0",
     "react-file-drop": "^0.2.7",
+    "react-layer-stack": "^4.2.1",
+    "react-native": "^0.59.1",
+    "react-native-web": "^0.11.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.8",
     "superagent": "^4.1.0"
   },
   "scripts": {
+    "backend-install": "cd ../backend/ && npm install",
     "start": "react-scripts start",
+    "server": "cd ../backend/ && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -33,5 +40,6 @@
   ],
   "devDependencies": {
     "sass-loader": "^7.1.0"
-  }
+  },
+  "proxy": "http://localhost:8080/"
 }

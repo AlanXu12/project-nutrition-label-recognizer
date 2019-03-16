@@ -1,0 +1,10 @@
+.result-card {
+  align-content: center;
+}
+
+.result-card-img {
+  background-image: url('../media/sample-nutrition-label-ca.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 5%;
+}
