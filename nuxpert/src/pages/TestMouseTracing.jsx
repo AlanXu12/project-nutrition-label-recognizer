@@ -18,9 +18,44 @@ class TestMouseTracing extends Component {
         {name: "Protein", yMin: 252, yMax: 273 },
         {name: "Calories", yMin: 105, yMax: 126 }
       ],
-      curNutri: "Default"
+      curNutri: "Default",
+      resNutri: '',
+      resDetails: '',
+      post: '',
+      responseToPost: ''
     };
   }
+
+  // componentDidMount() {
+  //   console.log("componentDidMount is called...");
+  //   this.getNutriDetails()
+  //     .then(res => this.setState({ response: res.express }))
+  //     .catch(err => console.log(err));
+  // }
+
+  getNutriDetails = async () => {
+    const response = await fetch('/api/nutrient/fat/');
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    console.log("In getNutriDetails, body: ", body);
+    this.setState({
+      resNutri: body.name,
+      resDetails: body.details
+    });
+    console.log("this.state: ", this.state);
+  };
+  // handleSubmit = async e => {
+  //   e.preventDefault();
+  //   const response = await fetch('/api/world', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ post: this.state.post }),
+  //   });
+  //   const body = await response.text();
+  //   this.setState({ responseToPost: body });
+  // };
 
   _onMouseMove(e) {
     this.setState({
@@ -67,6 +102,9 @@ class TestMouseTracing extends Component {
           )
         })}
         <h1>{ this.state.curNutri }</h1>
+        <h1>{ this.state.resNutri }</h1>
+        <h1>{ this.state.resDetails }</h1>
+        <button onClick={this.getNutriDetails}>Test Keyword Search from Backend</button>
       </div>
     );
   }
