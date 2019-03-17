@@ -3,5 +3,6 @@ docker build -t node-app .
 docker run -p 8080:8080 -d --name node-app node-app
 sleep 5s
 docker logs node-app
-# docker run -p 8080:8080 -d --name node-app-1 node-app-1
-# docker logs node-app-1
+sleep 3s
+docker tag node-app gcr.io/kubernetes-221921/node-app:latest
+docker push gcr.io/kubernetes-221921/node-app
