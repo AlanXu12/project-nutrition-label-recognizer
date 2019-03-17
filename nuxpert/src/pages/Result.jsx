@@ -36,6 +36,9 @@ class Result extends Component {
       {name: "calories", yMin: 105, yMax: 126 }
     ],
     curNutri: "Default",
+    image: null,
+    imageHeight: 0,
+    imageWidth: 0
   }
 
   // turn redirect flag to true
@@ -75,19 +78,24 @@ class Result extends Component {
   // find the corresponding factor of the user's mouse click from the scan result(nutriRangeArr)
   displayNutriInfo = () => {
     // get the current size of the result picture to find the zooming in/out ratio
-    const zoomRatio = this.divElement.getBoundingClientRect().width / 300;
+    // const zoomRatio = this.divElement.getBoundingClientRect().width / 300;
+    const zoomRatio = this.divElement.getBoundingClientRect().width / this.state.imageWidth;
+    console.log("zoomRatio: ", zoomRatio);
+    console.log("nutriRangeArr: ", this.state.nutriRangeArr);
     // find the corresponding factor that the user clicked on
     this.state.nutriRangeArr.map((nutri) => {
       console.log("clicked X: ", this.state.x);
       console.log("clicked Y: ", this.state.y);
       console.log("relative Y: ", this.state.y / this.state.zoomRatio);
-      if (nutri.yMin <= (this.state.y / zoomRatio) && (this.state.y / zoomRatio) <= nutri.yMax) {
-        this.setState({
-          curNutri: nutri.name
-        });
-        console.log("new curNutri: ", nutri.name);
-        this.getNutriDetails(nutri.name);
-        return;
+      if ((typeof nutri) == "object") {
+        if (nutri.yMin <= (this.state.y / zoomRatio) && (this.state.y / zoomRatio) <= nutri.yMax) {
+          this.setState({
+            curNutri: nutri.name
+          });
+          console.log("new curNutri: ", nutri.name);
+          this.getNutriDetails(nutri.name);
+          return;
+        }
       }
     });
   }
@@ -96,15 +104,6 @@ class Result extends Component {
   componentDidMount() {
     const height = this.divElement.clientHeight;
     this.setState({ height });
-
-    // this.setState({
-    //   // elementHeight: this.divRef.clientHeight,
-    //   // TODO: elementWidth is not updating...
-    //   elementWidth: this.divRef.clientWidth,
-    //   zoomRatio: (this.divRef.clientWidth / 300)
-    //   // zoomRatio: (this.divRef.clientWidth / this.divRef.clientWidth)
-    //   // zoomRatio: (this.divRef.clientWidth / this.state.widthFromHome)
-    // });
   }
 
   // request backend for the current clicked factor's nutrition details and display the info
@@ -127,7 +126,14 @@ class Result extends Component {
 
   render() {
     // get all saved data
-    // console.log(this.props);
+    const prevState = this.props.location.state;
+    console.log(prevState);
+    this.setState({
+      nutriRangeArr: prevState.result,
+      image: prevState.image,
+      imageHeight: prevState.result.height,
+      imageWidth: prevState.result.width
+    });
 
     return (
       <div className="container">
@@ -143,7 +149,7 @@ class Result extends Component {
 
             <div className="card mb-4 bg-secondary border border-primary result-card">
               <div ref={ (divElement) => this.divElement = divElement } >
-                <img className="card-img-top" onClick={this.displayNutriInfo} onMouseMove={this._onMouseMove.bind(this)} src={sampleImg} alt="Nutrition Fact Table"></img>
+                <img className="card-img-top" onClick={this.displayNutriInfo} onMouseMove={this._onMouseMove.bind(this)} src={ this.state.image } alt="Nutrition Fact Table"></img>
               </div>
 
               <div className="card-body text-center">
