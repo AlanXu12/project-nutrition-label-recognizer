@@ -103,7 +103,7 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
                 vertice["xMax"] = xmax;
                 vertice["xMin"] = xmin;
                 // get rid off the '/' in some phrases like 'Iron/Fer'
-                json_result[nutrient.split("/")[0]] = vertice;
+                json_result[nutrient.split("/")[0].toLowerCase()] = vertice;
             }
             // console.log(detail);
         });

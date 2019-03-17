@@ -6,3 +6,4 @@ docker logs node-app
 sleep 3s
 docker tag node-app gcr.io/kubernetes-221921/node-app:latest
 docker push gcr.io/kubernetes-221921/node-app
+kubectl apply -f kubernetes/deployment.yaml
