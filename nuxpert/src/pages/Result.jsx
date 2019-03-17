@@ -127,7 +127,7 @@ class Result extends Component {
 
   render() {
     // get all saved data
-    // console.log(this.props);
+    console.log(this.props.location.state);
 
     return (
       <div className="container">

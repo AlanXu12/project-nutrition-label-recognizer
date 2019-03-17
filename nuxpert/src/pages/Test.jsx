@@ -9,25 +9,23 @@ class Test extends Component {
     redirect: false,
     someData: [1, 2]
   }
-  setRedirect = () => {
-    this.setState({
-      redirect: true
-    })
-  }
-  resultRedirect = () => {
-    if (this.state.redirect) {
-      return (
-        <Result someData={this.state.someData}/>
-      );
+
+  redirectResultPage = () => {
+    const location = {
+      pathname: '/result',
+      state: {
+        id: '123',
+        someData: this.state.someData
+      }
     }
+    this.props.history.push(location);
   }
 
   render() {
     console.log(this.state.someData);
     return (
       <div>
-        {this.resultRedirect()}
-        <button onClick={this.setRedirect}>To Result Page</button>
+        <button onClick={this.redirectResultPage}>To Result Page</button>
       </div>
     );
   }
