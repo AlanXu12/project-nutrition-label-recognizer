@@ -1,50 +1,55 @@
-import React, { Component } from 'react';
+
+import React from 'react';
 import './Search_bar.css'
 
-class Search extends Component {
-    state = {
-        query: '',
-        results: {}
+class SearchBar extends React.Component {
+    constructor() {
+        super();
+
+        this.state = { keyword: '', result: {} }
+
     }
 
-    // getResult = () => {
-    //     axios.get(`${API_URL}?api_key=${API_KEY}&prefix=${this.state.query}&limit=7`)
-    //         .then(({ data }) => {
-    //             this.setState({
-    //                 results: data.data
-    //             })
-    //         })
-    // }
-
-    handleInputChange = () => {
-        this.setState({
-            query: this.search.value
+    handleSearch = () => {
+        const url = `http://localhost:3000/api/search/keyword/${this.state.keyword}/`
+        fetch(url).then((response) => {
+            return response.json();
+        }).then((results) => {
+            if (results !== undefined) {
+                this.setState({ result: results })
+                //   cb(searchValue)
+            }
         });
-        console.log(this.state.query);
-        // this.setState({
-        //     query: this.search.value
-        // }, () => {
-        //     if (this.state.query && this.state.query.length > 1) {
-        //         if (this.state.query.length % 2 === 0) {
-        //             this.getResult()
-        //         }
-        //     } else if (!this.state.query) {
-        //     }
-        // })
+    }
+
+    handleKeyDown(event) {
+        if (event.key === 'Enter') {
+            console.log("searching...", this.state.keyword);
+            // this.search();
+        }
+    }
+
+    handleKeyword = event => {
+        event.preventDefault();
+        this.setState({
+            keyword: event.target,
+            loaded: 0,
+        })
     }
 
     render() {
         return (
             <form>
                 <input
-                    placeholder="Search for..."
-                    ref={input => this.search = input}
-                    onChange={this.handleInputChange}
+                    type="text"
+                    className="search"
+                    id="keywordSearch"
+                    placeholder="search by keyword"
                 />
-                {/* <Suggestions results={this.state.results} /> */}
+                <button onClick={this.handleKeyword}>Search</button>
             </form>
         )
     }
 }
 
-export default Search
+export default SearchBar;

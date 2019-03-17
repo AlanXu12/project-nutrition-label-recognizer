@@ -1,10 +1,11 @@
 const path = require('path');
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const app = express();
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
-
+app.use(fileUpload());
 app.use(express.static('static'));
 
 app.use(function (req, res, next){
@@ -41,8 +42,15 @@ var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 
 // upload image and return text
-app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
-    let path = req.file.path;
+app.post('/api/search/image', upload.single('image'), function (req, res, next) {
+    console.log("in search image.", req.files);
+    // req.files.mv(`${__dirname}/uploads/${req.files.name}`, function(err) {
+    //     if (err) {
+    //       return res.status(500).send(err);
+    //     }
+    // });
+    let path = req.files.image.tempFilePath;
+    console.log(path);
     let nutrients = [];
     client.textDetection(path).then(results => {
         let vertices = results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox.vertices;
