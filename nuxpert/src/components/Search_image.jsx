@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import FileDrop from 'react-file-drop';
 import axios from 'axios'
 import './Search_image.css'
+import Result from '../pages/Result.jsx'
 // Imports the Google Cloud client library.
 // const {Storage} = require('@google-cloud/storage');
 
@@ -26,16 +27,18 @@ import './Search_image.css'
 //   });
 
 export class Search_image extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            image: null
+            image: null,
+            result: {}
         }
     }
 
-    onFileSelect(e){
+    onFileSelect(e) {
         this.setState({
-            image: e.target.files[0]
+            image: e.target.files[0],
+            result: {}
         })
     }
 
@@ -44,21 +47,31 @@ export class Search_image extends Component {
         let fd = new FormData();
         fd.append('image', this.state.image);
         axios.post("http://localhost:8080/api/search/image/", fd)
-        .then(res => {
-            console.log(res);
-        })
-
+            .then(res => {
+                console.log(res.data);
+                this.setState({
+                    image: this.state.image,
+                    result: res.data
+                }
+                );
+                console.log("sending result to result page..", this.state.result);
+                return (
+                    <Result someData={this.state.result} />
+                );
+            })
+        
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div onSubmit={this.onFormSubmit}>
-                <input 
-                type="file" 
-                name="file" 
-                onChange={(e) => this.onFileSelect(e)}
-                encType="multipart/form-data"
-                ></input>
+                <input
+                    type="file"
+                    name="file"
+                    onChange={(e) => this.onFileSelect(e)}
+                    encType="multipart/form-data"
+                >
+                </input>
                 <button onClick={this.fileUploadHandler}>See Report</button>
             </div>
         )
