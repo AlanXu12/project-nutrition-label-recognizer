@@ -1,46 +1,37 @@
-// import PropTypes from 'prop-types';
 import axios from 'axios'
 import React from 'react';
 import './Search_bar.css'
-class SearchBar extends React.Component {
-    constructor(props) {
-        super(props);
 
-        this.state = { selectedFile: null, loaded: 0, }
+class SearchBar extends React.Component {
+    constructor() {
+        super();
+
+        this.state = { keyword: '', result: {} }
 
     }
 
-    handleUpload = () => {
-        const data = new FormData()
-        const endpoint = 'http://localhost:3000'
-        data.append('file', this.state.selectedFile, this.state.selectedFile.name)
-
-        axios
-            .post(endpoint, data, {
-                onUploadProgress: ProgressEvent => {
-                    this.setState({
-                        loaded: (ProgressEvent.loaded / ProgressEvent.total * 100),
-                    })
-                },
-            })
-            .then(res => {
-                console.log(res.statusText)
-            })
-
+    handleSearch = () => {
+        const url = `http://localhost:3000/api/search/keyword/${this.state.keyword}/`
+        fetch(url).then( (response) => {
+            return response.json();
+          }).then((results) => {
+            if(results != undefined){
+              this.setState({ result: results })
+            //   cb(searchValue)
+            }
+          });
     }
 
     handleKeyDown(event) {
-        switch (event.key) {
-            case 'Enter':
-                console.log("searching...");
-                // this.search();
-                break;
+        if (event.key == 'Enter') {
+            console.log("searching...", this.state.keyword);
+            // this.search();
         }
     }
 
-    handleselectedFile = event => {
+    handleKeyword = event => {
         this.setState({
-            selectedFile: event.target.files[0],
+            keyword: event.target,
             loaded: 0,
         })
     }
@@ -48,15 +39,15 @@ class SearchBar extends React.Component {
     render() {
         return (
             <form>
-                {/* <input
+                <input
                     {...this.attributes}
                     type="text"
                     ref={ref => (this.input = ref)}
-                    value={state.value}
+                    value={this.state.keyword}
                     onChange={this.handleselectedFile}
-                /> */}
-                <input type="file" name="" id="" onChange={this.handleselectedFile} />
-                <button onClick={this.handleUpload}>Upload</button>
+                />
+                {/* <input type="file" name="" id="" onChange={this.handleselectedFile} /> */}
+                <button onClick={this.handleUpload}>Search</button>
             </form>
         )
     }
