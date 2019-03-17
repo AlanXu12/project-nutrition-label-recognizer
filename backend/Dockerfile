@@ -20,8 +20,6 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="./JSON_Credential/kubernetes-11ff0109cbb4.js
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY package*.json ./
 
 COPY JSON_Credential ./JSON_Credential
@@ -30,8 +28,6 @@ RUN npm install
 
 # Bundle app source
 COPY . .
-
-# RUN export GOOGLE_APPLICATION_CREDENTIALS="/usr/src/app/JSON_Credential/kubernetes-11ff0109cbb4.json"
 
 EXPOSE 8080
 
