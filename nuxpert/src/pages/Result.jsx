@@ -23,29 +23,109 @@ class Result extends Component {
   state = {
     redirect: false,
     title: "Default Title",
-    details: "Defualt details Defualt details Defualt details Defualt details"
+    details: "Defualt details Defualt details Defualt details Defualt details",
+    x: 0,
+    y: 0,
+    nutriRangeArr: [
+      {name: "fat", yMin: 139, yMax: 156 },
+      {name: "sugars", yMin: 233, yMax: 249 },
+      {name: "sodium", yMin: 301, yMax: 319 },
+      {name: "protein", yMin: 252, yMax: 273 },
+      {name: "calories", yMin: 105, yMax: 126 }
+    ],
+    curNutri: "Default",
   }
+
+  // turn redirect flag to true
   setRedirect = () => {
     this.setState({
       redirect: true
     })
   }
+
+  // redirect to home page when user wants to scan a new page
   uploadNewRedirect = () => {
     if (this.state.redirect) {
       return <Redirect to='/' />
     }
   }
 
+  // update user selected factor's detail in detail displaying area
   updateDetails = () => {
     this.setState({
       title: "Some new title",
       details: "Some new details Some new details Some new details Some new details"
     });
+    console.log("curNutri: ", this.state.curNutri);
+    console.log(this.divElement.getBoundingClientRect().width);
   }
+
+  // get real-time coordinates of mouse
+  _onMouseMove(e) {
+    this.setState({
+      x: e.nativeEvent.offsetX,
+      y: e.nativeEvent.offsetY
+    });
+    // console.log("curX: ", this.state.x);
+    // console.log("curY: ", this.state.y);
+  }
+
+  // find the corresponding factor of the user's mouse click from the scan result(nutriRangeArr)
+  displayNutriInfo = () => {
+    // get the current size of the result picture to find the zooming in/out ratio
+    const zoomRatio = this.divElement.getBoundingClientRect().width / 300;
+    // find the corresponding factor that the user clicked on
+    this.state.nutriRangeArr.map((nutri) => {
+      console.log("clicked X: ", this.state.x);
+      console.log("clicked Y: ", this.state.y);
+      console.log("relative Y: ", this.state.y / this.state.zoomRatio);
+      if (nutri.yMin <= (this.state.y / zoomRatio) && (this.state.y / zoomRatio) <= nutri.yMax) {
+        this.setState({
+          curNutri: nutri.name
+        });
+        console.log("new curNutri: ", nutri.name);
+        this.getNutriDetails(nutri.name);
+        return;
+      }
+    });
+  }
+
+  // set the size of current rendered result image
+  componentDidMount() {
+    const height = this.divElement.clientHeight;
+    this.setState({ height });
+
+    // this.setState({
+    //   // elementHeight: this.divRef.clientHeight,
+    //   // TODO: elementWidth is not updating...
+    //   elementWidth: this.divRef.clientWidth,
+    //   zoomRatio: (this.divRef.clientWidth / 300)
+    //   // zoomRatio: (this.divRef.clientWidth / this.divRef.clientWidth)
+    //   // zoomRatio: (this.divRef.clientWidth / this.state.widthFromHome)
+    // });
+  }
+
+  // request backend for the current clicked factor's nutrition details and display the info
+  getNutriDetails = async (nutriName) => {
+    console.log("In getNutriDetails, nutriName: ", nutriName);
+    console.log("In getNutriDetails, url: ", '/api/nutrient/' + nutriName + '/');
+    const response = await fetch('/api/nutrient/' + nutriName + '/');
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    console.log("In getNutriDetails, body: ", body);
+    if (body) {
+      this.setState({
+        title: body.name,
+        details: body.details
+      });
+    }
+    console.log("this.state: ", this.state);
+  };
+
 
   render() {
     // get all saved data
-    console.log(this.props);
+    // console.log(this.props);
 
     return (
       <div className="container">
@@ -60,12 +140,9 @@ class Result extends Component {
           <div className="col-sm-12 col-md-7">
 
             <div className="card mb-4 bg-secondary border border-primary result-card">
-              {/* <ImageBackground className="card-img-top" source={sampleImg}>
-                <View>
-                  <Text>×</Text>
-                </View>
-              </ImageBackground> */}
-              <img className="card-img-top" src={sampleImg} alt="Nutrition Fact Table"></img>
+              <div ref={ (divElement) => this.divElement = divElement } >
+                <img className="card-img-top" onClick={this.displayNutriInfo} onMouseMove={this._onMouseMove.bind(this)} src={sampleImg} alt="Nutrition Fact Table"></img>
+              </div>
 
               <div className="card-body text-center">
                 {this.uploadNewRedirect()}
@@ -80,8 +157,8 @@ class Result extends Component {
             <div className="card bg-secondary border border-primary">
               <div className="card-body text-center">
                 <div className="container">
-                  <h5 className="card-title">{this.state.title}</h5>
-                  <p className="crad-text">{this.state.details}</p>
+                  <h2 className="card-title">{this.state.title}</h2>
+                  <p className="card-text text-left">{this.state.details}</p>
                 </div>
               </div>
             </div>
