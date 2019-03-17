@@ -34,8 +34,6 @@ class Result extends Component {
       {name: "calories", yMin: 105, yMax: 126 }
     ],
     curNutri: "Default",
-    elementWidth: 0,
-    zoomRatio: 1,
   }
 
   // turn redirect flag to true
@@ -58,9 +56,8 @@ class Result extends Component {
       title: "Some new title",
       details: "Some new details Some new details Some new details Some new details"
     });
-    console.log("elementWidth: ", this.state.elementWidth);
-    console.log("zoomRatio: ", this.state.zoomRatio);
     console.log("curNutri: ", this.state.curNutri);
+    console.log(this.divElement.getBoundingClientRect().width);
   }
 
   // get real-time coordinates of mouse
@@ -75,11 +72,14 @@ class Result extends Component {
 
   // find the corresponding factor of the user's mouse click from the scan result(nutriRangeArr)
   displayNutriInfo = () => {
+    // get the current size of the result picture to find the zooming in/out ratio
+    const zoomRatio = this.divElement.getBoundingClientRect().width / 300;
+    // find the corresponding factor that the user clicked on
     this.state.nutriRangeArr.map((nutri) => {
       console.log("clicked X: ", this.state.x);
       console.log("clicked Y: ", this.state.y);
       console.log("relative Y: ", this.state.y / this.state.zoomRatio);
-      if (nutri.yMin <= (this.state.y / this.state.zoomRatio) && (this.state.y / this.state.zoomRatio) <= nutri.yMax) {
+      if (nutri.yMin <= (this.state.y / zoomRatio) && (this.state.y / zoomRatio) <= nutri.yMax) {
         this.setState({
           curNutri: nutri.name
         });
@@ -92,13 +92,17 @@ class Result extends Component {
 
   // set the size of current rendered result image
   componentDidMount() {
-    this.setState({
-      // elementHeight: this.divRef.clientHeight,
-      elementWidth: this.divRef.clientWidth,
-      zoomRatio: (this.divRef.clientWidth / 300)
-      // zoomRatio: (this.divRef.clientWidth / this.divRef.clientWidth)
-      // zoomRatio: (this.divRef.clientWidth / this.state.widthFromHome)
-    });
+    const height = this.divElement.clientHeight;
+    this.setState({ height });
+
+    // this.setState({
+    //   // elementHeight: this.divRef.clientHeight,
+    //   // TODO: elementWidth is not updating...
+    //   elementWidth: this.divRef.clientWidth,
+    //   zoomRatio: (this.divRef.clientWidth / 300)
+    //   // zoomRatio: (this.divRef.clientWidth / this.divRef.clientWidth)
+    //   // zoomRatio: (this.divRef.clientWidth / this.state.widthFromHome)
+    // });
   }
 
   // request backend for the current clicked factor's nutrition details and display the info
@@ -136,7 +140,7 @@ class Result extends Component {
           <div className="col-sm-12 col-md-7">
 
             <div className="card mb-4 bg-secondary border border-primary result-card">
-              <div ref={ (element) => {this.divRef = element;} } >
+              <div ref={ (divElement) => this.divElement = divElement } >
                 <img className="card-img-top" onClick={this.displayNutriInfo} onMouseMove={this._onMouseMove.bind(this)} src={sampleImg} alt="Nutrition Fact Table"></img>
               </div>
 
