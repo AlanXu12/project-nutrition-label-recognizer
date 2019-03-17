@@ -4,15 +4,16 @@ import './Home.css'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import SearchBar from '../components/Search_bar'
-import Intro from '../components/Intro'
 import SearchImage from '../components/Search_image'
+import Intro from '../components/Intro'
+// import SearchImage from '../components/Search_image'
 class Home extends Component {
-    
+
     state = {
         image: 'user uploaded file',
         report: 'genearted report'
     }
-    
+
     handleDrop = (files, event) => {
         console.log(files, event);
     }
@@ -30,7 +31,8 @@ class Home extends Component {
                 <SearchBar />
                 <br></br>
                 {/* drag and drop upload */}
-                <SearchImage />
+                {/* <SearchImage /> */}    
+                <SearchImage />            
             </div>
         );
     }
@@ -38,6 +40,6 @@ class Home extends Component {
 
 export default Home;
 
-                // credit: 
+                // credit:
                 // react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
 // drag and drop: http://react-dnd.github.io/react-dnd/about
