@@ -17,6 +17,8 @@ import NavBar from '../components/Navigation.jsx';
 
 import sampleImg from '../media/sample-nutrition-label-ca.png';
 
+import CreditPortal from '../components/CreditPortal.jsx';
+
 
 class Result extends Component {
 
@@ -166,6 +168,9 @@ class Result extends Component {
           </div>
 
         </div>
+
+        <CreditPortal />
+
 
       </div>
     );
