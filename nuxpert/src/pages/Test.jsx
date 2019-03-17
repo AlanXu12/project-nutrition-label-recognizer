@@ -18,6 +18,7 @@ class Test extends Component {
         someData: this.state.someData
       }
     }
+    console.log(this.props);
     this.props.history.push(location);
   }
 
