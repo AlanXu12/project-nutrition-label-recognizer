@@ -10,7 +10,6 @@
     "concurrently": "^4.1.0",
     "cors": "^2.8.5",
     "express-fileupload": "^1.1.3-alpha.1",
-    "license-checker": "^25.0.1",
     "mdbreact": "^4.11.0",
     "node-sass": "^4.11.0",
     "react": "^16.8.4",
@@ -34,8 +33,7 @@
     "dev": "concurrently \"npm run server\" \"npm run start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "licensecheck": "license-check"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,21 +45,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "license-check": "^1.1.5",
     "sass-loader": "^7.1.0"
-  },
-  "license-check-config": {
-    "src": [
-      "test/ ** / *",
-      "src/ ** / *.js",
-      "/usr/lib",
-      "./src/index.js",
-      "!./node_modules/ ** / *"
-    ],
-    "path": "assets/header.txt",
-    "blocking": false,
-    "logInfo": false,
-    "logError": true
   },
   "proxy": "http://localhost:8080/"
 }

@@ -5,19 +5,6 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-var license = require('license-check');
- 
-license.check({
-    src: [
-        '**/*',
-        '/usr/lib',
-        '!./node_modules/**/*'
-    ],
-    path: "assets/header.txt",
-    blocking: false,
-    logInfo: false,
-    logError: true
-});
 
 
 ReactDOM.render(<App />, document.getElementById('root'));
