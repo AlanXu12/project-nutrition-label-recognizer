@@ -27,11 +27,11 @@ class Result extends Component {
     x: 0,
     y: 0,
     nutriRangeArr: [
-      {name: "Fat", yMin: 139, yMax: 156 },
-      {name: "Sugar", yMin: 233, yMax: 249 },
-      {name: "Sodium", yMin: 301, yMax: 319 },
-      {name: "Protein", yMin: 252, yMax: 273 },
-      {name: "Calories", yMin: 105, yMax: 126 }
+      {name: "fat", yMin: 139, yMax: 156 },
+      {name: "sugars", yMin: 233, yMax: 249 },
+      {name: "sodium", yMin: 301, yMax: 319 },
+      {name: "protein", yMin: 252, yMax: 273 },
+      {name: "calories", yMin: 105, yMax: 126 }
     ],
     curNutri: "Default",
     elementWidth: 0,
@@ -84,6 +84,7 @@ class Result extends Component {
           curNutri: nutri.name
         });
         console.log("new curNutri: ", nutri.name);
+        this.getNutriDetails(nutri.name);
         return;
       }
     });
@@ -99,6 +100,23 @@ class Result extends Component {
       // zoomRatio: (this.divRef.clientWidth / this.state.widthFromHome)
     });
   }
+
+  // request backend for the current clicked factor's nutrition details and display the info
+  getNutriDetails = async (nutriName) => {
+    console.log("In getNutriDetails, nutriName: ", nutriName);
+    console.log("In getNutriDetails, url: ", '/api/nutrient/' + nutriName + '/');
+    const response = await fetch('/api/nutrient/' + nutriName + '/');
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    console.log("In getNutriDetails, body: ", body);
+    if (body) {
+      this.setState({
+        title: body.name,
+        details: body.details
+      });
+    }
+    console.log("this.state: ", this.state);
+  };
 
 
   render() {
@@ -135,8 +153,8 @@ class Result extends Component {
             <div className="card bg-secondary border border-primary">
               <div className="card-body text-center">
                 <div className="container">
-                  <h5 className="card-title">{this.state.title}</h5>
-                  <p className="crad-text">{this.state.details}</p>
+                  <h2 className="card-title">{this.state.title}</h2>
+                  <p className="card-text text-left">{this.state.details}</p>
                 </div>
               </div>
             </div>
