@@ -68,6 +68,8 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         // console.log(nutrients);
         let json_result = {};
         let keywords = results[0].textAnnotations.slice(1);
+        let width = results[0].fullTextAnnotation.pages[0].width;
+        let height = results[0].fullTextAnnotation.pages[0].height;
         nutrients.forEach(function(nutrient) {
             // basic scenario
             let detail = keywords.filter(keyword => keyword.description == nutrient);
@@ -87,11 +89,26 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
 
             // pack the nutrient with the coordinates
             if (detail.length != 0){
+                let vertices = detail[0].boundingPoly.vertices;
+                let ymin = height, ymax = 0, xmin = width, xmax = 0;
+                vertices.forEach(function(vertice) {
+                    if (vertice.x > xmax) xmax = vertice.x;
+                    if (vertice.x < xmin) xmin = vertice.x;
+                    if (vertice.y > ymax) ymax = vertice.y;
+                    if (vertice.y < ymin) ymin = vertice.y;
+                });
+                let vertice = {};
+                vertice["yMax"] = ymax;
+                vertice["yMin"] = ymin;
+                vertice["xMax"] = xmax;
+                vertice["xMin"] = xmin;
                 // get rid off the '/' in some phrases like 'Iron/Fer'
-                json_result[nutrient.split("/")[0]] = detail[0].boundingPoly.vertices;
+                json_result[nutrient.split("/")[0]] = vertice;
             }
             // console.log(detail);
         });
+        json_result['width'] = width;
+        json_result['height'] = height;
         // console.log(json_result);
         // return res.json(results[0]);
         return res.json(json_result);
