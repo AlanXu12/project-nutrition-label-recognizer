@@ -31,19 +31,29 @@ export class Search_image extends Component {
         super(props);
         this.state = {
             image: null,
-            result: {}
+            result: {},
+            redirect: false
         }
     }
 
     onFileSelect(e) {
         this.setState({
             image: e.target.files[0],
-            result: {}
+            result: {},
+            redirect: false
         })
     }
 
+
+    resultRedirect = () => {
+        if (this.state.redirect) {
+            return (
+                <Result someData={this.state.result} />
+            );
+        }
+    }
+
     fileUploadHandler = () => {
-        console.log("sending file to the backend");
         let fd = new FormData();
         fd.append('image', this.state.image);
         axios.post("http://localhost:8080/api/search/image/", fd)
@@ -51,20 +61,20 @@ export class Search_image extends Component {
                 console.log(res.data);
                 this.setState({
                     image: this.state.image,
-                    result: res.data
-                }
-                );
+                    result: res.data,
+                    redirect: true
+                });
                 console.log("sending result to result page..", this.state.result);
-                return (
-                    <Result someData={this.state.result} />
-                );
-            })
-        
+                // return (
+                //     <Result someData={this.state.result} />
+                // );
+            });
     }
 
     render() {
         return (
             <div onSubmit={this.onFormSubmit}>
+            {this.resultRedirect()}
                 <input
                     type="file"
                     name="file"
@@ -72,6 +82,7 @@ export class Search_image extends Component {
                     encType="multipart/form-data"
                 >
                 </input>
+                
                 <button onClick={this.fileUploadHandler}>See Report</button>
             </div>
         )
