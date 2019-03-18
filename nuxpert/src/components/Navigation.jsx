@@ -4,7 +4,7 @@ class Navigation extends Component {
     render() {
         return (
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-                <a className="navbar-brand logo" href="/"></a>
+                <div className="navbar-brand logo" ></div>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
                     <span className="navbar-toggler-icon"></span>
                 </button>
