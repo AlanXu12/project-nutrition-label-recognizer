@@ -31,16 +31,16 @@ class Home extends Component {
     }
 
 
-    resultRedirect = () => {
-        console.log("props:", this.props);
-        if (this.state.redirect) {
-            const location = {
-                pathname: '/result',
-                state: this.state
-            }
-            this.props.history.push(location);
-        }
-    }
+    // resultRedirect = () => {
+    //     console.log("props:", this.props);
+    //     if (this.state.redirect) {
+    //         const location = {
+    //             pathname: '/result',
+    //             state: this.state
+    //         }
+    //         this.props.history.push(location);
+    //     }
+    // }
 
     fileUploadHandler = () => {
         let fd = new FormData();
@@ -60,6 +60,7 @@ class Home extends Component {
                     state: this.state
                 }
                 this.props.history.push(location);
+                // this.props.navigate('Result');
             });
     }
 
