@@ -40,17 +40,12 @@ let dbUrl = "mongodb+srv://c09Viewer:viewer123@mongo-r9zv2.gcp.mongodb.net/test?
 
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
+var fs = require('fs');
 
 // upload image and return text
 app.post('/api/search/image', upload.single('image'), function (req, res, next) {
-    console.log("in search image.", req.files);
-    // req.files.mv(`${__dirname}/uploads/${req.files.name}`, function(err) {
-    //     if (err) {
-    //       return res.status(500).send(err);
-    //     }
-    // });
-    let path = req.files.image.tempFilePath;
-    console.log(path);
+    let path = 'uploads/' + req.files.image.md5;
+    fs.writeFile(path, (Buffer.from(req.files.image.data)).toString('binary'),  "binary",function(err) { });
     let nutrients = [];
     client.textDetection(path).then(results => {
         let vertices = results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox.vertices;
