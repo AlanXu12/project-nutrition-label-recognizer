@@ -49,25 +49,6 @@ class Result extends Component {
     console.log(this.state);
   }
 
-  // state = {
-  //   redirect: false,
-  //   title: "Default Title",
-  //   details: "Defualt details Defualt details Defualt details Defualt details",
-  //   x: 0,
-  //   y: 0,
-  //   nutriRangeArr: [
-  //     {name: "fat", yMin: 139, yMax: 156 },
-  //     {name: "sugars", yMin: 233, yMax: 249 },
-  //     {name: "sodium", yMin: 301, yMax: 319 },
-  //     {name: "protein", yMin: 252, yMax: 273 },
-  //     {name: "calories", yMin: 105, yMax: 126 }
-  //   ],
-  //   curNutri: "Default",
-  //   image: null,
-  //   imageHeight: 0,
-  //   imageWidth: 0
-  // }
-
   // turn redirect flag to true
   setRedirect = () => {
     this.setState({
@@ -149,7 +130,7 @@ class Result extends Component {
     //     }
     //   }
     // });
-    
+
   }
 
   // set the size of current rendered result image
