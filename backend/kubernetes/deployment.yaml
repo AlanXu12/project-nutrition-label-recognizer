@@ -9,23 +9,33 @@ spec:
       labels:
         app: node-app
     spec:
+      volumes:
+      - name: gcloud-key
+        secret:
+          secretName: cloudvision-key
       containers:
         - name: node-app
           image: gcr.io/kubernetes-221921/node-app:latest
+          volumeMounts:
+          - name: gcloud-key
+            mountPath: /var/secrets/google
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
           ports:
             - containerPort: 8080
 
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: node-app-service
-spec:
-  selector:
-    app: node-app
-  ports:
-    - protocol: "TCP"
-      port: 8080
-      targetPort: 8080
-      nodePort: 30000
-  type: LoadBalancer
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: node-app-service
+# spec:
+#   selector:
+#     app: node-app
+#   ports:
+#     - protocol: "TCP"
+#       port: 8080
+#       targetPort: 8080
+#       nodePort: 30000
+#   type: LoadBalancer

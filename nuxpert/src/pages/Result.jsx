@@ -110,7 +110,7 @@ class Result extends Component {
     console.log("zoomRatio: ", zoomRatio);
     console.log("nutriRangeArr: ", this.state.nutriRangeArr);
     // find the corresponding factor that the user clicked on
-    console.log(typeof nutriRangeArr);
+    // console.log(typeof nutriRangeArr);
     const nutrients = this.state.nutriRangeArr;
     Object.keys(nutrients).some((nutrient, index) => {
       // console.log("clicked X: ", this.state.x);
@@ -182,7 +182,7 @@ class Result extends Component {
 
   render() {
 
-    console.log("In render(): ", this.state);
+    // console.log("In render(): ", this.state);
 
     return (
       <div className="container">

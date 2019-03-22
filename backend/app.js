@@ -26,11 +26,60 @@ var Nutrient = (function(){
     };
 }());
 
+var User = (function(){
+    return function item(user){
+        this.username = user.username;
+        this.password = user.password;
+    };
+}());
+
+// security dependency
+const cookie = require('cookie');
+const crypto = require('crypto');
+const validator = require('validator');
+
+function generateSalt (){
+    return crypto.randomBytes(16).toString('base64');
+}
+
+function generateHash (password, salt){
+    var hash = crypto.createHmac('sha512', salt);
+    hash.update(password);
+    return hash.digest('base64');
+}
+
+const session = require('express-session');
+app.use(session({
+    secret: 'please change this secret',
+    resave: false,
+    saveUninitialized: true,
+}));
+
+let isAuthenticated = function(req, res, next) {
+    if (!req.username) return res.status(401).end("access denied");
+    next();
+};
+
+var checkUsername = function(req, res, next) {
+    if (!validator.isAlphanumeric(req.body.username)) return res.status(400).end("bad input");
+    next();
+};
+
+var sanitizeContent = function(req, res, next) {
+    req.body.content = validator.escape(req.body.content);
+    next();
+};
+
+var checkId = function(req, res, next) {
+    if (!validator.isAlphanumeric(req.params.id)) return res.status(400).end("bad input");
+    next();
+};
 
 let mongoClient = require('mongodb').MongoClient;
 // let dbUrl = "mongodb://" + process.env.IPADDRESS + ":27017/cscc09";
 // let olddbUrl = "mongodb://localhost:27017/mydb";
-let dbUrl = "mongodb+srv://c09Viewer:viewer123@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
+// let dbUrl = "mongodb+srv://c09Viewer:viewer123@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
+let dbUrl = "mongodb+srv://conner:8G0BOdeTu2gzNLyb@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
 // mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
 //     if (err) return res.status(500).end(err);
 //     let nutrients = db.db('cscc09').collection('nutrients');
@@ -41,9 +90,86 @@ let dbUrl = "mongodb+srv://c09Viewer:viewer123@mongo-r9zv2.gcp.mongodb.net/test?
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var fs = require('fs');
+const nodemailer = require("nodemailer");
+
+async function sendEmail(){
+
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    let account = await nodemailer.createTestAccount();
+  
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: account.user, // generated ethereal user
+        pass: account.pass // generated ethereal password
+      }
+    });
+  
+    // setup email data with unicode symbols
+    let mailOptions = {
+      from: '"Fred Foo 👻" <foo@example.com>', // sender address
+      to: "ssy543030341@hotmail.com", // list of receivers
+      subject: "Hello ✔", // Subject line
+      text: "Hello world?", // plain text body
+      html: "<b>Hello world?</b>" // html body
+    };
+  
+    console.log('hhhhh');
+    // send mail with defined transport object
+    let info = await transporter.sendMail(mailOptions)
+    console.log('done');
+    console.log("Message sent: %s", info.messageId);
+    // Preview only available when sending through an Ethereal account
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  
+    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+}
+  
+// sendEmail().catch(console.error);
+
+// user management
+// var emailVerification = function(email) {
+    
+// };
+
+// sign up
+app.post('/signup/', function (req, res, next) {
+    let username = req.body.username;
+    let password = req.body.password;
+    let email = req.body.email;
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let users = db.db('cscc09').collection('users');   
+        // console.log(username);
+        users.findOne({username: username}, {projection: {_id: 0, username: 1}}, function(err, user) {
+            if (err) return res.status(500).end(err.message);
+            // if (user) return res.status(409).end("username " + username + " already exists");
+            let salt = generateSalt();
+            let hash = generateHash(password, salt);
+            // update the db
+            users.updateOne({username: username},{ $set: {username: username, hash: hash, salt: salt}}, {upsert: true}, function(err){
+                if (err) return res.status(500).end(err.message);
+                // initialize cookie
+                // res.setHeader('Set-Cookie', cookie.serialize('username', username, {
+                //       path : '/', 
+                //       maxAge: 60 * 60 * 24 * 7
+                // }));
+                db.close();
+                return res.json("user " + username + " signed up");
+            });            
+        });
+    });
+});
+
 
 // upload image and return text
 app.post('/api/search/image', upload.single('image'), function (req, res, next) {
+    // save the file into uploads dir
     let path = 'uploads/' + req.files.image.md5;
     fs.writeFile(path, (Buffer.from(req.files.image.data)).toString('binary'),  "binary",function(err) { });
     let nutrients = [];
@@ -125,7 +251,7 @@ app.post('/api/search/image', upload.single('image'), function (req, res, next) 
 // need to update the method
 app.get('/api/nutrient/:name/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err);
+        if (err) return res.status(500).end(err.message);
         let nutrients = db.db('cscc09').collection('nutrients');
         // need to update the Item(req.body)
         // nutrients.find().toArray(function(err, nutrient) {      
@@ -147,14 +273,14 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
 
 app.post('/api/nutrients/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err);
+        if (err) return res.status(500).end(err.message);
         // console.log(db.db('cscc09'));
         // console.log(typeof db);
         let nutrients = db.db('cscc09').collection('nutrients');
         // need to update the Item(req.body)
         console.log(new Nutrient(req.body));
         nutrients.insertOne(new Nutrient(req.body), function(err, nutrient) {
-            if (err) return res.status(500).end(err);
+            if (err) return res.status(500).end(err.message);
             // Finish up test
             db.close();
             if(nutrient.insertedCount == 1) return res.json(req.body);
