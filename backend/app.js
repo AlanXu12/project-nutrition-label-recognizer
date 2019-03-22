@@ -100,28 +100,30 @@ async function sendEmail(){
   
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
+      host: "smtp.live.com",
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: account.user, // generated ethereal user
-        pass: account.pass // generated ethereal password
+        user: "ssy543030341@hotmail.com", // generated ethereal user
+        pass: "Ssy011211" // generated ethereal password
       }
     });
+    var text = "";
+    for (var i = 0; i < 5; i++)
+        text += Math.floor(Math.random() * possible.length);
+
   
     // setup email data with unicode symbols
     let mailOptions = {
-      from: '"Fred Foo 👻" <foo@example.com>', // sender address
-      to: "ssy543030341@hotmail.com", // list of receivers
+      from: 'ssy543030341@hotmail.com', // sender address
+      to: "conner_s223@outlook.com", // list of receivers
       subject: "Hello ✔", // Subject line
-      text: "Hello world?", // plain text body
-      html: "<b>Hello world?</b>" // html body
+    //   text: "Hello world?", // plain text body
+      html: "<b>This verification code is </b>" // html body
     };
   
-    console.log('hhhhh');
     // send mail with defined transport object
     let info = await transporter.sendMail(mailOptions)
-    console.log('done');
     console.log("Message sent: %s", info.messageId);
     // Preview only available when sending through an Ethereal account
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
@@ -136,6 +138,19 @@ async function sendEmail(){
 // var emailVerification = function(email) {
     
 // };
+
+// randomly generate the verifacation code
+function makeCode(length) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < length; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+  
+console.log(makeCode(5));
 
 // sign up
 app.post('/signup/', function (req, res, next) {
