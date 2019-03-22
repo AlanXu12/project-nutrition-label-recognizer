@@ -3,50 +3,43 @@ import React from 'react';
 import './Search_bar.css'
 
 class SearchBar extends React.Component {
-    constructor() {
-        super();
-
-        this.state = { keyword: '', result: {} }
-
-    }
+    state = {
+        query: "",
+        result: {}
+    };
 
     handleSearch = () => {
-        const url = `http://localhost:3000/api/search/keyword/${this.state.keyword}/`
-        fetch(url).then((response) => {
-            return response.json();
-        }).then((results) => {
-            if (results !== undefined) {
-                this.setState({ result: results })
-                //   cb(searchValue)
-            }
-        });
+        console.log("searching...", this.state.query);
+        // fetch(url).then((response) => {
+        //     return response.json();
+        // }).then((results) => {
+        //     if (results !== undefined) {
+        //         this.setState({ result: results })
+        //         //   cb(searchValue)
+        //     }
+        // });
     }
+    
+    handleInputChange = event => {
+        const query = event.target.value;
 
-    handleKeyDown(event) {
-        if (event.key === 'Enter') {
-            console.log("searching...", this.state.keyword);
-            // this.search();
-        }
-    }
-
-    handleKeyword = event => {
-        event.preventDefault();
         this.setState({
-            keyword: event.target,
-            loaded: 0,
-        })
-    }
+            query: query,
+            result:{}
+        });
+        console.log("searching...", this.state.query);
+    };
 
     render() {
         return (
             <form>
                 <input
-                    type="text"
-                    className="search"
-                    id="keywordSearch"
-                    placeholder="search by keyword"
+                    placeholder="Search for..."
+                    className="search-form"
+                    value={this.state.query}
+                    onChange={this.handleInputChange}
                 />
-                <button onClick={this.handleKeyword}>Search</button>
+                <button onClick={this.handleSearch}>Search</button>
             </form>
         )
     }
