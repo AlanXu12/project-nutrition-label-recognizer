@@ -152,6 +152,28 @@ function makeCode(length) {
   
 console.log(makeCode(5));
 
+// make pdf part
+const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
+const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// cited page: https://github.com/bpampuch/pdfmake/blob/0.1/dev-playground/server.js
+app.get('/api/pdf', function (req, res) {
+    var docDefinition = {
+        content: [
+            'First paragraph',
+            'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
+        ]
+    };
+
+    const pdfDoc = pdfMake.createPdf(docDefinition);
+
+    pdfDoc.getBase64((data) => {
+        res.contentType('application/pdf');
+        const download = Buffer.from(data.toString('utf-8'), 'base64');
+        res.end(download);
+    });
+});
+
 // sign up
 app.post('/signup/', function (req, res, next) {
     let username = req.body.username;
@@ -183,7 +205,7 @@ app.post('/signup/', function (req, res, next) {
 
 
 // upload image and return text
-app.post('/api/search/image', upload.single('image'), function (req, res, next) {
+app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
     // save the file into uploads dir
     let path = 'uploads/' + req.files.image.md5;
     fs.writeFile(path, (Buffer.from(req.files.image.data)).toString('binary'),  "binary",function(err) { });
