@@ -9,9 +9,9 @@ class SignUpForm extends Component {
     errorMsg: '',
   }
 
-  // helper function for sending signup/signin info to backend
-  sendPostRequest = async (username, password, url) => {
-    const response = await fetch(url, {
+  // helper function for sending signup info to backend
+  sendSignUpRequest = async (username, password) => {
+    const response = await fetch('/signup/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -25,7 +25,31 @@ class SignUpForm extends Component {
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     if (body) {
-      // TODO: update / redirect to some page depending on what request was done
+      // TODO: update / redirect to some page
+      // this.setState({
+      //
+      // });
+      console.log("Successfully get response from backend...");
+    }
+  };
+
+  // helper function for sending signin info to backend
+  sendSignUpRequest = async (username, password) => {
+    const response = await fetch('/signin/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      })
+    });
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    if (body) {
+      // TODO: update / redirect to some page
       // this.setState({
       //
       // });
@@ -50,7 +74,7 @@ class SignUpForm extends Component {
       }
       // send username and password to the backend
       console.log(username, password, passwordConfirmation);
-      this.sendPostRequest(username, password, '/signup/');
+      this.sendSignUpRequest(username, password);
     };
 
     // the handler function for login
@@ -60,7 +84,7 @@ class SignUpForm extends Component {
       const username = data.username;
       const password = data.password;
       // send username and password to the backend
-      this.sendPostRequest(username, password, '/signin/');
+      this.sendSignInRequest(username, password);
     };
 
     // the handler function for password recovering
