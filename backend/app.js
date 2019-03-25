@@ -8,6 +8,9 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(express.static('static'));
 
+const cors = require('cors');
+app.use(cors());
+
 app.use(function (req, res, next){
     console.log("HTTP request", req.method, req.url, req.body);
     next();
@@ -105,12 +108,12 @@ async function sendEmail(){
       secure: false, // true for 465, false for other ports
       auth: {
         user: "ssy543030341@hotmail.com", // generated ethereal user
-        pass: "Ssy011211" // generated ethereal password
+        pass: "******" // generated ethereal password
       }
     });
-    var text = "";
-    for (var i = 0; i < 5; i++)
-        text += Math.floor(Math.random() * possible.length);
+    // var text = "";
+    // for (var i = 0; i < 5; i++)
+    //     text += Math.floor(Math.random() * possible.length);
 
   
     // setup email data with unicode symbols
@@ -218,14 +221,17 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         // console.log(results[0].textAnnotations[0].description);
 
         // find all the nutrients detected by Google Vision API
-        let raw = results[0].textAnnotations[0].description.split("\n").filter(phrase => !(/^\d+$/.test(phrase)) && !(/pour/.test(phrase)) && !(/Per/.test(phrase)) && (/\d/.test(phrase)) && !(/%/.test(phrase)));
+        let raw = results[0].textAnnotations[0].description.split("\n").filter(phrase => (!(/^\d+$/.test(phrase)) && !(/pour/.test(phrase)) && !(/Per/.test(phrase)) && !(/%/.test(phrase))) && ((/\d/.test(phrase)) || (/o+O/.test(phrase))));
         // handle the situation where the detected looks like this --- Iron/Fer, in long-text spliting
         let eng_fr = raw.filter(phrase => /\w\/\w/.test(phrase));
         raw.forEach(function(phrase) {
             // console.log(phrase);
             let basic = phrase.split("/")[0];
-            let filtered = basic.split(/(\d+)/)[0].trim()
-            if (filtered != "Calories") nutrients.push(filtered);
+            // console.log(phrase);
+            let remove_total_filtered = basic.replace("Total", "");
+            let further_filtered = remove_total_filtered.split(/(\d+)/)[0].trim()
+            // console.log(remove_total_filtered);
+            if (further_filtered != "Calories" && further_filtered != "Includes") nutrients.push(further_filtered);
         });
         eng_fr.forEach(function(phrase) {
             if(phrase.split(" ")[0].includes("/")) nutrients.push(phrase.split(" ")[0]);
@@ -275,8 +281,12 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         });
         json_result['width'] = width;
         json_result['height'] = height;
-        // console.log(json_result);
+        console.log(raw);
         // return res.json(results[0]);
+        // console.log(nutrients);
+        // console.log(json_result);
+        return res.json(results[0].textAnnotations[0].description.split("\n"));
+        // return res.json(nutrients);
         return res.json(json_result);
         // return res.json(results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox);
         // labels.forEach(label => console.log(label.description));
