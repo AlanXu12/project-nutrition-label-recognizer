@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: node-app
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      volumes:
+      - name: gcloud-key
+        secret:
+          secretName: cloudvision-key
+      containers:
+        - name: node-app
+          image: gcr.io/kubernetes-221921/node-app:latest
+          volumeMounts:
+          - name: gcloud-key
+            mountPath: /var/secrets/google
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
+          ports:
+            - containerPort: 8080
+
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: node-app-service
+# spec:
+#   selector:
+#     app: node-app
+#   ports:
+#     - protocol: "TCP"
+#       port: 8080
+#       targetPort: 8080
+#       nodePort: 30000
+#   type: LoadBalancer
+
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "node-app-service"
+  namespace: "default"
+  labels:
+    app: "node-app"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: "node-app"
+  type: "ClusterIP"

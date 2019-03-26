@@ -10,3 +10,4 @@ db
 
 # JSON Credential
 JSON_Credential
+*.txt

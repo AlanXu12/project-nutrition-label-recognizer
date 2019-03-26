@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
 import './App.css';
-import Home from './pages/Home.jsx'
+import Home from './pages/Home.jsx';
 import Result from './pages/Result';
-import Test from './pages/Test.jsx'
-import TestMouseTracing from './pages/TestMouseTracing.jsx'
-import Credit from './pages/Credit.jsx'
 import Search from './pages/Search';
+import Test from './pages/Test.jsx';
+import TestMouseTracing from './pages/TestMouseTracing.jsx';
+import Credit from './pages/Credit.jsx';
+import SignUp from './pages/SignUp.jsx';
 
 class App extends Component {
   render() {
@@ -19,6 +20,7 @@ class App extends Component {
           <Route exact path="/tmt" component = {TestMouseTracing}/>
           <Route exact path="/credit" component = {Credit}/>
           <Route exact path="/search" component = {Search}/>
+          <Route exact path="/signup" component = {SignUp}/>
         </div>
       </Router>
     );
