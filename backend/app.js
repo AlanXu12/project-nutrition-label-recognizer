@@ -333,44 +333,29 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
     });
 });
 
-// need to update the method
-app.get('/api/fuzzy/nutrient/', function (req, res, next) {
-    // mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-    //     if (err) return res.status(500).end(err.message);
-    //     let nutrients = db.db('cscc09').collection('nutrients');
-    //     nutrients.findOne({name: req.params.name}, {projection: {_id: 0, name: 1, details: 1}}, function(err, nutrient) {
-    //         db.close();
-    //         return res.json(nutrient);
-    //     });
-    // });
-    let lst = [
-                {
-                    name: "carbohydrate"
-                },
-                {
-                    name: "fiber"
-                },
-                {
-                    name: "sodium"
-                },
-                {
-                    name: "selenium"
-                }
-            ];
-    var options = {
-        shouldSort: true,
-        threshold: 0.6,
-        location: 0,
-        distance: 100,
-        maxPatternLength: 32,
-        minMatchCharLength: 1,
-        keys: [
-            "name"
-        ]
-    };
-    var fuse = new Fuse(lst, options); // "list" is the item array
-    var result = fuse.search("soi");
-    return res.json(result);
+app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let nutrients = db.db('cscc09').collection('nutrients');
+        nutrients.find().project({_id: 0, name: 1, details: 1}).toArray(function(err, nutrients_lst) {
+            db.close();
+            // need to update the config
+            let options = {
+                shouldSort: true,
+                threshold: 0.6,
+                location: 0,
+                distance: 100,
+                maxPatternLength: 32,
+                minMatchCharLength: 1,
+                keys: [
+                    "name"
+                ]
+            };
+            var fuse = new Fuse(nutrients_lst, options);
+            var result = fuse.search(req.params.keyword);     
+            return res.json(result);   
+        });
+    });
 });
 
 
