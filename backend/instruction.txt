@@ -1,5 +1,0 @@
-Check Docker Container IP:
-    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
-
-docker run --name mongodb -d mongo
-    (docker run -d -p 27017:27017 mongo)
