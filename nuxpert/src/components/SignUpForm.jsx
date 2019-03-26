@@ -34,7 +34,7 @@ class SignUpForm extends Component {
   };
 
   // helper function for sending signin info to backend
-  sendSignUpRequest = async (username, password) => {
+  sendSignInRequest = async (username, password) => {
     const response = await fetch('/signin/', {
       method: 'POST',
       headers: {
@@ -105,6 +105,7 @@ class SignUpForm extends Component {
           handleRecoverPassword={recoverPasswordWasClickedCallback}
           submitLoginCustomLabel="Login"
           recoverPasswordCustomLabel="Forget password"
+          goToLoginCustomLabel="cancel"
         />
       </div>
     );
