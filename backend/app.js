@@ -18,9 +18,15 @@ app.use(function (req, res, next){
 
 // Imports the Google Cloud client library
 const vision = require('@google-cloud/vision');
-
-// Creates a client
+// Creates a GCP vision client
 const client = new vision.ImageAnnotatorClient();
+// google-cloud storage
+const {Storage} = require('@google-cloud/storage');
+// Creates a gcp storage client
+const storage = new Storage();
+// The name for the bucket
+const bucketName = 'nuxpert';
+
 
 var Nutrient = (function(){
     return function item(nutrient){
@@ -156,6 +162,24 @@ function makeCode(length) {
   
 console.log(makeCode(5));
 
+// upload file to the bucket
+let filename = 'resources/s1.png';
+storage.bucket(bucketName).upload(filename, {
+    destination: filename,
+    metadata: {
+      // Enable long-lived HTTP caching headers
+      // Use only if the contents of the file will never change
+      // (If the contents will change, use cacheControl: 'no-cache')
+      cacheControl: 'public, max-age=31536000',
+    },
+})
+.then(() => {
+    console.log(`${filename} uploaded to ${bucketName}.`);
+})
+.catch(err => {
+    console.error('ERROR:', err);
+});
+  
 // make pdf part
 const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
 const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
@@ -189,7 +213,7 @@ app.post('/signup/', function (req, res, next) {
         // console.log(username);
         users.findOne({username: username}, {projection: {_id: 0, username: 1}}, function(err, user) {
             if (err) return res.status(500).end(err.message);
-            // if (user) return res.status(409).end("username " + username + " already exists");
+            if (user) return res.status(409).end("username " + username + " already exists");
             let salt = generateSalt();
             let hash = generateHash(password, salt);
             // update the db
