@@ -94,6 +94,7 @@ var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var fs = require('fs');
 const nodemailer = require("nodemailer");
+const Fuse = require('fuse.js');
 
 async function sendEmail(){
 
@@ -206,6 +207,31 @@ app.post('/signup/', function (req, res, next) {
     });
 });
 
+// signin
+app.post('/signin/', function (req, res, next) {
+    var username = req.body.username;
+    var password = req.body.password;
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let users = db.db('cscc09').collection('users');   
+        // console.log(username);
+        users.findOne({username: username}, {projection: {_id: 0, username: 1, hash: 1, salt: 1}}, function(err, user) {
+            if (err) return res.status(500).end(err.message);
+            if (!user) return res.status(401).end("access denied");
+            if (user.hash !== generateHash(password, user.salt)) return res.status(401).end("access denied"); 
+            // initialize cookie
+            // res.setHeader('Set-Cookie', cookie.serialize('username', username, {
+            //     path : '/', 
+            //     maxAge: 60 * 60 * 24 * 7
+            // }));
+            // // start a session
+            // req.session.user = user;
+            return res.json("user " + username + " signed in");
+        });
+    });
+});
+
+
 
 // upload image and return text
 app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
@@ -300,23 +326,53 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
         let nutrients = db.db('cscc09').collection('nutrients');
-        // need to update the Item(req.body)
-        // nutrients.find().toArray(function(err, nutrient) {      
-        //     db.close();
-        //     return res.json(nutrient);
-        // });
         nutrients.findOne({name: req.params.name}, {projection: {_id: 0, name: 1, details: 1}}, function(err, nutrient) {
             db.close();
             return res.json(nutrient);
         });
     });
-    // items.find({}).sort({createdAt:-1}).limit(5).exec(function(err, items) { 
-    //     if (err) return res.status(500).end(err);
-    //     console.log(req);
-    //     console.loads(res.status(500).end());
-    //     return res.json(items.reverse());
-    // });
 });
+
+// need to update the method
+app.get('/api/fuzzy/nutrient/', function (req, res, next) {
+    // mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+    //     if (err) return res.status(500).end(err.message);
+    //     let nutrients = db.db('cscc09').collection('nutrients');
+    //     nutrients.findOne({name: req.params.name}, {projection: {_id: 0, name: 1, details: 1}}, function(err, nutrient) {
+    //         db.close();
+    //         return res.json(nutrient);
+    //     });
+    // });
+    let lst = [
+                {
+                    name: "carbohydrate"
+                },
+                {
+                    name: "fiber"
+                },
+                {
+                    name: "sodium"
+                },
+                {
+                    name: "selenium"
+                }
+            ];
+    var options = {
+        shouldSort: true,
+        threshold: 0.6,
+        location: 0,
+        distance: 100,
+        maxPatternLength: 32,
+        minMatchCharLength: 1,
+        keys: [
+            "name"
+        ]
+    };
+    var fuse = new Fuse(lst, options); // "list" is the item array
+    var result = fuse.search("soi");
+    return res.json(result);
+});
+
 
 app.post('/api/nutrients/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {

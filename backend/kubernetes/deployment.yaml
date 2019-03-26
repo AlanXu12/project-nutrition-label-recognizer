@@ -39,3 +39,20 @@ spec:
 #       targetPort: 8080
 #       nodePort: 30000
 #   type: LoadBalancer
+
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "node-app-service"
+  namespace: "default"
+  labels:
+    app: "node-app"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: "node-app"
+  type: "ClusterIP"
