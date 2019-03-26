@@ -84,26 +84,33 @@ var checkId = function(req, res, next) {
     next();
 };
 
+// mongodb dependency
 let mongoClient = require('mongodb').MongoClient;
 // let dbUrl = "mongodb://" + process.env.IPADDRESS + ":27017/cscc09";
-// let olddbUrl = "mongodb://localhost:27017/mydb";
 // let dbUrl = "mongodb+srv://c09Viewer:viewer123@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
 let dbUrl = "mongodb+srv://conner:8G0BOdeTu2gzNLyb@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
-// mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-//     if (err) return res.status(500).end(err);
-//     let nutrients = db.db('cscc09').collection('nutrients');
-//     console.log('Connected to db!');
-//     db.close();
-// });
 
-var multer  = require('multer');
-var upload = multer({ dest: 'uploads/' });
-var fs = require('fs');
+// other dependencies
+const multer  = require('multer');
+let upload = multer({ dest: 'uploads/' });
+const fs = require('fs');
 const nodemailer = require("nodemailer");
 const Fuse = require('fuse.js');
 
-async function sendEmail(){
 
+// randomly generate the verifacation code
+// reference: https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript/1349462
+function makeCode(length) {
+    let text = "";
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < length; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
+// reference: https://nodemailer.com/about/
+async function sendEmail(){
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
     let account = await nodemailer.createTestAccount();
@@ -118,67 +125,48 @@ async function sendEmail(){
         pass: "******" // generated ethereal password
       }
     });
-    // var text = "";
-    // for (var i = 0; i < 5; i++)
-    //     text += Math.floor(Math.random() * possible.length);
-
-  
+    let code = makeCode(5);
     // setup email data with unicode symbols
     let mailOptions = {
       from: 'ssy543030341@hotmail.com', // sender address
       to: "conner_s223@outlook.com", // list of receivers
       subject: "Hello ✔", // Subject line
     //   text: "Hello world?", // plain text body
-      html: "<b>This verification code is </b>" // html body
+      html: `<b>This verification code is ${code}</b>` // html body
     };
   
     // send mail with defined transport object
     let info = await transporter.sendMail(mailOptions)
     console.log("Message sent: %s", info.messageId);
     // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));  
 }
-  
 // sendEmail().catch(console.error);
 
 // user management
 // var emailVerification = function(email) {
     
 // };
-
-// randomly generate the verifacation code
-function makeCode(length) {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < length; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
   
 console.log(makeCode(5));
 
 // upload file to the bucket
-let filename = 'resources/s1.png';
-storage.bucket(bucketName).upload(filename, {
-    destination: filename,
-    metadata: {
-      // Enable long-lived HTTP caching headers
-      // Use only if the contents of the file will never change
-      // (If the contents will change, use cacheControl: 'no-cache')
-      cacheControl: 'public, max-age=31536000',
-    },
-})
-.then(() => {
-    console.log(`${filename} uploaded to ${bucketName}.`);
-})
-.catch(err => {
-    console.error('ERROR:', err);
-});
+// let filename = 'resources/s1.png';
+// storage.bucket(bucketName).upload(filename, {
+//     destination: filename,
+//     metadata: {
+//       // Enable long-lived HTTP caching headers
+//       // Use only if the contents of the file will never change
+//       // (If the contents will change, use cacheControl: 'no-cache')
+//       cacheControl: 'public, max-age=31536000',
+//     },
+// })
+// .then(() => {
+//     console.log(`${filename} uploaded to ${bucketName}.`);
+// })
+// .catch(err => {
+//     console.error('ERROR:', err);
+// });
   
 // make pdf part
 const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
@@ -196,9 +184,36 @@ app.get('/api/pdf', function (req, res) {
     const pdfDoc = pdfMake.createPdf(docDefinition);
 
     pdfDoc.getBase64((data) => {
-        res.contentType('application/pdf');
-        const download = Buffer.from(data.toString('utf-8'), 'base64');
-        res.end(download);
+        // convert the pdf to base64-encoded
+        const base64Data = Buffer.from(data.toString('utf-8'), 'base64');
+        let local_path = "uploads/test.pdf";
+        // generate the local temp file
+        fs.writeFile(local_path, base64Data, 'base64', function(err) {
+            if(err) throw err;
+        });
+        // upload the file to the cloud bucket
+        let bucket_path = 'usr1/test1.pdf';
+        storage.bucket(bucketName).upload(local_path, {
+            destination: bucket_path,
+            metadata: {
+            // Enable long-lived HTTP caching headers
+            // Use only if the contents of the file will never change
+            // (If the contents will change, use cacheControl: 'no-cache')
+            cacheControl: 'public, max-age=31536000',
+            },
+        })
+        .then(() => {
+            console.log(`${bucket_path} uploaded to ${bucketName}.`);
+            res.contentType('application/pdf');
+            res.end(base64Data);
+            fs.unlink(local_path, (err) => {
+                if (err) throw err;
+                console.log(`${local_path} was deleted`);
+            });
+        })
+        .catch(err => {
+            console.error('ERROR:', err);
+        });
     });
 });
 
@@ -233,8 +248,8 @@ app.post('/signup/', function (req, res, next) {
 
 // signin
 app.post('/signin/', function (req, res, next) {
-    var username = req.body.username;
-    var password = req.body.password;
+    let username = req.body.username;
+    let password = req.body.password;
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
         let users = db.db('cscc09').collection('users');   
@@ -331,11 +346,11 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         });
         json_result['width'] = width;
         json_result['height'] = height;
-        console.log(raw);
+        console.log(nutrients);
         // return res.json(results[0]);
         // console.log(nutrients);
         // console.log(json_result);
-        return res.json(results[0].textAnnotations[0].description.split("\n"));
+        // return res.json(results[0].textAnnotations[0].description.split("\n"));
         // return res.json(nutrients);
         return res.json(json_result);
         // return res.json(results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox);
@@ -386,11 +401,8 @@ app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
 app.post('/api/nutrients/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
-        // console.log(db.db('cscc09'));
-        // console.log(typeof db);
         let nutrients = db.db('cscc09').collection('nutrients');
-        // need to update the Item(req.body)
-        console.log(new Nutrient(req.body));
+        // console.log(new Nutrient(req.body));
         nutrients.insertOne(new Nutrient(req.body), function(err, nutrient) {
             if (err) return res.status(500).end(err.message);
             // Finish up test
