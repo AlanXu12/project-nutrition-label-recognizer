@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import './Home.css'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
-import SearchBar from '../components/Search_bar'
+import SearchBar from '../components/SearchBar'
 import Intro from '../components/Intro'
 // import SearchImage from '../components/Search_image'
 class Home extends Component {
@@ -13,14 +12,6 @@ class Home extends Component {
         result: {},
         redirect: false
     }
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         image: null,
-    //         result: {},
-    //         redirect: false
-    //     }
-    // }
 
     onFileSelect(e) {
         this.setState({
@@ -29,18 +20,6 @@ class Home extends Component {
             redirect: false
         })
     }
-
-
-    // resultRedirect = () => {
-    //     console.log("props:", this.props);
-    //     if (this.state.redirect) {
-    //         const location = {
-    //             pathname: '/result',
-    //             state: this.state
-    //         }
-    //         this.props.history.push(location);
-    //     }
-    // }
 
     fileUploadHandler = () => {
         let fd = new FormData();
@@ -60,7 +39,6 @@ class Home extends Component {
                     state: this.state
                 }
                 this.props.history.push(location);
-                // this.props.navigate('Result');
             });
     }
 
@@ -96,6 +74,6 @@ class Home extends Component {
 
 export default Home;
 
-                // credit:
-                // react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
+// credit:
+// react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
 // drag and drop: http://react-dnd.github.io/react-dnd/about

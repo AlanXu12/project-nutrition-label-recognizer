@@ -6,6 +6,7 @@ import Result from './pages/Result';
 import Test from './pages/Test.jsx'
 import TestMouseTracing from './pages/TestMouseTracing.jsx'
 import Credit from './pages/Credit.jsx'
+import Search from './pages/Search';
 
 class App extends Component {
   render() {
@@ -17,6 +18,7 @@ class App extends Component {
           <Route exact path="/test" component = {Test}/>
           <Route exact path="/tmt" component = {TestMouseTracing}/>
           <Route exact path="/credit" component = {Credit}/>
+          <Route exact path="/search" component = {Search}/>
         </div>
       </Router>
     );

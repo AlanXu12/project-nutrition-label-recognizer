@@ -1,0 +1,8 @@
+.search-form{
+    border: none;
+    background-color:transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 600px;
+    border-bottom: 2px solid grey;
+}
