@@ -417,7 +417,20 @@ app.get('/', (req, res) => {
 });
 
 const http = require('http');
+const https = require('https');
 const PORT = 8080;
+
+// let privateKey = fs.readFileSync( 'server.key' );
+// let certificate = fs.readFileSync( 'server.crt' );
+// let config = {
+//         key: privateKey,
+//         cert: certificate
+// };
+
+// https.createServer(config, app).listen(PORT, function (err) {
+//     if (err) console.log(err);
+//     else console.log("HTTPS server on https://localhost:%s", PORT);
+// });
 
 http.createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);
