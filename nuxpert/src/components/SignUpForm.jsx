@@ -67,7 +67,7 @@ class SignUpForm extends Component {
       const password = data.password;
       const passwordConfirmation = data.passwordConfirmation;
       // check if the password matches passwordConfirmation
-      if (passwordConfirmation != password) {
+      if (passwordConfirmation !== password) {
         this.setState({
           errorMsg: 'Password confirmation does not match your password!'
         });
