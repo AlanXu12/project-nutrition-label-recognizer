@@ -3,16 +3,29 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
-import { Link } from 'react-router-dom'
+import SearchBar from '../components/SearchBar';
+
 
 class Home extends Component {
 
-    state = {
-        image: 'image',
-        keyword: '',
-        result: {},
-        fuzzy_result: {}
+    constructor(props) {
+        super(props);
+        this.state = {
+            image: 'image',
+            keyword: ' ',
+            result: {},
+            fuzzy_result: {}
+        }
+        this.props.location.state = this.state;
+        console.log(this.props);
     }
+
+    // state = {
+    //     image: 'image',
+    //     keyword: ' ',
+    //     result: {},
+    //     fuzzy_result: {}
+    // }
 
     onFileSelect(e) {
         this.setState({
@@ -93,7 +106,8 @@ class Home extends Component {
                 <Intro />
                 <br></br>
                 {/* search bar */}
-                <div>
+                <SearchBar {...this.props}/>
+                {/* <div>
                     <input
                         type="text"
                         className="search-form"
@@ -104,8 +118,8 @@ class Home extends Component {
                             pathname: '/search',
                             state: this.state
                         }}> Search </Link> */}
-                    <button onClick={this.fuzzySearchHandler}>Search</button>
-                </div>
+                    {/* <button onClick={this.fuzzySearchHandler}>Search</button>
+                </div> */}
                 <br></br>
                 {/* drag and drop upload */}
                 {/* <SearchImage /> */}

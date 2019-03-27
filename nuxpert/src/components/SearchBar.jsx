@@ -1,29 +1,50 @@
-import axios from 'axios'
+// import axios from 'axios'
 import React from 'react';
 import './SearchBar.css';
-import { withRouter } from 'react-router-dom'
 
 class SearchBar extends React.Component {
 
+    constructor(props) {
+        super(props);
+        // console.log(props);
+        const prevState = this.props.location.state;
+        this.state = {
+            //name of the nutrient user wanna search
+            keyword: prevState.keyword,
+            // search result from the backend, this variable eventually will be passed to /search page
+            result: new Map()
+        }
+        // console.log("current state after parent's call", this.state);
+    }
     state = {
-        //name of the nutrient user wanna search
-        keyword: 'nutrient',
-        // search result from the backend, this variable eventually will be passed to /search page
-        result: {}
+        keyword: '',
+        result: new Map()
     }
 
-    handleFuzzySearch = () => {
-        //get result from the backend
-        axios.get("http://localhost:8080/api/fuzzy/nutrient/" + this.state.keyword + "/")
-            // after result got from backend
-            .then(function (res) {
-                console.log("result from the backend:", res);
-                // update result to state
-                this.setState({
-                    keyword: this.state.keyword,
-                    result: res
-                });
+
+    handleFuzzySearch = async () => {
+        const response = await fetch('http://localhost:8080/api/fuzzy/nutrient/' + this.state.keyword + '/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        if (body) {
+            // console.log(this.state);
+            console.log(body);
+            this.setState({
+                keyword: this.state.keyword,
+                result: body
             });
+            const location = {
+                pathname: '/search',
+                state: this.state
+            }
+            this.props.history.push(location);
+        }
     }
 
     handleInputChange = () => {
@@ -31,12 +52,11 @@ class SearchBar extends React.Component {
             keyword: this.search.value,
             result: {}
         });
-        console.log("go search:", this.state.keyword);
     }
 
     render() {
         return (
-            <form className="search-component">
+            <div>
                 <input
                     type="text"
                     className="search-form"
@@ -44,7 +64,8 @@ class SearchBar extends React.Component {
                     onChange={this.handleInputChange}
                 />
                 <button onClick={this.handleFuzzySearch}>Search</button>
-            </form>
+                
+            </div>
         )
     }
 }
