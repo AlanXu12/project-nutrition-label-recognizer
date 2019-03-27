@@ -25,21 +25,6 @@ spec:
           ports:
             - containerPort: 8080
 
-# ---
-# kind: Service
-# apiVersion: v1
-# metadata:
-#   name: node-app-service
-# spec:
-#   selector:
-#     app: node-app
-#   ports:
-#     - protocol: "TCP"
-#       port: 8080
-#       targetPort: 8080
-#       nodePort: 30000
-#   type: LoadBalancer
-
 ---
 apiVersion: "v1"
 kind: "Service"
