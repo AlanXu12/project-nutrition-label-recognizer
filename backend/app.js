@@ -286,7 +286,7 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         // console.log(results[0].textAnnotations[0].description);
 
         // find all the nutrients detected by Google Vision API
-        let raw = results[0].textAnnotations[0].description.split("\n").filter(phrase => (!(/^\d+$/.test(phrase)) && !(/pour/.test(phrase)) && !(/Per/.test(phrase)) && !(/%/.test(phrase))) && ((/\d/.test(phrase)) || (/o+O/.test(phrase))));
+        let raw = results[0].textAnnotations[0].description.split("\n").filter(phrase => (!(/^\d+$/.test(phrase)) && !(/pour/.test(phrase)) && !(/Per/.test(phrase)) && !(/%/.test(phrase))) && ((/\d/.test(phrase)) || (/O/.test(phrase))));
         // handle the situation where the detected looks like this --- Iron/Fer, in long-text spliting
         let eng_fr = raw.filter(phrase => /\w\/\w/.test(phrase));
         raw.forEach(function(phrase) {
@@ -294,7 +294,9 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             let basic = phrase.split("/")[0];
             // console.log(phrase);
             let remove_total_filtered = basic.replace("Total", "");
-            let further_filtered = remove_total_filtered.split(/(\d+)/)[0].trim()
+            // handle the situation when Google API detects '0' into 'O'
+            let remove_uppero_filtered = remove_total_filtered.split('O')[0]
+            let further_filtered = remove_uppero_filtered.split(/(\d+)/)[0].trim()
             // console.log(remove_total_filtered);
             if (further_filtered != "Calories" && further_filtered != "Includes") nutrients.push(further_filtered);
         });
@@ -314,16 +316,6 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             if(detail.length == 0){
                 detail = keywords.filter(keyword => keyword.description == nutrient+"\/");
             }
-            // handle the situation where the nutrient contains at least two words
-            // if(detail.length == 0){
-            //     console.log(nutrient);
-            //     let splited = nutrient.split(" ");
-            //     console.log(keywords.filter(keyword => keyword.description == splited[0]));
-            //     let index = keywords.indexOf(keywords.filter(keyword => keyword.description == splited[0]), 2);
-            //     console.log(index);
-            //     // detail = keywords.filter();
-            // }
-
             // pack the nutrient with the coordinates
             if (detail.length != 0){
                 let vertices = detail[0].boundingPoly.vertices;
@@ -342,7 +334,32 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
                 // get rid off the '/' in some phrases like 'Iron/Fer'
                 json_result[nutrient.split("/")[0].toLowerCase()] = vertice;
             }
-            // console.log(detail);
+            // handle the situation where the nutrient contains at least two words
+            if(detail.length == 0){
+                // console.log(nutrient);
+                let splited = nutrient.split(" ");
+                for (let i = 0; i < keywords.length; i++){
+                    if(splited[0] == keywords[i].description){
+                        let j = 1, valid = true;
+                        while(j < splited.length && valid){
+                            if(splited[j] == keywords[i+j].description){
+                                // console.log(keywords[i+j]);
+                                j++;
+                            } else{
+                                valid = false; 
+                            }
+                        }
+                        if(valid){
+                            console.log(`Successfully match ${nutrient}`)
+                            break;
+                        }
+                    }
+                }
+                // console.log(keywords.filter(keyword => keyword.description == splited[0]));
+                let index = keywords.indexOf(keywords.filter(keyword => keyword.description == splited[0]), 2);
+                // console.log(index);
+                // detail = keywords.filter();
+            }
         });
         json_result['width'] = width;
         json_result['height'] = height;
