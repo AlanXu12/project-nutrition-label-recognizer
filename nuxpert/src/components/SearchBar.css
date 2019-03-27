@@ -6,3 +6,7 @@
     width: 600px;
     border-bottom: 2px solid grey;
 }
+
+.seach-component{
+    justify-items: space-around;
+}

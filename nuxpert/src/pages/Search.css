@@ -1,0 +1,7 @@
+.nutrient{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 20px;
+    justify-items: center;
+}

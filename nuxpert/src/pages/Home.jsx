@@ -52,7 +52,7 @@ class Home extends Component {
                 <Intro />
                 <br></br>
                 {/* search bar */}
-                <SearchBar />
+                <SearchBar/>
                 <br></br>
                 {/* drag and drop upload */}
                 {/* <SearchImage /> */}
