@@ -16,10 +16,7 @@ export class Search extends Component {
             redirect: false,
             nutrient: "Nutrien Name",
             info: "Details about this nutritien",
-            fuzzyResults: [
-                { name: "fat", details: "some fats are good,some fats are good,some fats are good,some fats are good,some fats are good,some fats are good,some fats are good,some fats are good" },
-                { name: "sugar", details: "too much sugar is bad" },
-                { name: "sodium", details: "sodium is necessary" }]
+            fuzzyResults: prevState.fuzzy_result
         };
         console.log(this.state);
     }
@@ -28,8 +25,8 @@ export class Search extends Component {
         const data = this.state.fuzzyResults;
         const fuzzyResultsList = data.map((nutrient) => {
             return (
-                <div>
-                <Collapsible className=".Collapsible__trigger" trigger={nutrient.name} key={nutrient.name}>
+                <div key={nutrient.name}>
+                <Collapsible className=".Collapsible__trigger" trigger={nutrient.name+'(click here)'} >
                     <p className="nutrient">{nutrient.details}</p>
                 </Collapsible>
                 <br />

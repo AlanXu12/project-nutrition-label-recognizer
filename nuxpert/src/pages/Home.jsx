@@ -2,23 +2,61 @@ import React, { Component } from 'react';
 import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
-import SearchBar from '../components/SearchBar'
 import Intro from '../components/Intro'
-// import SearchImage from '../components/Search_image'
+import { Link } from 'react-router-dom'
+
 class Home extends Component {
 
     state = {
-        image: null,
+        image: 'image',
+        keyword: '',
         result: {},
-        redirect: false
+        fuzzy_result: {}
     }
 
     onFileSelect(e) {
         this.setState({
             image: e.target.files[0],
+            keyword: this.state.keyword,
             result: {},
-            redirect: false
+            fuzzy_result: {}
         })
+
+    }
+
+    onKeywordUpdate(e) {
+        this.setState({
+            image: this.state.image,
+            keyword: e.target.value,
+            result: {},
+            fuzzy_result: {}
+        })
+        console.log("after change,", this.state.keyword);
+    }
+
+    fuzzySearchHandler = () => {
+        //get result from the backend
+        console.log("keyword:", this.state.keyword);
+        axios.get("http://localhost:8080/api/fuzzy/nutrient/" + this.state.keyword + "/")
+            // after result got from backend
+            .then(fuzzy_result => {
+                console.log("result from the backend:", fuzzy_result.data);
+                // update result to state
+                this.setState({
+                    image: this.state.image,
+                    result: this.state.result,
+                    keyword: this.state.keyword,
+                    fuzzy_result: fuzzy_result.data
+                });
+                const location = {
+                    pathname: '/search',
+                    state: this.state
+                }
+                this.props.history.push(location);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     fileUploadHandler = () => {
@@ -30,7 +68,8 @@ class Home extends Component {
                 this.setState({
                     image: this.state.image,
                     result: res.data,
-                    redirect: true
+                    keyword: this.state.keyword,
+                    fuzzy_result: this.state.fuzzy_result
                 });
                 console.log("before push props:", this.props);
                 console.log("before push, location:", location);
@@ -39,6 +78,8 @@ class Home extends Component {
                     state: this.state
                 }
                 this.props.history.push(location);
+            }).then(err => {
+                console.log(err);
             });
     }
 
@@ -52,7 +93,19 @@ class Home extends Component {
                 <Intro />
                 <br></br>
                 {/* search bar */}
-                <SearchBar/>
+                <div>
+                    <input
+                        type="text"
+                        className="search-form"
+                        value={this.state.keyword}
+                        onChange={(e) => this.onKeywordUpdate(e)}
+                    />
+                    {/* <Link to={{
+                            pathname: '/search',
+                            state: this.state
+                        }}> Search </Link> */}
+                    <button onClick={this.fuzzySearchHandler}>Search</button>
+                </div>
                 <br></br>
                 {/* drag and drop upload */}
                 {/* <SearchImage /> */}
