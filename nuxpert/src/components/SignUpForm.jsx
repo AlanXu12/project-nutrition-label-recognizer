@@ -5,6 +5,11 @@ import './SignUpForm.css';
 
 class SignUpForm extends Component {
 
+  constructor(props) {
+    super(props);
+    console.log(this.props);
+  }
+
   state = {
     errorMsg: '',
   }
@@ -22,20 +27,70 @@ class SignUpForm extends Component {
         password: password,
       })
     });
-    const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
-    if (body) {
-      // TODO: update / redirect to some page
-      // this.setState({
-      //
-      // });
-      console.log("Successfully get response from backend...");
+    if (response.status !== 200) {
+      if (response.status == 409) this.setState({
+        errorMsg: "Username has been taken..."
+      });
+      if (response.status == 500) this.setState({
+        errorMsg: "Server side error, please try again later..."
+      });
+    } else {
+      const body = await response.json();
+      if (body) {
+        // clean up error message
+        this.setState({
+          errorMsg: ''
+        });
+        console.log("Successfully get response from backend...");
+        console.log("this.props: ", this.props);
+        // TODO: update / redirect to some page
+        window.location.reload();
+      }
     }
   };
 
   // helper function for sending signin info to backend
   sendSignInRequest = async (username, password) => {
+    console.log("username password: ", username, password);
     const response = await fetch('/signin/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
+    });
+    if (response.status !== 200) {
+      if (response.status == 401) this.setState({
+        errorMsg: "Username or password not correct..."
+      });
+      if (response.status == 500) this.setState({
+        errorMsg: "Server side error, please try again later..."
+      });
+    } else {
+      const body = await response.json();
+      if (body) {
+        console.log("Successfully get response from backend...");
+        // clean up error message
+        this.setState({
+          errorMsg: ''
+        });
+        // TODO: update / redirect to some page
+        const location = {
+          pathname: '/',
+          state: this.state
+        }
+        this.props.history.push(location);
+      }
+    }
+  };
+
+  // helper function for sending recover request to backend
+  sendRecoverRequest = async (username) => {
+    const response = await fetch('/reset/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -43,19 +98,29 @@ class SignUpForm extends Component {
       },
       body: JSON.stringify({
         username: username,
-        password: password,
       })
     });
-    const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
-    if (body) {
-      // TODO: update / redirect to some page
-      // this.setState({
-      //
-      // });
-      console.log("Successfully get response from backend...");
+    if (response.status !== 200) {
+      if (response.status == 401) this.setState({
+        errorMsg: "Username does not exist..."
+      });
+      if (response.status == 500) this.setState({
+        errorMsg: "Server side error, please try again later..."
+      });
+    } else {
+      const body = await response.json();
+      if (body) {
+        console.log("Successfully get response from backend...");
+        // clean up error message
+        // this.setState({
+        //   errorMsg: "Successfully reset your password to your username"
+        // });
+        // TODO: update / redirect to some page
+        window.location.reload();
+      }
     }
   };
+
 
 
   render() {
@@ -67,14 +132,15 @@ class SignUpForm extends Component {
       const password = data.password;
       const passwordConfirmation = data.passwordConfirmation;
       // check if the password matches passwordConfirmation
-      if (passwordConfirmation != password) {
+      if (passwordConfirmation !== password) {
         this.setState({
           errorMsg: 'Password confirmation does not match your password!'
         });
+      } else {
+        // send username and password to the backend
+        console.log(username, password, passwordConfirmation);
+        this.sendSignUpRequest(username, password);
       }
-      // send username and password to the backend
-      console.log(username, password, passwordConfirmation);
-      this.sendSignUpRequest(username, password);
     };
 
     // the handler function for login
@@ -91,8 +157,9 @@ class SignUpForm extends Component {
     const recoverPasswordWasClickedCallback = (data) => {
       // get the user input
       const username = data.username;
-      // TODO: send username to backend and determine if the username exists
       console.log(data);
+      // TODO: try to reset password by sending username to backend
+      this.sendRecoverRequest(username);
     };
 
     return (
