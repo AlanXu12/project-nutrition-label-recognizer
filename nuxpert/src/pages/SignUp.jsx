@@ -31,7 +31,9 @@ class SignUp extends Component {
         <NavBar />
         {/*this.resultRedirect()*/}
         {/*<button onClick={this.setRedirect}>To Result Page</button>*/}
-        <SignUpForm />
+        <SignUpForm
+          {...this.props}
+        />
       </div>
     );
   }

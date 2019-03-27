@@ -5,6 +5,11 @@ import './SignUpForm.css';
 
 class SignUpForm extends Component {
 
+  constructor(props) {
+    super(props);
+    console.log(this.props);
+  }
+
   state = {
     errorMsg: '',
   }
@@ -36,11 +41,10 @@ class SignUpForm extends Component {
         this.setState({
           errorMsg: ''
         });
-        // TODO: update / redirect to some page
-        // this.setState({
-        //
-        // });
         console.log("Successfully get response from backend...");
+        console.log("this.props: ", this.props);
+        // TODO: update / redirect to some page
+        window.location.reload();
       }
     }
   };
@@ -69,15 +73,17 @@ class SignUpForm extends Component {
     } else {
       const body = await response.json();
       if (body) {
+        console.log("Successfully get response from backend...");
         // clean up error message
         this.setState({
           errorMsg: ''
         });
         // TODO: update / redirect to some page
-        // this.setState({
-        //
-        // });
-        console.log("Successfully get response from backend...");
+        const location = {
+          pathname: '/',
+          state: this.state
+        }
+        this.props.history.push(location);
       }
     }
   };
@@ -104,15 +110,13 @@ class SignUpForm extends Component {
     } else {
       const body = await response.json();
       if (body) {
-        // clean up error message
-        this.setState({
-          errorMsg: "Successfully reset your password to your username"
-        });
-        // TODO: update / redirect to some page
-        // this.setState({
-        //
-        // });
         console.log("Successfully get response from backend...");
+        // clean up error message
+        // this.setState({
+        //   errorMsg: "Successfully reset your password to your username"
+        // });
+        // TODO: update / redirect to some page
+        window.location.reload();
       }
     }
   };
