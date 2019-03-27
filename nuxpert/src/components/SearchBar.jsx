@@ -23,7 +23,7 @@ class SearchBar extends React.Component {
 
 
     handleFuzzySearch = async () => {
-        const response = await fetch('http://localhost:8080/api/fuzzy/nutrient/' + this.state.keyword + '/', {
+        const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -33,17 +33,17 @@ class SearchBar extends React.Component {
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         if (body) {
-            // console.log(this.state);
-            console.log(body);
             this.setState({
                 keyword: this.state.keyword,
                 result: body
             });
+            console.log("new search...",this.state);
             const location = {
-                pathname: '/search',
+                pathname: '/search/'+this.state.keyword,
                 state: this.state
             }
             this.props.history.push(location);
+            window.location.reload();
         }
     }
 
@@ -52,6 +52,7 @@ class SearchBar extends React.Component {
             keyword: this.search.value,
             result: {}
         });
+        console.log("new keyword:", this.state.keyword);
     }
 
     render() {

@@ -19,7 +19,7 @@ class App extends Component {
           <Route exact path="/test" component = {Test}/>
           <Route exact path="/tmt" component = {TestMouseTracing}/>
           <Route exact path="/credit" component = {Credit}/>
-          <Route exact path="/search" component = {Search}/>
+          <Route exact path="/search/:keyword" component = {Search}/>
           <Route exact path="/signup" component = {SignUp}/>
         </div>
       </Router>

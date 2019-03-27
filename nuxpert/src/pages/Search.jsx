@@ -9,7 +9,9 @@ import { withRouter } from "react-router";
 export class Search extends Component {
 
     constructor(props) {
+        
         super(props);
+        
         console.log(this.props);
         const prevState = this.props.location.state;
         console.log(prevState);
@@ -19,6 +21,7 @@ export class Search extends Component {
             fuzzyResults: prevState.result
         };
         console.log(this.state);
+        
     }
 
     render() {
