@@ -8,16 +8,16 @@ import {
 } from 'react-native';
 // import {BrowserRouter as Router, Route} from 'react-router-dom';
 import { Redirect } from 'react-router-dom';
+import { PDFReader } from 'react-read-pdf';
 import './Result.css';
 // import './styles.css';
 
 import Test from './Test.jsx'
-
 import NavBar from '../components/Navigation.jsx';
+import CreditPortal from '../components/CreditPortal.jsx';
 
 import sampleImg from '../media/sample-nutrition-label-ca.png';
-
-import CreditPortal from '../components/CreditPortal.jsx';
+import samplePdf from '../media/sample.pdf';
 
 
 class Result extends Component {
@@ -38,7 +38,8 @@ class Result extends Component {
       curNutri: "Default",
       image: URL.createObjectURL(prevState.image),
       imageHeight: prevState.result.height,
-      imageWidth: prevState.result.width
+      imageWidth: prevState.result.width,
+      showPdf: false
     };
     console.log(this.state);
   }
@@ -55,16 +56,6 @@ class Result extends Component {
     if (this.state.redirect) {
       return <Redirect to='/' />
     }
-  }
-
-  // update user selected factor's detail in detail displaying area
-  updateDetails = () => {
-    this.setState({
-      title: "Some new title",
-      details: "Some new details Some new details Some new details Some new details"
-    });
-    console.log("curNutri: ", this.state.curNutri);
-    console.log(this.divElement.getBoundingClientRect().width);
   }
 
   // get real-time coordinates of mouse
@@ -128,53 +119,84 @@ class Result extends Component {
     console.log("this.state: ", this.state);
   };
 
+  showReport = () => {
+    this.setState({
+      showPdf: true
+    });
+  };
+
+  backToResult = () => {
+    this.setState({
+      showPdf: false
+    });
+  }
+
 
   render() {
 
     // console.log("In render(): ", this.state);
 
-    return (
-      <div className="container">
+    // divide components to two display views (1. scanning result 2. PDF report preview)
+    const showPdf = this.state.showPdf;
+    let displayView;
+    if(!showPdf) {
+      displayView = (
+        <div>
+          <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.showReport}>Report</button>
 
-        <NavBar/>
+          <div className="row row-eq-height mt-2">
 
-        <button className="btn btn-primary btn-lg mt-2 btn-report" type="button">Report</button>
-        <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.updateDetails}>TEST-SHOW-TEXT</button>
+            <div className="col-sm-12 col-md-7">
 
-        <div className="row row-eq-height mt-2">
+              <div className="card mb-4 bg-secondary border border-primary result-card">
+                <div ref={ (divElement) => this.divElement = divElement } >
+                  <img className="card-img-top" onClick={this.displayNutriInfo} onMouseMove={this._onMouseMove.bind(this)} src={ this.state.image } alt="Nutrition Fact Table"></img>
+                </div>
 
-          <div className="col-sm-12 col-md-7">
-
-            <div className="card mb-4 bg-secondary border border-primary result-card">
-              <div ref={ (divElement) => this.divElement = divElement } >
-                <img className="card-img-top" onClick={this.displayNutriInfo} onMouseMove={this._onMouseMove.bind(this)} src={ this.state.image } alt="Nutrition Fact Table"></img>
-              </div>
-
-              <div className="card-body text-center">
-                {this.uploadNewRedirect()}
-                <button className="btn btn-primary btn-reupload" type="button" name="button" onClick={this.setRedirect}>Upload New</button>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="col">
-
-            <div className="card bg-secondary border border-primary">
-              <div className="card-body text-center">
-                <div className="container">
-                  <h2 className="card-title">{this.state.title}</h2>
-                  <p className="card-text text-left">{this.state.details}</p>
+                <div className="card-body text-center">
+                  {this.uploadNewRedirect()}
+                  <button className="btn btn-primary btn-reupload" type="button" name="button" onClick={this.setRedirect}>Upload New</button>
                 </div>
               </div>
+
+            </div>
+
+            <div className="col">
+
+              <div className="card bg-secondary border border-primary">
+                <div className="card-body text-center">
+                  <div className="container">
+                    <h2 className="card-title">{this.state.title}</h2>
+                    <p className="card-text text-left">{this.state.details}</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
           </div>
-
         </div>
+      );
+    } else {
+      displayView = (
+        <div>
+          <div>
+            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" onClick={this.backToResult} alter="Back to scanning report">Back</button>
+            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Save to my account">Save</button>
+            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Download this report">Download</button>
+          </div>
+          <div style={{overflow: 'scroll', height:800}}>
+            <PDFReader url={ samplePdf }/>
+          </div>
+        </div>
+      );
+    }
 
+    return (
+      <div className="container">
+        <NavBar/>
+        { displayView }
         <CreditPortal />
-
       </div>
     );
   }
