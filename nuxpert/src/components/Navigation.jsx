@@ -9,10 +9,9 @@ class Navigation extends Component {
     constructor(props) {
         super(props);
         // console.log(props);
-        const prevState = this.props.location.state;
         this.state = {
             //name of the nutrient user wanna search
-            keyword: prevState.keyword,
+            keyword: '',
             // search result from the backend, this variable eventually will be passed to /search page
             result: new Map()
         }
@@ -24,9 +23,13 @@ class Navigation extends Component {
         result: new Map()
     }
 
+    toggleCollapse = collapseID => () =>
+        this.setState(prevState => ({
+            collapseID: prevState.collapseID !== collapseID ? collapseID : ""
+        }));
+
 
     handleFuzzySearch = async () => {
-
         const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
             headers: {
@@ -41,9 +44,9 @@ class Navigation extends Component {
                 keyword: this.state.keyword,
                 result: body
             });
-            console.log("new search...",this.state);
+            console.log("new search...", this.state);
             const location = {
-                pathname: '/search/'+this.state.keyword,
+                pathname: '/search/' + this.state.keyword,
                 state: this.state
             }
             this.props.history.push(location);
@@ -83,20 +86,18 @@ class Navigation extends Component {
                         </MDBNavItem>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>
-                        <MDBNavItem>
-                            <MDBFormInline waves>
-                                <div className="md-form my-0">
-                                    <input 
-                                    className="form-control mr-sm-2" 
-                                    type="text" 
+                        <MDBFormInline waves>
+                            <div className="md-form my-0">
+                                <input
+                                    className="form-control mr-sm-2"
+                                    type="text"
                                     ref={input => this.search = input}
-                                    placeholder="Search Nutrient" 
+                                    placeholder="Search Nutrient"
                                     onChange={this.handleInputChange}
-                                     />
-                                     <button onClick={this.handleFuzzySearch}>Search</button>
-                                </div>
-                            </MDBFormInline>
-                        </MDBNavItem>
+                                />
+                                <button onClick={this.handleFuzzySearch}>Search</button>
+                            </div>
+                        </MDBFormInline>
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
