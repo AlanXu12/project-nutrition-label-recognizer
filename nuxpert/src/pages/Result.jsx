@@ -145,6 +145,10 @@ class Result extends Component {
           <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.showReport}>Report</button>
 
           <div className="row row-eq-height mt-2">
+        <NavBar {...this.props}/>
+
+        <button className="btn btn-primary btn-lg mt-2 btn-report" type="button">Report</button>
+        <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.updateDetails}>TEST-SHOW-TEXT</button>
 
             <div className="col-sm-12 col-md-7">
 
