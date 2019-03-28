@@ -127,17 +127,15 @@ class Result extends Component {
   showReport = async () => {
     console.log("showReport is hitted...");
     // get corresponding pdf report from backend
-    // const response = await fetch('/api/pdf/' + imageId + '/');
-    const response = await fetch('/api/pdf/');
+    // const response = await fetch('/api/report/' + imageId + '/');
+    const response = await fetch('/api/report/');
     console.log("response: ", response);
-    const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
-    if (body) {
-      this.setState({
-        showPdf: true,
-        // reportPdf:
-      });
-    }
+    // const body = await response.json();
+    if (response.status !== 200) throw Error("something wrong...");
+    this.setState({
+      showPdf: true,
+      reportPdf: response
+    });
   }
 
   backToResult = () => {
