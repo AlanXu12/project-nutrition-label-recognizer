@@ -94,9 +94,9 @@ class Navigation extends Component {
                                     placeholder="Search Nutrient"
                                     onChange={this.handleInputChange}
                                 />
-                                <button onClick={this.handleFuzzySearch}>Search</button>
                             </div>
                         </MDBFormInline>
+                        <button onClick={this.handleFuzzySearch}>Search</button>
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>

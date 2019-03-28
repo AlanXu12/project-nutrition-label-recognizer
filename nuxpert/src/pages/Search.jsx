@@ -11,6 +11,8 @@ export class Search extends Component {
         super(props);
         console.log(this.props);
         this.state = {
+            nutrient: this.props.location.state.keyword,
+            info: "Details about this nutritien",
             fuzzyResults: this.props.location.state.result
         };
         console.log(this.state);
