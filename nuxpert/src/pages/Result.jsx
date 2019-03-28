@@ -39,7 +39,9 @@ class Result extends Component {
       image: URL.createObjectURL(prevState.image),
       imageHeight: prevState.result.height,
       imageWidth: prevState.result.width,
-      showPdf: false
+      showPdf: false,
+      pdfPageNum: 1,
+      pdfPageNumMax: 1
     };
     console.log(this.state);
   }
@@ -131,6 +133,34 @@ class Result extends Component {
     });
   }
 
+  // handler for pdf previewer's previous page button clicking
+  prevPdfPage = () => {
+    // check if pdfPageNum will be less than 1 after this time of operation
+    let newPdfPageNum = this.state.pdfPageNum - 1;
+    newPdfPageNum = newPdfPageNum < 1 ? 1 : newPdfPageNum;
+    this.setState({
+      pdfPageNum: newPdfPageNum
+    });
+  }
+
+  // handler for pdf previewer's next page button clicking
+  nextPdfPage = () => {
+    // check if pdfPageNum will be greater than the max page num of the current file after this time of operation
+    let pdfPageNumMax = this.state.pdfPageNumMax;
+    let newPdfPageNum = this.state.pdfPageNum + 1;
+    newPdfPageNum = newPdfPageNum > pdfPageNumMax ? pdfPageNumMax : newPdfPageNum;
+    this.setState({
+      pdfPageNum: newPdfPageNum
+    });
+  }
+
+  // after loading the pdf file, the pdfPageNumMax will be reset by this function
+  setPdfPageNumMax = (totalPage) => {
+    this.setState({
+      pdfPageNumMax: totalPage
+    });
+  }
+
 
   render() {
 
@@ -143,12 +173,6 @@ class Result extends Component {
       displayView = (
         <div>
           <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.showReport}>Report</button>
-
-        <NavBar {...this.props}/>
-
-        <button className="btn btn-primary btn-lg mt-2 btn-report" type="button">Report</button>
-        <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.updateDetails}>TEST-SHOW-TEXT</button>
-
           <div className="row row-eq-height mt-2">
 
             <div className="col-sm-12 col-md-7">
@@ -188,18 +212,30 @@ class Result extends Component {
           <div>
             <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" onClick={this.backToResult} alter="Back to scanning report">Back</button>
             <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Save to my account">Save</button>
-            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Download this report">Download</button>
+            <a className="btn btn-primary btn-lg mt-2 btn-preview-pdf" href={samplePdf} download="Report" alter="Download this report">Download</a>
           </div>
-          <div style={{overflow: 'scroll', height:800}}>
-            <PDFReader url={ samplePdf }/>
+          <div className="btn-flex-container">
+            <button className="btn btn-primary btn-sm mt-2" type="button" onClick={this.prevPdfPage} alter="Previous page">Prev</button>
+            <button className="btn btn-primary btn-sm mt-2" type="button" onClick={this.nextPdfPage} alter="Previous page">Next</button>
           </div>
+          <PDFReader
+            className="pdf-reader"
+            url={ samplePdf }
+            page={this.state.pdfPageNum}
+            onDocumentComplete={this.setPdfPageNumMax}
+          />
+          {/*
+            <div className="pdf-viewer-container">
+
+            </div>
+          */}
         </div>
       );
     }
 
     return (
       <div className="container">
-        <NavBar {... this.props}/>
+        <NavBar {...this.props}/>
         { displayView }
         <CreditPortal />
       </div>
