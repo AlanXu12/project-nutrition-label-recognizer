@@ -80,23 +80,7 @@ class Home extends Component {
                 <br></br>
                 <Intro />
                 <br></br>
-                {/* search bar */}
-                {/* <SearchBar {...this.props}/> */}
-                {/* <div>
-                    <input
-                        type="text"
-                        className="search-form"
-                        value={this.state.keyword}
-                        onChange={(e) => this.onKeywordUpdate(e)}
-                    />
-                    {/* <Link to={{
-                            pathname: '/search',
-                            state: this.state
-                        }}> Search </Link> */}
-                {/* <button onClick={this.fuzzySearchHandler}>Search</button>
-                </div> */}
                 <br></br>
-                {/* drag and drop upload */}
                 {/* <SearchImage /> */}
                 <div>
                     {/* {this.resultRedirect()} */}

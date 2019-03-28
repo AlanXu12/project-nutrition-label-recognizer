@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
 import Result from './Result.jsx';
 import NavBar from '../components/Navigation.jsx';
 import SignUpForm from '../components/SignUpForm.jsx';
@@ -28,7 +26,7 @@ class SignUp extends Component {
     console.log(this.state.someData);
     return (
       <div>
-        <NavBar {...this.props}/>
+        <NavBar {...this.props} user={"alice"}/>
         {/*this.resultRedirect()*/}
         {/*<button onClick={this.setRedirect}>To Result Page</button>*/}
         <SignUpForm

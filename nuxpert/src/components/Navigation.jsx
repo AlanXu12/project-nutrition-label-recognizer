@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBContainer,
     MDBIcon, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
@@ -13,9 +12,10 @@ class Navigation extends Component {
         this.state = {
             keyword: ' ',
             fuzzy_result: {},
-            collapseID: ''
+            collapseID: '',
+            user:props.user
         }
-        console.log("nav bar's state:", this.state);
+        console.log("user exist?", this.state.user);
     }
 
     state = {
@@ -64,6 +64,7 @@ class Navigation extends Component {
 
     render() {
         return (
+
             <MDBNavbar color="default-color" expand="md">
                 <MDBNavbarBrand>
                     <strong className="white-text">Navbar</strong>
@@ -101,6 +102,7 @@ class Navigation extends Component {
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
+
         );
     }
 
