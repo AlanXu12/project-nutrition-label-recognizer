@@ -15,7 +15,6 @@ class Navigation extends Component {
             fuzzy_result: {},
             collapseID: ''
         }
-        console.log("nav bar's state:", this.state);
     }
 
     state = {
@@ -107,5 +106,4 @@ class Navigation extends Component {
 
 }
 export default Navigation;
-
 // nav bar from: https://mdbootstrap.com/docs/react/navigation/navbar/
