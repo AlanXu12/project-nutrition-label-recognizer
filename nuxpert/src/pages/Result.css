@@ -11,12 +11,13 @@
 
 .btn-preview-pdf {
   margin-right: 3%;
-  margin-bottom: 2%;
+  /* margin-bottom: 1%; */
 }
 
 .btn-flex-container {
   display: flex;
   justify-content: space-between;
+  margin: 0;
 }
 
 .pdf-viewer-container {
@@ -26,5 +27,13 @@
 }
 
 canvas {
-  max-width: 800px !important;
+  max-width: inherit !important;
+}
+
+/* PDFReader {
+  object-fit: contain;
+} */
+
+.pdf-reader {
+  max-width: inherit !important;
 }

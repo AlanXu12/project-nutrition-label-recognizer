@@ -219,13 +219,17 @@ class Result extends Component {
             <button className="btn btn-primary btn-sm mt-2" type="button" onClick={this.prevPdfPage} alter="Previous page">Prev</button>
             <button className="btn btn-primary btn-sm mt-2" type="button" onClick={this.nextPdfPage} alter="Previous page">Next</button>
           </div>
-          <div className="pdf-viewer-container">
-            <PDFReader
-              url={ samplePdf }
-              page={this.state.pdfPageNum}
-              onDocumentComplete={this.setPdfPageNumMax}
-            />
-          </div>
+          <PDFReader
+            className="pdf-reader"
+            url={ samplePdf }
+            page={this.state.pdfPageNum}
+            onDocumentComplete={this.setPdfPageNumMax}
+          />
+          {/*
+            <div className="pdf-viewer-container">
+
+            </div>
+          */}
         </div>
       );
     }
