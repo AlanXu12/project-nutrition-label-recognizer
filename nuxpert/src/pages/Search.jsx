@@ -2,23 +2,18 @@ import React, { Component } from 'react'
 import '../styles.scss'
 import Collapsible from 'react-collapsible';
 import Navigation from '../components/Navigation'
-import SearchBar from '../components/SearchBar'
 import "./Search.css"
-import { withRouter } from "react-router";
 
 export class Search extends Component {
 
     constructor(props) {
         
         super(props);
-        
         console.log(this.props);
-        const prevState = this.props.location.state;
-        console.log(prevState);
         this.state = {
-            nutrient: prevState.keyword,
+            nutrient: ' ',
             info: "Details about this nutritien",
-            fuzzyResults: prevState.result
+            fuzzyResults: this.props.location.state.result
         };
         console.log(this.state);
         

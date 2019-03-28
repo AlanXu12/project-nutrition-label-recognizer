@@ -1,25 +1,23 @@
 import React, { Component } from 'react';
+
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBFormInline,
     MDBDropdown, MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem
-} from "mdbreact";
+} from 'mdbreact';
 
 class Navigation extends Component {
 
     constructor(props) {
         super(props);
-        // console.log(props);
         this.state = {
-            //name of the nutrient user wanna search
-            keyword: '',
-            // search result from the backend, this variable eventually will be passed to /search page
-            result: new Map()
+            keyword: ' ',
+            fuzzy_result: {}
         }
-        // console.log("current state after parent's call", this.state);
+        this.props.location.state = this.state;
     }
 
     state = {
-        keyword: '',
+        keyword: ' ',
         result: new Map()
     }
 
