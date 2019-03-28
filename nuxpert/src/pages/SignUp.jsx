@@ -28,7 +28,7 @@ class SignUp extends Component {
     console.log(this.state.someData);
     return (
       <div>
-        <NavBar />
+        <NavBar {...this.props}/>
         {/*this.resultRedirect()*/}
         {/*<button onClick={this.setRedirect}>To Result Page</button>*/}
         <SignUpForm
