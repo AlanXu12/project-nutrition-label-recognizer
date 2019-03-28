@@ -13,7 +13,6 @@ class Navigation extends Component {
             keyword: ' ',
             fuzzy_result: {}
         }
-        this.props.location.state = this.state;
     }
 
     state = {
