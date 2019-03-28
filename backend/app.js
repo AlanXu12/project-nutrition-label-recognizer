@@ -235,10 +235,10 @@ app.post('/signup/', function (req, res, next) {
             users.updateOne({username: username},{ $set: {username: username, hash: hash, salt: salt}}, {upsert: true}, function(err){
                 if (err) return res.status(500).end(err.message);
                 // initialize cookie
-                // res.setHeader('Set-Cookie', cookie.serialize('username', username, {
-                //       path : '/', 
-                //       maxAge: 60 * 60 * 24 * 7
-                // }));
+                res.setHeader('Set-Cookie', cookie.serialize('username', username, {
+                      path : '/', 
+                      maxAge: 60 * 60 * 24 * 7
+                }));
                 db.close();
                 return res.json("user " + username + " signed up");
             });            
@@ -259,16 +259,47 @@ app.post('/signin/', function (req, res, next) {
             if (!user) return res.status(401).end("access denied");
             if (user.hash !== generateHash(password, user.salt)) return res.status(401).end("access denied"); 
             // initialize cookie
-            // res.setHeader('Set-Cookie', cookie.serialize('username', username, {
-            //     path : '/', 
-            //     maxAge: 60 * 60 * 24 * 7
-            // }));
-            // // start a session
-            // req.session.user = user;
+            res.setHeader('Set-Cookie', cookie.serialize('username', username, {
+                path : '/', 
+                maxAge: 60 * 60 * 24 * 7
+            }));
+            // start a session
+            req.session.user = user;
             return res.json("user " + username + " signed in");
         });
     });
 });
+
+// recover password
+app.post('/reset/', function (req, res, next) {
+    let username = req.body.username;
+    // reset the password to the same as the username
+    let password = req.body.username;
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let users = db.db('cscc09').collection('users');   
+        // console.log(username);
+        users.findOne({username: username}, {projection: {_id: 0, username: 1, hash: 1, salt: 1}}, function(err, user) {
+            if (err) return res.status(500).end(err.message);
+            if (!user) return res.status(401).end("access denied");
+            // generate the new password
+            let salt = generateSalt();
+            let hash = generateHash(password, salt);
+            // update the db
+            users.updateOne({username: username},{ $set: {username: username, hash: hash, salt: salt}}, {upsert: true}, function(err){
+                if (err) return res.status(500).end(err.message);
+                // initialize cookie
+                // res.setHeader('Set-Cookie', cookie.serialize('username', username, {
+                //       path : '/', 
+                //       maxAge: 60 * 60 * 24 * 7
+                // }));
+                db.close();
+                return res.json("user " + username + "'s password has been reset");
+            });
+        });
+    });
+});
+
 
 
 
@@ -369,6 +400,7 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         // console.log(json_result);
         // return res.json(results[0].textAnnotations[0].description.split("\n"));
         // return res.json(nutrients);
+        console.log(req.session);
         return res.json(json_result);
         // return res.json(results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox);
         // labels.forEach(label => console.log(label.description));
@@ -390,6 +422,7 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
 });
 
 app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
+    if (!req.params.keyword) return res.json([]);
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
         let nutrients = db.db('cscc09').collection('nutrients');
@@ -434,20 +467,7 @@ app.get('/', (req, res) => {
 });
 
 const http = require('http');
-const https = require('https');
 const PORT = 8080;
-
-// let privateKey = fs.readFileSync( 'server.key' );
-// let certificate = fs.readFileSync( 'server.crt' );
-// let config = {
-//         key: privateKey,
-//         cert: certificate
-// };
-
-// https.createServer(config, app).listen(PORT, function (err) {
-//     if (err) console.log(err);
-//     else console.log("HTTPS server on https://localhost:%s", PORT);
-// });
 
 http.createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);

@@ -6,6 +6,7 @@ docker build -t nuxpert .
 # sleep 3s
 docker tag nuxpert gcr.io/kubernetes-221921/nuxpert:latest
 docker push gcr.io/kubernetes-221921/nuxpert
+sleep 3s
 kubectl apply -f kubernetes/deployment.yaml
 # docker tag node-app gcr.io/kubernetes-221921/node-app:latest
 # docker push gcr.io/kubernetes-221921/node-app
