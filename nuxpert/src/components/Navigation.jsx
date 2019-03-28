@@ -6,19 +6,20 @@ import {
 } from 'mdbreact';
 
 class Navigation extends Component {
-
     constructor(props) {
         super(props);
+        console.log("this," ,this);
+        console.log("nav props," ,props);
         this.state = {
             keyword: ' ',
             fuzzy_result: {}
         }
-        this.props.location.state = this.state;
+        console.log("nav bar's state:", this.state);
     }
 
     state = {
         keyword: ' ',
-        result: new Map()
+        fuzzy_result: new Map()
     }
 
     toggleCollapse = collapseID => () =>
