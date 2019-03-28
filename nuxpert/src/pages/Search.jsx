@@ -38,12 +38,10 @@ export class Search extends Component {
         })
         return (
             <div className="container">
-                <Navigation />
+                <Navigation {...this.props}/>
                 <br />
                 <br />
-                <SearchBar {...this.props}/>
-                <br />
-                <h1>Result(s) for: {this.state.nutrient}</h1>
+                <h1>related result(s) for: {this.state.nutrient}</h1>
                 {fuzzyResultsList}
             </div>
         )
