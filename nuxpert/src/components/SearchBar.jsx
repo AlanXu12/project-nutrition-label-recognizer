@@ -6,7 +6,7 @@ class SearchBar extends React.Component {
 
     constructor(props) {
         super(props);
-        // console.log(props);
+        console.log(props);
         const prevState = this.props.location.state;
         this.state = {
             //name of the nutrient user wanna search
@@ -16,6 +16,7 @@ class SearchBar extends React.Component {
         }
         // console.log("current state after parent's call", this.state);
     }
+
     state = {
         keyword: '',
         result: new Map()
