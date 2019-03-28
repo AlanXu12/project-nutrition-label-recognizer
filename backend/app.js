@@ -11,11 +11,6 @@ app.use(express.static('static'));
 const cors = require('cors');
 app.use(cors());
 
-app.use(function (req, res, next){
-    console.log("HTTP request", req.method, req.url, req.body);
-    next();
-});
-
 // Imports the Google Cloud client library
 const vision = require('@google-cloud/vision');
 // Creates a GCP vision client
@@ -63,6 +58,11 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
+app.use(function (req, res, next){
+    req.username = ('user' in req.session)? req.session.user.username : null;
+    console.log("HTTP request", req.method, req.url, req.body);
+    next();
+});
 
 let isAuthenticated = function(req, res, next) {
     if (!req.username) return res.status(401).end("access denied");
@@ -173,7 +173,7 @@ const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
 const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // cited page: https://github.com/bpampuch/pdfmake/blob/0.1/dev-playground/server.js
-app.get('/api/pdf', function (req, res) {
+app.get('/api/report', function (req, res) {
     var docDefinition = {
         content: [
             'First paragraph',
@@ -269,6 +269,16 @@ app.post('/signin/', function (req, res, next) {
         });
     });
 });
+// signout
+app.get('/signout/', function (req, res, next) {
+    res.setHeader('Set-Cookie', cookie.serialize('username', '', {
+          path : '/', 
+          maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
+    }));
+    req.session.destroy();
+    return res.json("user " + username + " signed out");
+});
+
 
 // recover password
 app.post('/reset/', function (req, res, next) {
@@ -306,7 +316,8 @@ app.post('/reset/', function (req, res, next) {
 // upload image and return text
 app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
     // save the file into uploads dir
-    let path = 'uploads/' + req.files.image.md5;
+    let file_extension = req.files.image.mimetype.split('/')[1];
+    let path = `uploads/${req.files.image.md5}.${file_extension}`;
     fs.writeFile(path, (Buffer.from(req.files.image.data)).toString('binary'),  "binary",function(err) { });
     let nutrients = [];
     client.textDetection(path).then(results => {
@@ -394,16 +405,51 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
         });
         json_result['width'] = width;
         json_result['height'] = height;
-        console.log(nutrients);
-        // return res.json(results[0]);
-        // console.log(nutrients);
-        // console.log(json_result);
-        // return res.json(results[0].textAnnotations[0].description.split("\n"));
-        // return res.json(nutrients);
-        console.log(req.session);
-        return res.json(json_result);
-        // return res.json(results[0].fullTextAnnotation.pages[0].blocks[0].boundingBox);
-        // labels.forEach(label => console.log(label.description));
+
+        // upload the file to the cloud bucket
+        let bucket_path;
+        if (req.username){
+            bucket_path = `${req.username}/${path}`;
+        } else{
+            bucket_path = `temp/${path}`;
+        }
+        storage.bucket(bucketName).upload(path, {
+            destination: bucket_path,
+            metadata: {
+            // Enable long-lived HTTP caching headers
+            // Use only if the contents of the file will never change
+            // (If the contents will change, use cacheControl: 'no-cache')
+            cacheControl: 'public, max-age=31536000',
+            },
+        })
+        .then(() => {
+            console.log(`${bucket_path} uploaded to ${bucketName}.`);
+            // store the image info into db
+            mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+                if (err) return res.status(500).end(err.message);
+                let images = db.db('cscc09').collection('images');
+                // insert bucket path and the scanning result into the db
+                images.updateOne({path: bucket_path}, {$set: {path: bucket_path, result: Object.keys(json_result).slice(0, -2)}},  {upsert: true}, function(err){
+                    if (err) return res.status(500).end(err.message);
+                    // get the imageID
+                    images.findOne({path: bucket_path}, {projection: {_id: 1}}, function(err, image) {
+                        db.close();
+                        // console.log(nutrients);
+                        // return res.json(results[0]);
+                        // console.log(nutrients);
+                        // console.log(json_result);
+                        // return res.json(results[0].textAnnotations[0].description.split("\n"));
+                        // return res.json(nutrients);
+                        // console.log(req.username);
+                        json_result['id'] = image._id;
+                        return res.json(json_result);
+                    });
+                });            
+            });
+        })
+        .catch(err => {
+            console.error('ERROR:', err);
+        });
     }).catch(err => {
         console.error('ERROR:', err);
     });
