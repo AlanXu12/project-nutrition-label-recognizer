@@ -107,3 +107,5 @@ class Navigation extends Component {
 
 }
 export default Navigation;
+
+// nav bar from: https://mdbootstrap.com/docs/react/navigation/navbar/
