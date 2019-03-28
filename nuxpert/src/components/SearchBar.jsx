@@ -16,6 +16,7 @@ class SearchBar extends React.Component {
         }
         // console.log("current state after parent's call", this.state);
     }
+
     state = {
         keyword: '',
         result: new Map()

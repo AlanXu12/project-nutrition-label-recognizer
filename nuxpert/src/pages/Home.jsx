@@ -100,13 +100,13 @@ class Home extends Component {
         return (
             <div className="container">
                 {/* Navigation bar */}
-                <Navigation />
+                <Navigation {...this.props}/>
                 {/* Introduction for nuXpert */}
                 <br></br>
                 <Intro />
                 <br></br>
                 {/* search bar */}
-                <SearchBar {...this.props}/>
+                {/* <SearchBar {...this.props}/> */}
                 {/* <div>
                     <input
                         type="text"
