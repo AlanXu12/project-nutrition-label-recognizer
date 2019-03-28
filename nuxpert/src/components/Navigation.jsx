@@ -6,9 +6,10 @@ import {
 } from 'mdbreact';
 
 class Navigation extends Component {
-
     constructor(props) {
         super(props);
+        console.log("this," ,this);
+        console.log("nav props," ,props);
         this.state = {
             keyword: ' ',
             fuzzy_result: {}
@@ -17,7 +18,7 @@ class Navigation extends Component {
 
     state = {
         keyword: ' ',
-        result: new Map()
+        fuzzy_result: new Map()
     }
 
     toggleCollapse = collapseID => () =>
@@ -92,9 +93,9 @@ class Navigation extends Component {
                                     placeholder="Search Nutrient"
                                     onChange={this.handleInputChange}
                                 />
-                                <button onClick={this.handleFuzzySearch}>Search</button>
                             </div>
                         </MDBFormInline>
+                        <button onClick={this.handleFuzzySearch}>Search</button>
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
