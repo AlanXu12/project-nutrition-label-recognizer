@@ -41,7 +41,8 @@ class Result extends Component {
       imageWidth: prevState.result.width,
       showPdf: false,
       pdfPageNum: 1,
-      pdfPageNumMax: 1
+      pdfPageNumMax: 1,
+      reportPdf: samplePdf
     };
     console.log(this.state);
   }
@@ -85,6 +86,7 @@ class Result extends Component {
       // console.log("clicked Y: ", this.state.y);
       // console.log("zoomRatio: ", zoomRatio);
       // console.log("relative Y: ", this.state.y / zoomRatio);
+      // TODO: need to check if the current nutrient is "imageId" or not as well.....
       if (nutrient != "height" && nutrient != "width") {
         const nutri = nutrients[nutrient];
         // console.log("nutrient: ", nutrient);
@@ -121,11 +123,20 @@ class Result extends Component {
     console.log("this.state: ", this.state);
   };
 
-  showReport = () => {
+  // handler for report button clicking on scanning result page
+  showReport = async () => {
+    console.log("showReport is hitted...");
+    // get corresponding pdf report from backend
+    // const response = await fetch('/api/report/' + imageId + '/');
+    const response = await fetch('/api/report/');
+    console.log("response: ", response);
+    // const body = await response.json();
+    if (response.status !== 200) throw Error("something wrong...");
     this.setState({
-      showPdf: true
+      showPdf: true,
+      reportPdf: response
     });
-  };
+  }
 
   backToResult = () => {
     this.setState({
@@ -163,9 +174,6 @@ class Result extends Component {
 
 
   render() {
-
-    // console.log("In render(): ", this.state);
-
     // divide components to two display views (1. scanning result 2. PDF report preview)
     const showPdf = this.state.showPdf;
     let displayView;
@@ -210,19 +218,53 @@ class Result extends Component {
       displayView = (
         <div>
           <div>
-            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" onClick={this.backToResult} alter="Back to scanning report">Back</button>
-            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Save to my account">Save</button>
-            <a className="btn btn-primary btn-lg mt-2 btn-preview-pdf" href={samplePdf} download="Report" alter="Download this report">Download</a>
+            <button
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              type="button"
+              onClick={ this.backToResult }
+              alter="Back to scanning report"
+            >
+              Back
+            </button>
+            <button
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              type="button"
+              alter="Save to my account"
+            >
+              Save
+            </button>
+            <a
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              href={ this.state.reportPdf }
+              download="Report"
+              alter="Download this report"
+            >
+              Download
+            </a>
           </div>
           <div className="btn-flex-container">
-            <button className="btn btn-primary btn-sm mt-2" type="button" onClick={this.prevPdfPage} alter="Previous page">Prev</button>
-            <button className="btn btn-primary btn-sm mt-2" type="button" onClick={this.nextPdfPage} alter="Previous page">Next</button>
+            <button
+              className="btn btn-primary btn-sm mt-2"
+              type="button"
+              onClick={ this.prevPdfPage }
+              alter="Previous page"
+            >
+              Prev
+            </button>
+            <button
+              className="btn btn-primary btn-sm mt-2"
+              type="button"
+              onClick={ this.nextPdfPage }
+              alter="Previous page"
+            >
+              Next
+            </button>
           </div>
           <PDFReader
             className="pdf-reader"
-            url={ samplePdf }
-            page={this.state.pdfPageNum}
-            onDocumentComplete={this.setPdfPageNumMax}
+            url={ this.state.reportPdf }
+            page={ this.state.pdfPageNum }
+            onDocumentComplete={ this.setPdfPageNumMax }
           />
           {/*
             <div className="pdf-viewer-container">

@@ -1,29 +1,31 @@
 import React, { Component } from 'react';
 
 import {
-    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBFormInline,
-    MDBDropdown, MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem
+    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBContainer,
+    MDBIcon, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
 } from 'mdbreact';
 
 class Navigation extends Component {
-
     constructor(props) {
         super(props);
+        console.log("this,", this);
+        console.log("nav props,", props);
         this.state = {
             keyword: ' ',
-            fuzzy_result: {}
+            fuzzy_result: {},
+            collapseID: ''
         }
     }
 
     state = {
         keyword: ' ',
-        result: new Map()
+        fuzzy_result: new Map(),
+        collapseID: ''
     }
 
-    toggleCollapse = collapseID => () =>
-        this.setState(prevState => ({
-            collapseID: prevState.collapseID !== collapseID ? collapseID : ""
-        }));
+    toggleCollapse = () => {
+        this.setState({ isOpen: !this.state.isOpen });
+    }
 
 
     handleFuzzySearch = async () => {
@@ -63,7 +65,7 @@ class Navigation extends Component {
         return (
             <MDBNavbar color="default-color" expand="md">
                 <MDBNavbarBrand>
-                    <strong className="white-text">nuXpert</strong>
+                    <strong className="white-text">Navbar</strong>
                 </MDBNavbarBrand>
                 <MDBNavbarToggler onClick={this.toggleCollapse} />
                 <MDBCollapse id="navbarCollapse3" isOpen={this.state.isOpen} navbar>
@@ -92,9 +94,9 @@ class Navigation extends Component {
                                     placeholder="Search Nutrient"
                                     onChange={this.handleInputChange}
                                 />
-                                <button onClick={this.handleFuzzySearch}>Search</button>
                             </div>
                         </MDBFormInline>
+                        <button onClick={this.handleFuzzySearch}>Search</button>
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
@@ -104,3 +106,4 @@ class Navigation extends Component {
 
 }
 export default Navigation;
+// nav bar from: https://mdbootstrap.com/docs/react/navigation/navbar/
