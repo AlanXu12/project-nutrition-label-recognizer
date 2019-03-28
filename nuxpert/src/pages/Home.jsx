@@ -1,46 +1,51 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import './Home.css'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
-import SearchBar from '../components/Search_bar'
 import Intro from '../components/Intro'
-// import SearchImage from '../components/Search_image'
+
+
 class Home extends Component {
 
-    state = {
-        image: null,
-        result: {},
-        redirect: false
+    constructor(props) {
+        super(props);
+        this.state = {
+            image: 'image',
+            keyword: ' ',
+            result: {},
+            fuzzy_result: {}
+        }
+        this.props.location.state = this.state;
     }
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         image: null,
-    //         result: {},
-    //         redirect: false
-    //     }
-    // }
+
+    state = {
+        image: 'image',
+        keyword: ' ',
+        result: {},
+        fuzzy_result: {}
+    }
+
 
     onFileSelect(e) {
         this.setState({
             image: e.target.files[0],
+            keyword: this.state.keyword,
             result: {},
-            redirect: false
+            fuzzy_result: {}
         })
     }
 
+    onKeywordUpdate(e) {
+        this.setState({
+            image: this.state.image,
+            keyword: e.target.value,
+            result: {},
+            fuzzy_result: {}
+        })
+        console.log("after change,", this.state.keyword);
+    }
 
-    // resultRedirect = () => {
-    //     console.log("props:", this.props);
-    //     if (this.state.redirect) {
-    //         const location = {
-    //             pathname: '/result',
-    //             state: this.state
-    //         }
-    //         this.props.history.push(location);
-    //     }
-    // }
+
 
     fileUploadHandler = () => {
         let fd = new FormData();
@@ -51,7 +56,8 @@ class Home extends Component {
                 this.setState({
                     image: this.state.image,
                     result: res.data,
-                    redirect: true
+                    keyword: this.state.keyword,
+                    fuzzy_result: this.state.fuzzy_result
                 });
                 console.log("before push props:", this.props);
                 console.log("before push, location:", location);
@@ -60,7 +66,8 @@ class Home extends Component {
                     state: this.state
                 }
                 this.props.history.push(location);
-                // this.props.navigate('Result');
+            }).then(err => {
+                console.log(err);
             });
     }
 
@@ -68,26 +75,40 @@ class Home extends Component {
         return (
             <div className="container">
                 {/* Navigation bar */}
-                <Navigation />
+                <Navigation {...this.props} />
                 {/* Introduction for nuXpert */}
                 <br></br>
                 <Intro />
                 <br></br>
                 {/* search bar */}
-                <SearchBar />
+                {/* <SearchBar {...this.props}/> */}
+                {/* <div>
+                    <input
+                        type="text"
+                        className="search-form"
+                        value={this.state.keyword}
+                        onChange={(e) => this.onKeywordUpdate(e)}
+                    />
+                    {/* <Link to={{
+                            pathname: '/search',
+                            state: this.state
+                        }}> Search </Link> */}
+                {/* <button onClick={this.fuzzySearchHandler}>Search</button>
+                </div> */}
                 <br></br>
                 {/* drag and drop upload */}
                 {/* <SearchImage /> */}
-                <div onSubmit={this.onFormSubmit}>
+                <div>
                     {/* {this.resultRedirect()} */}
                     <input
                         type="file"
                         name="file"
                         onChange={(e) => this.onFileSelect(e)}
                         encType="multipart/form-data"
-                    >
-                    </input>
+                    />
                     <button onClick={this.fileUploadHandler}>See Report</button>
+                    <br></br>
+                    <br></br>
                 </div>
             </div>
         );
@@ -96,6 +117,6 @@ class Home extends Component {
 
 export default Home;
 
-                // credit:
-                // react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
+// credit:
+// react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
 // drag and drop: http://react-dnd.github.io/react-dnd/about

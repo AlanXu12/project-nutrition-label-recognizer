@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 import './App.css';
 import Home from './pages/Home.jsx';
 import Result from './pages/Result';
+import Search from './pages/Search';
 import Test from './pages/Test.jsx';
 import TestMouseTracing from './pages/TestMouseTracing.jsx';
 import Credit from './pages/Credit.jsx';
@@ -20,6 +21,7 @@ class App extends Component {
           <Route exact path="/test" component = {Test}/>
           <Route exact path="/tmt" component = {TestMouseTracing}/>
           <Route exact path="/credit" component = {Credit}/>
+          <Route exact path="/search/:keyword" component = {Search}/>
           <Route exact path="/signup" component = {SignUp}/>
           <Route exact path="/history" component = {History}/>
         </div>
