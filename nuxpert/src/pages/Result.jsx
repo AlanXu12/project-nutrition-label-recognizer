@@ -144,6 +144,8 @@ class Result extends Component {
         <div>
           <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.showReport}>Report</button>
 
+        <NavBar {...this.props}/>
+
         <button className="btn btn-primary btn-lg mt-2 btn-report" type="button">Report</button>
         <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.updateDetails}>TEST-SHOW-TEXT</button>
 
@@ -197,7 +199,7 @@ class Result extends Component {
 
     return (
       <div className="container">
-        <NavBar {...this.props}/>
+        <NavBar {... this.props}/>
         { displayView }
         <CreditPortal />
       </div>
