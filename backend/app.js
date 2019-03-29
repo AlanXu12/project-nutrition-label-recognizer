@@ -55,7 +55,7 @@ function generateHash (password, salt){
 
 const session = require('express-session');
 app.use(session({
-    secret: 'please change this secret',
+    secret: 'nuxpertinfo',
     resave: false,
     saveUninitialized: true,
 }));
@@ -158,7 +158,8 @@ const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
 const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // cited page: https://github.com/bpampuch/pdfmake/blob/0.1/dev-playground/server.js
-app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
+// create the pdf file
+app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next) {
     // initialize the docDefinition
     var docDefinition = {
         content: [
@@ -287,6 +288,20 @@ app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
                 results.reportObjArr.push(result);
             });
             return res.json(results);   
+        });    
+    });
+});
+
+app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let reports = db.db('cscc09').collection('reports');
+        reports.findOne({imageid: req.params.imageid}, {projection: {_id: 0, path: 1, username: 1}}, function(err, report) {
+            if (req.username != report.username) return res.status(401).end("access denied");
+            let report_path = report.path;
+            let result = {};
+            result['url'] = `${public_access_url}${report_path}`
+            return res.json(result);
         });    
     });
 });
