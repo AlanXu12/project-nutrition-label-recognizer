@@ -13,7 +13,8 @@ class Home extends Component {
             image: 'image',
             keyword: ' ',
             result: {},
-            fuzzy_result: {}
+            fuzzy_result: {},
+            username:''
         }
         this.props.location.state = this.state;
     }
@@ -22,25 +23,27 @@ class Home extends Component {
         image: 'image',
         keyword: ' ',
         result: {},
-        fuzzy_result: {}
+        fuzzy_result: {},
+        username:''
     }
 
 
     onFileSelect(e) {
         this.setState({
-            image: e.target.files[0],
-            keyword: this.state.keyword,
-            result: {},
-            fuzzy_result: {}
+            image: e.target.files[0]
+        })
+    }
+
+    onUserUpdate = (username) =>{
+        this.setState({
+            user:username
         })
     }
 
     onKeywordUpdate(e) {
         this.setState({
             image: this.state.image,
-            keyword: e.target.value,
-            result: {},
-            fuzzy_result: {}
+            keyword: e.target.value
         })
         console.log("after change,", this.state.keyword);
     }
@@ -54,10 +57,7 @@ class Home extends Component {
             .then(res => {
                 console.log(res.data);
                 this.setState({
-                    image: this.state.image,
-                    result: res.data,
-                    keyword: this.state.keyword,
-                    fuzzy_result: this.state.fuzzy_result
+                    result: res.data
                 });
                 console.log("before push props:", this.props);
                 console.log("before push, location:", location);
@@ -74,32 +74,12 @@ class Home extends Component {
     render() {
         return (
             <div className="container">
-                {/* Navigation bar */}
                 <Navigation {...this.props} />
-                {/* Introduction for nuXpert */}
                 <br></br>
                 <Intro />
                 <br></br>
-                {/* search bar */}
-                {/* <SearchBar {...this.props}/> */}
-                {/* <div>
-                    <input
-                        type="text"
-                        className="search-form"
-                        value={this.state.keyword}
-                        onChange={(e) => this.onKeywordUpdate(e)}
-                    />
-                    {/* <Link to={{
-                            pathname: '/search',
-                            state: this.state
-                        }}> Search </Link> */}
-                {/* <button onClick={this.fuzzySearchHandler}>Search</button>
-                </div> */}
                 <br></br>
-                {/* drag and drop upload */}
-                {/* <SearchImage /> */}
                 <div>
-                    {/* {this.resultRedirect()} */}
                     <input
                         type="file"
                         name="file"

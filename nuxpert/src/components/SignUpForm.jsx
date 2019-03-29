@@ -12,6 +12,7 @@ class SignUpForm extends Component {
 
   state = {
     errorMsg: '',
+    username: null
   }
 
   // helper function for sending signup info to backend
@@ -76,7 +77,8 @@ class SignUpForm extends Component {
         console.log("Successfully get response from backend...");
         // clean up error message
         this.setState({
-          errorMsg: ''
+          errorMsg: '',
+          username: username
         });
         // TODO: update / redirect to some page
         const location = {

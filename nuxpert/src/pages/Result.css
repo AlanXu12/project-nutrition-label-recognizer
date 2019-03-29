@@ -37,3 +37,7 @@ canvas {
 .pdf-reader {
   max-width: inherit !important;
 }
+
+#msg-box {
+  color: red;
+}
