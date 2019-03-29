@@ -129,7 +129,7 @@ class Result extends Component {
   showReport = async () => {
     console.log("showReport is hitted...");
     // get corresponding pdf report from backend
-    const response = await fetch('/api/report/' + this.state.imageId + '/');
+    const response = await fetch('/api/report/make/' + this.state.imageId + '/');
     console.log("response: ", response);
     // const body = await response.json();
     if (response.status !== 200) throw Error("something wrong...");

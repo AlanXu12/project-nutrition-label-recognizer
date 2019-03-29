@@ -24,18 +24,21 @@ class History extends Component {
   showReport = async (imageId) => {
     console.log("showReport is hitted...");
     // get corresponding pdf report from backend
-    // const response = await fetch('/api/report/' + imageId + '/');
     console.log("In history page, imageId: ", imageId);
     // TODO: needs to request the corresponding report using the current imageId
-    const response = await fetch('/api/report/');
+    const response = await fetch('/api/report/' + imageId + '/');
+    // const response = await fetch('/api/report/');
     console.log("response: ", response);
-    // const body = await response.json();
     if (response.status !== 200) throw Error("something wrong...");
-    this.setState({
-      showPdf: true,
-      reportPdf: response
-    });
-    console.log("response.url: ", response.url);
+    const body = await response.json();
+    if (body) {
+      // ask History page to show the PDF report
+      this.setState({
+        showPdf: true,
+        reportPdf: body.url
+      });
+    }
+    console.log("response.body: ", response.body);
   }
 
   backToResult = () => {
