@@ -1,26 +1,20 @@
 import React, { Component } from 'react';
-
+import Cookies from 'js-cookie';
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
 } from 'mdbreact';
 
 class Navigation extends Component {
     constructor(props) {
-        console.log("home page got props:", props);
+        console.log("nav got props:", props);
+        console.log("nav got cookie.get:", Cookies.get());
         super(props);
         this.state = {
             keyword: '_',
             fuzzy_result: {},
             collapseID: '',
-            username: this.props.history.location.state ? this.props.history.location.state.username : null
+            username: Cookies.get('username') 
         }
-    }
-
-    state = {
-        keyword: '_',
-        fuzzy_result: new Map(),
-        collapseID: '',
-        username: this.props.history.location.state ? this.props.history.location.state.username : null
     }
 
     toggleCollapse = () => {
@@ -60,31 +54,15 @@ class Navigation extends Component {
         console.log("new keyword:", this.state.keyword);
     }
 
-     async checkUserLoggedin(){
-        // response expected to be a username / null
-        const response = await fetch('/' , {
+    handleSignout = () => {
+        const response = fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
         });
-        if (response.status !== 200) throw Error(response.json().message);
-        if (response !== null){
-            this.state.username = 'response';
-            return true;
-        }else{return false}
-    }
-
-    handleSignout = async () => {
-        const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            }
-        });
-        if (response.status !== 200) throw Error(response.json().message);
+        console.log(response.body);
     }
 
     renderVisitor = () => (
@@ -129,7 +107,7 @@ class Navigation extends Component {
                             <MDBNavLink to="/">Home</MDBNavLink>
                         </MDBNavItem>
                         <div>
-                            {this.checkUserLoggedin() ? this.renderUser() : this.renderVisitor()}
+                            {this.state.username ? this.renderUser() : this.renderVisitor()}
                         </div>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>

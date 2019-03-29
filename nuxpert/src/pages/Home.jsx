@@ -3,6 +3,7 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
+import Cookies from 'js-cookie';
 
 
 class Home extends Component {
@@ -14,19 +15,10 @@ class Home extends Component {
             image: 'image',
             keyword: ' ',
             result: {},
-            fuzzy_result: {},
-            username: this.props.history.location.state ? this.props.history.location.state.username : null
+            fuzzy_result: {}
         }
-        // console.log("home page state:", this.state);
     }
 
-    state = {
-        image: 'image',
-        keyword: ' ',
-        result: {},
-        fuzzy_result: {},
-        username: this.props.history.location.state ? this.props.history.location.state.username : null
-    }
 
 
     onFileSelect(e) {
