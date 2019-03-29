@@ -39,10 +39,13 @@ class Result extends Component {
       image: URL.createObjectURL(prevState.image),
       imageHeight: prevState.result.height,
       imageWidth: prevState.result.width,
+      imageId: prevState.result.id,
       showPdf: false,
       pdfPageNum: 1,
       pdfPageNumMax: 1,
-      reportPdf: samplePdf
+      reportPdf: samplePdf,
+      reportSaved: false,
+      msgBox: ""
     };
     console.log(this.state);
   }
@@ -87,7 +90,7 @@ class Result extends Component {
       // console.log("zoomRatio: ", zoomRatio);
       // console.log("relative Y: ", this.state.y / zoomRatio);
       // TODO: need to check if the current nutrient is "imageId" or not as well.....
-      if (nutrient != "height" && nutrient != "width") {
+      if (nutrient != "height" && nutrient != "width" && nutrient != "id") {
         const nutri = nutrients[nutrient];
         // console.log("nutrient: ", nutrient);
         // console.log("nutri: ", nutri);
@@ -127,8 +130,7 @@ class Result extends Component {
   showReport = async () => {
     console.log("showReport is hitted...");
     // get corresponding pdf report from backend
-    // const response = await fetch('/api/report/' + imageId + '/');
-    const response = await fetch('/api/report/');
+    const response = await fetch('/api/report/' + this.state.imageId + '/');
     console.log("response: ", response);
     // const body = await response.json();
     if (response.status !== 200) throw Error("something wrong...");
@@ -138,9 +140,34 @@ class Result extends Component {
     });
   }
 
+  // handler for back button clicking on scanning result page
   backToResult = () => {
+    // check if this report has been saved already
+    if (!this.state.reportSaved) {
+      // send request and let backend know this report doesn't need to be saved
+      this.sendSaveReportRequest(false);
+    }
+    // hide the pdf preview reader
     this.setState({
       showPdf: false
+    });
+  }
+
+  // request backend for saving or not saving the current showing report
+  sendSaveReportRequest = async (saveReport) => {
+    // get request URL depending on if the current report needs to be saved or not
+    const requestUrl = '/api/report/' + (saveReport? 'save' : 'unsave') + '/' + this.state.imageId;
+    const response = await fetch(requestUrl);
+    if (response.status !== 200) throw Error("something wrong...");
+  };
+
+  // handler for save button clicking on scanning result page
+  saveReport = () => {
+    // send request and let backend know this report needs to be saved
+    this.sendSaveReportRequest(true);
+    this.setState({
+      reportSaved: true,
+      msgBox: "This report has been successfully saved!"
     });
   }
 
@@ -231,10 +258,10 @@ class Result extends Component {
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
               type="button"
               alter="Save to my account"
+              onClick={ this.saveReport }
             >
               Save
             </button>
-            {/*
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
               href={ pdfReportHref }
@@ -243,13 +270,7 @@ class Result extends Component {
             >
               Download
             </a>
-            */}
-            <a
-              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              href={ this.state.reportPdf.url }
-            >
-              Download
-            </a>
+            <p id="msg-box">{ this.state.msgBox }</p>
           </div>
           <div className="btn-flex-container">
             <button
