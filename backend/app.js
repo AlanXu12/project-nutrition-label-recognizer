@@ -293,7 +293,40 @@ app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
 
 app.delete('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
     // delete image and report entry from mongodb
-    // delete image and report file from bucket
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let reports = db.db('cscc09').collection('reports');
+        let images =  db.db('cscc09').collection('images');
+        reports.findOne({imageid: req.params.imageid}, {projection: {username: 1}}, function(err, report) {
+            if (err) return res.status(500).end(err.message);
+            // check if the user is deleting others reports
+            if (req.username != report.username) return res.status(401).end("access denied");
+            images.findOneAndDelete({_id: ObjectId(req.params.imageid)}, {projection: {path: 1}}, function(err, image) {
+                if (err) return res.status(500).end(err.message);
+                reports.findOneAndDelete({imageid: req.params.imageid}, {projection: {_id: 1, path: 1, imagePath: 1}}, function(err, report) {
+                    if (err) return res.status(500).end(err.message);
+                    // delete image and report file from bucket
+                    let image_path = report.value.imagePath;
+                    let path = report.value.path;
+                    // delete the image from the bucket
+                    storage.bucket(bucketName).file(image_path).delete()
+                    .then(() => {
+                        // delete the report from the bucket
+                        storage.bucket(bucketName).file(path).delete()
+                        .then(() => {
+                            return res.status(200).end(`The image with id ${req.params.imageid}  and its corresponding pdf have already been removed`);
+                        })
+                        .catch(err => {
+                            return res.status(500).end(err.code);
+                        });
+                    })
+                    .catch(err => {
+                        return res.status(500).end(err.code);
+                    });
+                });
+            });
+        });
+    });
 });
 
 
