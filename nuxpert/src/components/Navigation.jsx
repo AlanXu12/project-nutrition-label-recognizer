@@ -60,6 +60,22 @@ class Navigation extends Component {
         console.log("new keyword:", this.state.keyword);
     }
 
+     async checkUserLoggedin(){
+        // response expected to be a username / null
+        const response = await fetch('/' , {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+        if (response.status !== 200) throw Error(response.json().message);
+        if (response !== null){
+            this.state.username = 'response';
+            return true;
+        }else{return false}
+    }
+
     handleSignout = async () => {
         const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
@@ -113,7 +129,7 @@ class Navigation extends Component {
                             <MDBNavLink to="/">Home</MDBNavLink>
                         </MDBNavItem>
                         <div>
-                            {this.state.username ? this.renderUser() : this.renderVisitor()}
+                            {this.checkUserLoggedin() ? this.renderUser() : this.renderVisitor()}
                         </div>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>
