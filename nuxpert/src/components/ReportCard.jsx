@@ -9,14 +9,16 @@ class ReportCard extends Component {
     console.log("this.props.imageId: ", this.props.imageId);
     const displayImage = (this.props.image != null)? this.props.image : "https://www.eatright.org/-/media/eatrightimages/food/nutrition/nutritionfactsandfoodlabels/nutritionfacts2016.jpg?la=en&hash=CE6F2C9DBF73E50256EA72EABDBDF46E5396FD2E";
     const imageId = this.props.imageId;
+    const time = this.props.time;
     this.askParentShowReport = this.askParentShowReport.bind(this);
     // console.log("image: ", image);
     this.state = {
-      title: "Test Title",
-      date: "YYYY-MM-DD",
       image: displayImage,
-      briefIntro: "Some brief description of report for this certain time of scanning search...",
-      imageId: imageId
+      imageId: imageId,
+      time: time,
+      // title: "Test Title",
+      // date: "YYYY-MM-DD",
+      // briefIntro: "Some brief description of report for this certain time of scanning search...",
     };
   }
 
@@ -33,14 +35,15 @@ class ReportCard extends Component {
           <a className="preview" href="#">
             <img src={require('../media/preview-icon.svg')} onClick={ this.askParentShowReport }/>
           </a>
+          {/* TODO: replace href here to the URL that can delete the corresponding image and its report */}
           <a className="delete" href="#">
             <img src={require('../media/delete-icon.svg')}/>
           </a>
         </div>
         <div className="card-body">
-          <h3 className="card-title">{this.state.title}</h3>
-          <h4 className="card-subtitle">{this.state.date}</h4>
-          <p className="card-text">{this.state.briefIntro}</p>
+          {/* <h3 className="card-title">{this.state.title}</h3> */}
+          <h4 className="card-subtitle">{this.state.time}</h4>
+          {/* <p className="card-text">{this.state.briefIntro}</p> */}
         </div>
       </div>
     );

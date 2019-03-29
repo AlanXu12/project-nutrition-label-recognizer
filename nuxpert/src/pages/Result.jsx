@@ -89,7 +89,6 @@ class Result extends Component {
       // console.log("clicked Y: ", this.state.y);
       // console.log("zoomRatio: ", zoomRatio);
       // console.log("relative Y: ", this.state.y / zoomRatio);
-      // TODO: need to check if the current nutrient is "imageId" or not as well.....
       if (nutrient != "height" && nutrient != "width" && nutrient != "id") {
         const nutri = nutrients[nutrient];
         // console.log("nutrient: ", nutrient);

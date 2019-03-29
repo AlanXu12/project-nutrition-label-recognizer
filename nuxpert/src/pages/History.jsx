@@ -14,28 +14,11 @@ import samplePdf from '../media/sample.pdf';
 class History extends Component {
 
   state = {
-    redirect: false,
     showPdf: false,
     pdfPageNum: 1,
     pdfPageNumMax: 1,
     reportPdf: samplePdf
   }
-  // setRedirect = () => {
-  //   this.setState({
-  //     redirect: true
-  //   })
-  // }
-  // resultRedirect = () => {
-  //   if (this.state.redirect) {
-  //
-  //   }
-  // }
-
-  // handleData(data) {
-  //   this.setState({
-  //     fromChild: data
-  //   });
-  // }
 
   // handler for report button clicking on scanning result page
   showReport = async (imageId) => {
@@ -88,23 +71,67 @@ class History extends Component {
     });
   }
 
+  // request backend to get all the saved reports' corresponding imageIds
+  getAllSavedReportsRequest = async () => {
+    const response = await fetch('/api/report/history/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        // username: get the username somewhere
+      })
+    });
+    // TODO: handler backend server response errors
+    if (response.status !== 200) {
+      return null;
+    } else {
+      // get all the imageIds from backend response
+      const body = await response.json();
+      if (body) {
+        // TODO: may need to change reportObjArr to the actual key that was sent in the response body
+        return body.reportObjArr;
+      }
+    }
+  }
+
   render() {
 
     // divide components to two display views (1. scanning result 2. PDF report preview)
     const showPdf = this.state.showPdf;
     let displayView;
     if(!showPdf) {
+      // request backend to get all the saved reports' corresponding imageIds
+      let reportObjArr = this.getAllSavedReportsRequest;
+      if (reportObjArr != null) {
+        // loop through the imageIdArr to create corresponding ReportCards
+        let reportCards;
+        Object.keys(reportObjArr).some((reportObj, index) => {
+          // create ReportCard using the current reportObj contains
+          reportCards += (
+            <ReportCard
+              showReportFromParant={ this.showReport }
+              imageId={ reportObj.imageId }
+              image={ reportObj.image }
+              time={ reportObj.time }
+            />
+          );
+        });
+      }
+      // create report cards one by one
       displayView = (
         <div className="card-columns">
-          <ReportCard showReportFromParant={this.showReport} imageId="TEST_IMAGE_ID"/>
-          <ReportCard image={"https://stephanieclairmont.com/wp-content/uploads/2015/03/rsz_nutrition_label.gif"}/>
-          <ReportCard image={"https://www.khlaw.com/webfiles/Nutrition%20Label.jpg"}/>
-          <ReportCard image={"http://www.dreamfoods.com/wp-content/uploads/2014/07/ItalianVolcano_LemonJuice_NutritionFacts.jpg"}/>
-          <ReportCard image={"https://www.free-power-point-templates.com/articles/wp-content/uploads/2013/03/nutrition-facts-label-template.jpg"}/>
-          <ReportCard image={"http://hallskitchen.ca/wp-content/uploads/Bangkok-Coconut-Curry-Soup-Nutrition-Label-2013.jpg"}/>
-          <ReportCard />
-          <ReportCard image={"https://ncsweetpotatoes.com/wp-content/uploads/2018/06/Sweet-Potato-Medium-Label-507x1024.jpg"}/>
+          { reportCards }
           {/*
+            <ReportCard showReportFromParant={this.showReport} imageId="TEST_IMAGE_ID"/>
+            <ReportCard image={"https://stephanieclairmont.com/wp-content/uploads/2015/03/rsz_nutrition_label.gif"}/>
+            <ReportCard image={"https://www.khlaw.com/webfiles/Nutrition%20Label.jpg"}/>
+            <ReportCard image={"http://www.dreamfoods.com/wp-content/uploads/2014/07/ItalianVolcano_LemonJuice_NutritionFacts.jpg"}/>
+            <ReportCard image={"https://www.free-power-point-templates.com/articles/wp-content/uploads/2013/03/nutrition-facts-label-template.jpg"}/>
+            <ReportCard image={"http://hallskitchen.ca/wp-content/uploads/Bangkok-Coconut-Curry-Soup-Nutrition-Label-2013.jpg"}/>
+            <ReportCard />
+            <ReportCard image={"https://ncsweetpotatoes.com/wp-content/uploads/2018/06/Sweet-Potato-Medium-Label-507x1024.jpg"}/>
           */}
         </div>
       );
@@ -120,13 +147,14 @@ class History extends Component {
             >
               Back
             </button>
-            <button
+            {/* TODO: replace href here to the URL that can delete the corresponding image and its report */}
+            <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              type="button"
+              href="#"
               alter="Delete from my report history"
             >
               Delete
-            </button>
+            </a>
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
               href={ this.state.reportPdf }
