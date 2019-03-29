@@ -1,31 +1,32 @@
 import React, { Component } from 'react';
 
 import {
-    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBContainer,
-    MDBIcon, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
+    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
 } from 'mdbreact';
 
 class Navigation extends Component {
     constructor(props) {
         super(props);
-        console.log("this,", this);
-        console.log("nav props,", props);
         this.state = {
             keyword: ' ',
             fuzzy_result: {},
-            collapseID: ''
+            collapseID: '',
+            username: null
         }
     }
 
     state = {
         keyword: ' ',
         fuzzy_result: new Map(),
-        collapseID: ''
+        collapseID: '',
+        username: null
     }
 
     toggleCollapse = () => {
         this.setState({ isOpen: !this.state.isOpen });
     }
+
+
 
 
     handleFuzzySearch = async () => {
@@ -61,11 +62,41 @@ class Navigation extends Component {
         console.log("new keyword:", this.state.keyword);
     }
 
+
+    renderVisitor = () => (
+        <MDBNavItem id="visitor">
+            <MDBDropdown>
+                <MDBDropdownToggle nav caret>
+                    <span className="mr-2">User</span>
+                </MDBDropdownToggle>
+                <MDBDropdownMenu>
+                    <MDBDropdownItem href="/signup">Login</MDBDropdownItem>
+                </MDBDropdownMenu>
+            </MDBDropdown>
+        </MDBNavItem>
+    )
+
+    renderUser = () => (
+        <MDBNavItem id="user">
+            <MDBDropdown>
+                <MDBDropdownToggle nav caret>
+                    <span className="mr-2">Welcome! {this.state.username}</span>
+                </MDBDropdownToggle>
+                <MDBDropdownMenu>
+                    <MDBDropdownItem href="/history">History report</MDBDropdownItem>
+                    <MDBDropdownItem href="/signout">Signout</MDBDropdownItem>
+                </MDBDropdownMenu>
+            </MDBDropdown>
+        </MDBNavItem>
+
+    )
+
     render() {
+
         return (
             <MDBNavbar color="default-color" expand="md">
                 <MDBNavbarBrand>
-                    <strong className="white-text">Navbar</strong>
+                    <strong className="white-text">nuXpert</strong>
                 </MDBNavbarBrand>
                 <MDBNavbarToggler onClick={this.toggleCollapse} />
                 <MDBCollapse id="navbarCollapse3" isOpen={this.state.isOpen} navbar>
@@ -73,16 +104,9 @@ class Navigation extends Component {
                         <MDBNavItem active>
                             <MDBNavLink to="/">Home</MDBNavLink>
                         </MDBNavItem>
-                        <MDBNavItem>
-                            <MDBDropdown>
-                                <MDBDropdownToggle nav caret>
-                                    <span className="mr-2">User</span>
-                                </MDBDropdownToggle>
-                                <MDBDropdownMenu>
-                                    <MDBDropdownItem href="/signup">Login</MDBDropdownItem>
-                                </MDBDropdownMenu>
-                            </MDBDropdown>
-                        </MDBNavItem>
+                        <div>
+                            {this.state.username ? this.renderUser() : this.renderVisitor()}
+                        </div>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>
                         <MDBFormInline waves>
