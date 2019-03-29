@@ -13,8 +13,7 @@ export class Search extends Component {
         this.state = {
             nutrient: this.props.location.state.keyword,
             info: "Details about this nutritien",
-            fuzzyResults: this.props.location.state.result,
-            username:this.props.history.location.state ? this.props.history.location.state.username : null
+            fuzzyResults: this.props.location.state.result
         };
         console.log(this.state);
         
@@ -34,7 +33,7 @@ export class Search extends Component {
         })
         return (
             <div className="container">
-                <Navigation {...this.props}/>
+                <Navigation/>
                 <br />
                 <br />
                 <h1>related result(s) for: {this.state.nutrient}</h1>
