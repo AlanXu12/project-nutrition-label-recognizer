@@ -24,7 +24,7 @@ export class Search extends Component {
         const fuzzyResultsList = data.map((nutrient) => {
             return (
                 <div key={nutrient.name}>
-                <Collapsible className="nutrient" trigger={'>>'+nutrient.name+' :'} >
+                <Collapsible className="nutrient" trigger={' > '+nutrient.name+':  '} >
                     <p className="nutrient">{nutrient.details}</p>
                 </Collapsible>
                 <br />
