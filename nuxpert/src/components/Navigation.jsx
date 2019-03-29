@@ -6,28 +6,26 @@ import {
 
 class Navigation extends Component {
     constructor(props) {
+        console.log("home page got props:", props);
         super(props);
         this.state = {
-            keyword: ' ',
+            keyword: '_',
             fuzzy_result: {},
             collapseID: '',
-            username: null
+            username: this.props.history.location.state ? this.props.history.location.state.username : null
         }
     }
 
     state = {
-        keyword: ' ',
+        keyword: '_',
         fuzzy_result: new Map(),
         collapseID: '',
-        username: null
+        username: this.props.history.location.state ? this.props.history.location.state.username : null
     }
 
     toggleCollapse = () => {
         this.setState({ isOpen: !this.state.isOpen });
     }
-
-
-
 
     handleFuzzySearch = async () => {
         const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
@@ -62,6 +60,16 @@ class Navigation extends Component {
         console.log("new keyword:", this.state.keyword);
     }
 
+    handleSignout = async () => {
+        const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+        if (response.status !== 200) throw Error(response.json().message);
+    }
 
     renderVisitor = () => (
         <MDBNavItem id="visitor">
@@ -84,7 +92,7 @@ class Navigation extends Component {
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
                     <MDBDropdownItem href="/history">History report</MDBDropdownItem>
-                    <MDBDropdownItem href="/signout">Signout</MDBDropdownItem>
+                    <MDBDropdownItem href="/" onClick = {this.handleSignout}>Signout</MDBDropdownItem>
                 </MDBDropdownMenu>
             </MDBDropdown>
         </MDBNavItem>
@@ -92,7 +100,7 @@ class Navigation extends Component {
     )
 
     render() {
-
+        console.log("does user exist?", this.state.username);
         return (
             <MDBNavbar color="default-color" expand="md">
                 <MDBNavbarBrand>

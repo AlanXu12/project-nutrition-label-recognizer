@@ -8,15 +8,16 @@ import Intro from '../components/Intro'
 class Home extends Component {
 
     constructor(props) {
+        console.log("home page got props:", props);
         super(props);
         this.state = {
             image: 'image',
             keyword: ' ',
             result: {},
             fuzzy_result: {},
-            username:''
+            username: this.props.history.location.state ? this.props.history.location.state.username : null
         }
-        this.props.location.state = this.state;
+        // console.log("home page state:", this.state);
     }
 
     state = {
@@ -24,7 +25,7 @@ class Home extends Component {
         keyword: ' ',
         result: {},
         fuzzy_result: {},
-        username:''
+        username: this.props.history.location.state ? this.props.history.location.state.username : null
     }
 
 
