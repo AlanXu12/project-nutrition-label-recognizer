@@ -86,6 +86,7 @@ var checkId = function(req, res, next) {
 
 // mongodb dependency
 let mongoClient = require('mongodb').MongoClient;
+let ObjectId = require('mongodb').ObjectID;
 // let dbUrl = "mongodb://" + process.env.IPADDRESS + ":27017/cscc09";
 // let dbUrl = "mongodb+srv://c09Viewer:viewer123@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
 let dbUrl = "mongodb+srv://conner:8G0BOdeTu2gzNLyb@mongo-r9zv2.gcp.mongodb.net/test?retryWrites=true";
@@ -173,46 +174,67 @@ const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
 const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // cited page: https://github.com/bpampuch/pdfmake/blob/0.1/dev-playground/server.js
-app.get('/api/report', function (req, res) {
+app.get('/api/report/:imageid/', function (req, res) {
+    // initialize the docDefinition
     var docDefinition = {
         content: [
-            'First paragraph',
-            'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
         ]
     };
-
-    const pdfDoc = pdfMake.createPdf(docDefinition);
-
-    pdfDoc.getBase64((data) => {
-        // convert the pdf to base64-encoded
-        const base64Data = Buffer.from(data.toString('utf-8'), 'base64');
-        let local_path = "uploads/test.pdf";
-        // generate the local temp file
-        fs.writeFile(local_path, base64Data, 'base64', function(err) {
-            if(err) throw err;
-        });
-        // upload the file to the cloud bucket
-        let bucket_path = 'usr1/test1.pdf';
-        storage.bucket(bucketName).upload(local_path, {
-            destination: bucket_path,
-            metadata: {
-            // Enable long-lived HTTP caching headers
-            // Use only if the contents of the file will never change
-            // (If the contents will change, use cacheControl: 'no-cache')
-            cacheControl: 'public, max-age=31536000',
-            },
-        })
-        .then(() => {
-            console.log(`${bucket_path} uploaded to ${bucketName}.`);
-            res.contentType('application/pdf');
-            res.end(base64Data);
-            fs.unlink(local_path, (err) => {
-                if (err) throw err;
-                console.log(`${local_path} was deleted`);
+    // get the imageId from the request URL
+    let id = req.params.imageid;
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        // get two collections
+        let images = db.db('cscc09').collection('images');
+        let nutrients = db.db('cscc09').collection('nutrients');
+        // find the image details from the given imageId
+        images.findOne({_id: ObjectId(id)}, {projection: {result: 1}}, function(err, image) {
+            let results = image.result;
+            // retrive all the nutrients from the db to filter out those the image has
+            nutrients.find().project({_id: 0, name: 1, details: 1}).toArray(function(err, nutrients_lst) {
+                db.close();
+                // traverse the all the nutrients to match
+                nutrients_lst.forEach(function(nutrient) {
+                    if(results.indexOf(nutrient.name) != -1){
+                        docDefinition.content.push(`${nutrient.name}: `);
+                        docDefinition.content.push(`    ${nutrient.details}\n\n`);
+                    }
+                });
+                // generate pdf corresponding to the docDefinition
+                const pdfDoc = pdfMake.createPdf(docDefinition);
+                pdfDoc.getBase64((data) => {
+                    // convert the pdf to base64-encoded
+                    const base64Data = Buffer.from(data.toString('utf-8'), 'base64');
+                    let local_path = "uploads/test.pdf";
+                    // generate the local temp file
+                    fs.writeFile(local_path, base64Data, 'base64', function(err) {
+                        if(err) return res.status(500).end(err.message);
+                    });
+                    // upload the file to the cloud bucket
+                    let bucket_path = 'usr1/test1.pdf';
+                    storage.bucket(bucketName).upload(local_path, {
+                        destination: bucket_path,
+                        metadata: {
+                        // Enable long-lived HTTP caching headers
+                        // Use only if the contents of the file will never change
+                        // (If the contents will change, use cacheControl: 'no-cache')
+                        cacheControl: 'public, max-age=31536000',
+                        },
+                    })
+                    .then(() => {
+                        console.log(`${bucket_path} uploaded to ${bucketName}.`);
+                        res.contentType('application/pdf');
+                        res.end(base64Data);
+                        fs.unlink(local_path, (err) => {
+                            if (err) return res.status(500).end(err.message);
+                            console.log(`${local_path} was deleted`);
+                        });
+                    })
+                    .catch(err => {
+                        console.error('ERROR:', err);
+                    });
+                });
             });
-        })
-        .catch(err => {
-            console.error('ERROR:', err);
         });
     });
 });
