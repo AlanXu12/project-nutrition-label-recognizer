@@ -17,7 +17,8 @@ class History extends Component {
     showPdf: false,
     pdfPageNum: 1,
     pdfPageNumMax: 1,
-    reportPdf: samplePdf
+    reportPdf: samplePdf,
+    imageId: null
   }
 
   // handler for report button clicking on scanning result page
@@ -35,10 +36,36 @@ class History extends Component {
       // ask History page to show the PDF report
       this.setState({
         showPdf: true,
-        reportPdf: body.url
+        reportPdf: body.url,
+        imageId: imageId
       });
     }
     console.log("response.body: ", response.body);
+  }
+
+  // handler for report delete button clicking on scanning result page
+  sendDeleteReportRequest = async (imageId) => {
+    // delete corresponding pdf report from backend
+    console.log("In history page, imageId: ", imageId);
+    const response = await fetch('/api/report/' + imageId + '/', {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    });
+    console.log("response: ", response);
+    if (response.status !== 200) throw Error("something wrong...");
+    // TODO: delete corresponding ReportCard / refresh the page?
+    window.location.reload();
+    // let index;
+    // for(index=0; index<reportObjArr.length; index++) {
+    //   if (reportObjArr[index].imageId == imageId) break;
+    // }
+    // let newReportObjArr = this.state.reportObjArr.splice(index, 1);
+    // this.setState({
+    //   reportObjArr: newReportObjArr
+    // });
   }
 
   backToResult = () => {
@@ -113,9 +140,11 @@ class History extends Component {
         let reportCards;
         Object.keys(reportObjArr).some((reportObj, index) => {
           // create ReportCard using the current reportObj contains
+          // TODO: needs to check if this expression works or not
           reportCards += (
             <ReportCard
               showReportFromParant={ this.showReport }
+              deleteReportFromParent={ this.sendDeleteReportRequest }
               imageId={ reportObj.imageId }
               image={ reportObj.image }
               time={ reportObj.time }
@@ -152,13 +181,14 @@ class History extends Component {
               Back
             </button>
             {/* TODO: replace href here to the URL that can delete the corresponding image and its report */}
-            <a
+            <button
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              href="#"
+              type="button"
+              onClick={ this.sendDeleteReportRequest(this.state.imageId) }
               alter="Delete from my report history"
             >
               Delete
-            </a>
+            </button>
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
               href={ this.state.reportPdf }

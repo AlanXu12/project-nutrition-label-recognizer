@@ -11,6 +11,7 @@ class ReportCard extends Component {
     const imageId = this.props.imageId;
     const time = this.props.time;
     this.askParentShowReport = this.askParentShowReport.bind(this);
+    this.deleteReportFromParent = this.deleteReportFromParent.bind(this);
     // console.log("image: ", image);
     this.state = {
       image: displayImage,
@@ -37,7 +38,7 @@ class ReportCard extends Component {
           </a>
           {/* TODO: replace href here to the URL that can delete the corresponding image and its report */}
           <a className="delete" href="#">
-            <img src={require('../media/delete-icon.svg')}/>
+            <img src={require('../media/delete-icon.svg')} onClick={ this.deleteReportFromParent }/>
           </a>
         </div>
         <div className="card-body">
