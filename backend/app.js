@@ -406,7 +406,8 @@ app.get('/signout/', function (req, res, next) {
           maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
     }));
     req.session.destroy();
-    return res.json("user " + username + " signed out");
+    res.redirect('/');
+    // return res.json("user " + username + " signed out");
 });
 
 
