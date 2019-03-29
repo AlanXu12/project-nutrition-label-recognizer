@@ -7,7 +7,7 @@ import {
 class Navigation extends Component {
     constructor(props) {
         console.log("nav got props:", props);
-        console.log("nav got cookie.get:", Cookies.get());
+        console.log("nav got Cookies.get:", Cookies.get());
         super(props);
         this.state = {
             keyword: '_',
@@ -54,15 +54,16 @@ class Navigation extends Component {
         console.log("new keyword:", this.state.keyword);
     }
 
-    handleSignout = () => {
-        const response = fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
+    handleSignout = async () => {
+        console.log("before signout");
+        const response = await fetch('/signout/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
         });
-        console.log(response.body);
+        console.log("after signout", response, Cookies.get());
     }
 
     renderVisitor = () => (
@@ -82,7 +83,7 @@ class Navigation extends Component {
         <MDBNavItem id="user">
             <MDBDropdown>
                 <MDBDropdownToggle nav caret>
-                    <span className="mr-2">Welcome! {this.state.username}</span>
+                    <span className="mr-2">Welcome! {Cookies.get('username')}</span>
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
                     <MDBDropdownItem href="/history">History report</MDBDropdownItem>
@@ -94,7 +95,7 @@ class Navigation extends Component {
     )
 
     render() {
-        console.log("does user exist?", this.state.username);
+        console.log("does user exist?", Cookies.get('username'));
         return (
             <MDBNavbar color="default-color" expand="md">
                 <MDBNavbarBrand>
@@ -107,7 +108,7 @@ class Navigation extends Component {
                             <MDBNavLink to="/">Home</MDBNavLink>
                         </MDBNavItem>
                         <div>
-                            {this.state.username ? this.renderUser() : this.renderVisitor()}
+                            {Cookies.get('username') ? this.renderUser() : this.renderVisitor()}
                         </div>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>
