@@ -3,7 +3,6 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
-import SearchBar from '../components/SearchBar';
 
 
 class Home extends Component {
@@ -17,15 +16,15 @@ class Home extends Component {
             fuzzy_result: {}
         }
         this.props.location.state = this.state;
-        console.log(this.props);
     }
 
-    // state = {
-    //     image: 'image',
-    //     keyword: ' ',
-    //     result: {},
-    //     fuzzy_result: {}
-    // }
+    state = {
+        image: 'image',
+        keyword: ' ',
+        result: {},
+        fuzzy_result: {}
+    }
+
 
     onFileSelect(e) {
         this.setState({
@@ -34,7 +33,6 @@ class Home extends Component {
             result: {},
             fuzzy_result: {}
         })
-
     }
 
     onKeywordUpdate(e) {
@@ -47,30 +45,7 @@ class Home extends Component {
         console.log("after change,", this.state.keyword);
     }
 
-    fuzzySearchHandler = () => {
-        //get result from the backend
-        console.log("keyword:", this.state.keyword);
-        axios.get("http://localhost:8080/api/fuzzy/nutrient/" + this.state.keyword + "/")
-            // after result got from backend
-            .then(fuzzy_result => {
-                console.log("result from the backend:", fuzzy_result.data);
-                // update result to state
-                this.setState({
-                    image: this.state.image,
-                    result: this.state.result,
-                    keyword: this.state.keyword,
-                    fuzzy_result: fuzzy_result.data
-                });
-                const location = {
-                    pathname: '/search',
-                    state: this.state
-                }
-                this.props.history.push(location);
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    }
+
 
     fileUploadHandler = () => {
         let fd = new FormData();
@@ -100,13 +75,13 @@ class Home extends Component {
         return (
             <div className="container">
                 {/* Navigation bar */}
-                <Navigation />
+                <Navigation {...this.props} />
                 {/* Introduction for nuXpert */}
                 <br></br>
                 <Intro />
                 <br></br>
                 {/* search bar */}
-                <SearchBar {...this.props}/>
+                {/* <SearchBar {...this.props}/> */}
                 {/* <div>
                     <input
                         type="text"
@@ -118,21 +93,22 @@ class Home extends Component {
                             pathname: '/search',
                             state: this.state
                         }}> Search </Link> */}
-                    {/* <button onClick={this.fuzzySearchHandler}>Search</button>
+                {/* <button onClick={this.fuzzySearchHandler}>Search</button>
                 </div> */}
                 <br></br>
                 {/* drag and drop upload */}
                 {/* <SearchImage /> */}
-                <div onSubmit={this.onFormSubmit}>
+                <div>
                     {/* {this.resultRedirect()} */}
                     <input
                         type="file"
                         name="file"
                         onChange={(e) => this.onFileSelect(e)}
                         encType="multipart/form-data"
-                    >
-                    </input>
+                    />
                     <button onClick={this.fileUploadHandler}>See Report</button>
+                    <br></br>
+                    <br></br>
                 </div>
             </div>
         );

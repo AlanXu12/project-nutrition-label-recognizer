@@ -39,7 +39,10 @@ class Result extends Component {
       image: URL.createObjectURL(prevState.image),
       imageHeight: prevState.result.height,
       imageWidth: prevState.result.width,
-      showPdf: false
+      showPdf: false,
+      pdfPageNum: 1,
+      pdfPageNumMax: 1,
+      reportPdf: samplePdf
     };
     console.log(this.state);
   }
@@ -83,6 +86,7 @@ class Result extends Component {
       // console.log("clicked Y: ", this.state.y);
       // console.log("zoomRatio: ", zoomRatio);
       // console.log("relative Y: ", this.state.y / zoomRatio);
+      // TODO: need to check if the current nutrient is "imageId" or not as well.....
       if (nutrient != "height" && nutrient != "width") {
         const nutri = nutrients[nutrient];
         // console.log("nutrient: ", nutrient);
@@ -119,11 +123,20 @@ class Result extends Component {
     console.log("this.state: ", this.state);
   };
 
-  showReport = () => {
+  // handler for report button clicking on scanning result page
+  showReport = async () => {
+    console.log("showReport is hitted...");
+    // get corresponding pdf report from backend
+    // const response = await fetch('/api/report/' + imageId + '/');
+    const response = await fetch('/api/report/');
+    console.log("response: ", response);
+    // const body = await response.json();
+    if (response.status !== 200) throw Error("something wrong...");
     this.setState({
-      showPdf: true
+      showPdf: true,
+      reportPdf: response
     });
-  };
+  }
 
   backToResult = () => {
     this.setState({
@@ -131,11 +144,36 @@ class Result extends Component {
     });
   }
 
+  // handler for pdf previewer's previous page button clicking
+  prevPdfPage = () => {
+    // check if pdfPageNum will be less than 1 after this time of operation
+    let newPdfPageNum = this.state.pdfPageNum - 1;
+    newPdfPageNum = newPdfPageNum < 1 ? 1 : newPdfPageNum;
+    this.setState({
+      pdfPageNum: newPdfPageNum
+    });
+  }
+
+  // handler for pdf previewer's next page button clicking
+  nextPdfPage = () => {
+    // check if pdfPageNum will be greater than the max page num of the current file after this time of operation
+    let pdfPageNumMax = this.state.pdfPageNumMax;
+    let newPdfPageNum = this.state.pdfPageNum + 1;
+    newPdfPageNum = newPdfPageNum > pdfPageNumMax ? pdfPageNumMax : newPdfPageNum;
+    this.setState({
+      pdfPageNum: newPdfPageNum
+    });
+  }
+
+  // after loading the pdf file, the pdfPageNumMax will be reset by this function
+  setPdfPageNumMax = (totalPage) => {
+    this.setState({
+      pdfPageNumMax: totalPage
+    });
+  }
+
 
   render() {
-
-    // console.log("In render(): ", this.state);
-
     // divide components to two display views (1. scanning result 2. PDF report preview)
     const showPdf = this.state.showPdf;
     let displayView;
@@ -143,7 +181,6 @@ class Result extends Component {
       displayView = (
         <div>
           <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.showReport}>Report</button>
-
           <div className="row row-eq-height mt-2">
 
             <div className="col-sm-12 col-md-7">
@@ -181,20 +218,66 @@ class Result extends Component {
       displayView = (
         <div>
           <div>
-            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" onClick={this.backToResult} alter="Back to scanning report">Back</button>
-            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Save to my account">Save</button>
-            <button className="btn btn-primary btn-lg mt-2 btn-preview-pdf" type="button" alter="Download this report">Download</button>
+            <button
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              type="button"
+              onClick={ this.backToResult }
+              alter="Back to scanning report"
+            >
+              Back
+            </button>
+            <button
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              type="button"
+              alter="Save to my account"
+            >
+              Save
+            </button>
+            <a
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              href={ this.state.reportPdf }
+              download="Report"
+              alter="Download this report"
+            >
+              Download
+            </a>
           </div>
-          <div style={{overflow: 'scroll', height:800}}>
-            <PDFReader url={ samplePdf }/>
+          <div className="btn-flex-container">
+            <button
+              className="btn btn-primary btn-sm mt-2"
+              type="button"
+              onClick={ this.prevPdfPage }
+              alter="Previous page"
+            >
+              Prev
+            </button>
+            <button
+              className="btn btn-primary btn-sm mt-2"
+              type="button"
+              onClick={ this.nextPdfPage }
+              alter="Previous page"
+            >
+              Next
+            </button>
           </div>
+          <PDFReader
+            className="pdf-reader"
+            url={ this.state.reportPdf }
+            page={ this.state.pdfPageNum }
+            onDocumentComplete={ this.setPdfPageNumMax }
+          />
+          {/*
+            <div className="pdf-viewer-container">
+
+            </div>
+          */}
         </div>
       );
     }
 
     return (
       <div className="container">
-        <NavBar/>
+        <NavBar {...this.props}/>
         { displayView }
         <CreditPortal />
       </div>
