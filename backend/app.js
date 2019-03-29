@@ -195,31 +195,29 @@ app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
                     fs.writeFile(local_path, base64Data, 'base64', function(err) {
                         if(err) return res.status(500).end(err.message);
                     });
-                    res.contentType('application/pdf');
-                    res.end(base64Data);
-                    // // upload the file to the cloud bucket
-                    // let bucket_path = `${req.username}/${req.params.imageid}.pdf`;
-                    // storage.bucket(bucketName).upload(local_path, {
-                    //     destination: bucket_path,
-                    //     metadata: {
-                    //     // Enable long-lived HTTP caching headers
-                    //     // Use only if the contents of the file will never change
-                    //     // (If the contents will change, use cacheControl: 'no-cache')
-                    //     cacheControl: 'public, max-age=31536000',
-                    //     },
-                    // })
-                    // .then(() => {
-                    //     console.log(`${bucket_path} uploaded to ${bucketName}.`);
-                    //     res.contentType('application/pdf');
-                    //     res.end(base64Data);
-                    //     fs.unlink(local_path, (err) => {
-                    //         if (err) return res.status(500).end(err.message);
-                    //         console.log(`${local_path} was deleted`);
-                    //     });
-                    // })
-                    // .catch(err => {
-                    //     console.error('ERROR:', err);
-                    // });
+                    // upload the file to the cloud bucket
+                    let bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
+                    // console.log(bucket_path);
+                    storage.bucket(bucketName).upload(local_path, {
+                        destination: bucket_path,
+                        metadata: {
+                        // Enable long-lived HTTP caching headers
+                        // Use only if the contents of the file will never change
+                        // (If the contents will change, use cacheControl: 'no-cache')
+                        cacheControl: 'public, max-age=31536000',
+                        },
+                    })
+                    .then(() => {
+                        fs.unlink(local_path, (err) => {
+                            if (err) return res.status(500).end(err.code);
+                            console.log(`${local_path} was deleted`);
+                            console.log(`${bucket_path} uploaded to ${bucketName}.`);
+                            return res.json({'url': `${public_access_url}${bucket_path}`});    
+                        });
+                    })
+                    .catch(err => {
+                        return res.status(500).end(err.code);
+                    });
                 });
             });
         });
@@ -230,39 +228,26 @@ app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
 app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next) {
     // upload the file to the cloud bucket
     let local_path = `uploads/${req.params.imageid}.pdf`;
-    let bucket_path = `${req.username}/${req.params.imageid}.pdf`;
-    storage.bucket(bucketName).upload(local_path, {
-        destination: bucket_path,
-        metadata: {
-        // Enable long-lived HTTP caching headers
-        // Use only if the contents of the file will never change
-        // (If the contents will change, use cacheControl: 'no-cache')
-        cacheControl: 'public, max-age=31536000',
-        },
-    })
+    let org_bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
+    let des_bucket_path = `${req.username}/${req.params.imageid}.pdf`;
+    storage.bucket(bucketName).file(org_bucket_path).move(des_bucket_path)
     .then(() => {
-        console.log(`${bucket_path} uploaded to ${bucketName}.`);
-        // delete the local temp file
-        fs.unlink(local_path, (err) => {
-            if (err) return res.status(500).end(err.code);
-            console.log(`${local_path} was deleted`);
-            // insert the saved pdf info
-            mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-                if (err) return res.status(500).end(err.message);
-                let reports = db.db('cscc09').collection('reports');
-                let images =  db.db('cscc09').collection('images'); 
-                // console.log(username);
-                console.log(req.params.imageid);
-                images.findOne({_id: ObjectId(req.params.imageid)}, {projection: {_id: 0, path: 1}}, function(err, image) {
-                    let image_path = image.path;
-                    reports.updateOne({path: bucket_path},{ $set: {path: bucket_path, username: req.username, imageid: req.params.imageid, imagePath: image_path}}, {upsert: true}, function(err){
-                        if (err) return res.status(500).end(err.message);
-                        db.close();
-                        return res.status(200).end(`The file ${req.params.imageid}.pdf has already been saved`);
-                    }); 
-                });    
-            });
+        console.log(`${org_bucket_path} moved to ${des_bucket_path}.`);
+        // insert the saved pdf info
+        mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+            if (err) return res.status(500).end(err.message);
+            let reports = db.db('cscc09').collection('reports');
+            let images =  db.db('cscc09').collection('images'); 
+            images.findOne({_id: ObjectId(req.params.imageid)}, {projection: {_id: 0, path: 1}}, function(err, image) {
+                let image_path = image.path;
+                reports.updateOne({path: des_bucket_path},{ $set: {path: des_bucket_path, username: req.username, imageid: req.params.imageid, imagePath: image_path}}, {upsert: true}, function(err){
+                    if (err) return res.status(500).end(err.message);
+                    db.close();
+                    return res.status(200).end(`The file ${req.params.imageid}.pdf has already been saved`);
+                }); 
+            });    
         });
+
     })
     .catch(err => {
         return res.status(500).end(err.code);
@@ -272,11 +257,15 @@ app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next)
 // unsave the pdf file
 app.get('/api/report/unsave/:imageid/', isAuthenticated, function (req, res, next) {
     let local_path = `uploads/${req.params.imageid}.pdf`;
-    fs.unlink(local_path, (err) => {
-        if (err) return res.status(500).end(err.code);
-        console.log(`${local_path} was deleted`);
-        res.status(200).end(`The file ${req.params.imageid}.pdf has already been removed`);
-    });
+    // delete the file from the cloud bucket
+    let bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
+    storage.bucket(bucketName).file(bucket_path).delete()
+    .then(() => {
+        return res.status(200).end(`The file ${req.params.imageid}.pdf has already been removed`);
+    })
+    .catch(err => {
+        console.error('ERROR:', err);
+    });  
 });
 
 // get history page
@@ -297,11 +286,14 @@ app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
                 result['time'] = ObjectId(report._id).getTimestamp();
                 results.reportObjArr.push(result);
             });
-            // console.log(ObjectId(reports_lst[0]._id).getTimestamp().year);
-            // console.log(reports_lst);
             return res.json(results);   
         });    
     });
+});
+
+app.delete('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
+    // delete image and report entry from mongodb
+    // delete image and report file from bucket
 });
 
 
