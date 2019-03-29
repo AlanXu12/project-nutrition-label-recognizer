@@ -151,24 +151,7 @@ async function sendEmail(){
   
 console.log(makeCode(5));
 
-// upload file to the bucket
-// let filename = 'resources/s1.png';
-// storage.bucket(bucketName).upload(filename, {
-//     destination: filename,
-//     metadata: {
-//       // Enable long-lived HTTP caching headers
-//       // Use only if the contents of the file will never change
-//       // (If the contents will change, use cacheControl: 'no-cache')
-//       cacheControl: 'public, max-age=31536000',
-//     },
-// })
-// .then(() => {
-//     console.log(`${filename} uploaded to ${bucketName}.`);
-// })
-// .catch(err => {
-//     console.error('ERROR:', err);
-// });
-  
+
 // make pdf part
 const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
 const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
@@ -182,6 +165,7 @@ app.get('/api/report/:imageid/', function (req, res) {
     };
     // get the imageId from the request URL
     let id = req.params.imageid;
+    // console.log(id);
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
         // get two collections
@@ -205,37 +189,77 @@ app.get('/api/report/:imageid/', function (req, res) {
                 pdfDoc.getBase64((data) => {
                     // convert the pdf to base64-encoded
                     const base64Data = Buffer.from(data.toString('utf-8'), 'base64');
-                    let local_path = "uploads/test.pdf";
+                    let local_path = `uploads/${req.params.imageid}.pdf`;
                     // generate the local temp file
                     fs.writeFile(local_path, base64Data, 'base64', function(err) {
                         if(err) return res.status(500).end(err.message);
                     });
-                    // upload the file to the cloud bucket
-                    let bucket_path = 'usr1/test1.pdf';
-                    storage.bucket(bucketName).upload(local_path, {
-                        destination: bucket_path,
-                        metadata: {
-                        // Enable long-lived HTTP caching headers
-                        // Use only if the contents of the file will never change
-                        // (If the contents will change, use cacheControl: 'no-cache')
-                        cacheControl: 'public, max-age=31536000',
-                        },
-                    })
-                    .then(() => {
-                        console.log(`${bucket_path} uploaded to ${bucketName}.`);
-                        res.contentType('application/pdf');
-                        res.end(base64Data);
-                        fs.unlink(local_path, (err) => {
-                            if (err) return res.status(500).end(err.message);
-                            console.log(`${local_path} was deleted`);
-                        });
-                    })
-                    .catch(err => {
-                        console.error('ERROR:', err);
-                    });
+                    res.contentType('application/pdf');
+                    res.end(base64Data);
+                    // // upload the file to the cloud bucket
+                    // let bucket_path = `${req.username}/${req.params.imageid}.pdf`;
+                    // storage.bucket(bucketName).upload(local_path, {
+                    //     destination: bucket_path,
+                    //     metadata: {
+                    //     // Enable long-lived HTTP caching headers
+                    //     // Use only if the contents of the file will never change
+                    //     // (If the contents will change, use cacheControl: 'no-cache')
+                    //     cacheControl: 'public, max-age=31536000',
+                    //     },
+                    // })
+                    // .then(() => {
+                    //     console.log(`${bucket_path} uploaded to ${bucketName}.`);
+                    //     res.contentType('application/pdf');
+                    //     res.end(base64Data);
+                    //     fs.unlink(local_path, (err) => {
+                    //         if (err) return res.status(500).end(err.message);
+                    //         console.log(`${local_path} was deleted`);
+                    //     });
+                    // })
+                    // .catch(err => {
+                    //     console.error('ERROR:', err);
+                    // });
                 });
             });
         });
+    });
+});
+
+// save the pdf file
+app.get('/api/report/save/:imageid/', function (req, res) {
+    // upload the file to the cloud bucket
+    let local_path = `uploads/${req.params.imageid}.pdf`;
+    let bucket_path = `${req.username}/${req.params.imageid}.pdf`;
+    storage.bucket(bucketName).upload(local_path, {
+        destination: bucket_path,
+        metadata: {
+        // Enable long-lived HTTP caching headers
+        // Use only if the contents of the file will never change
+        // (If the contents will change, use cacheControl: 'no-cache')
+        cacheControl: 'public, max-age=31536000',
+        },
+    })
+    .then(() => {
+        console.log(`${bucket_path} uploaded to ${bucketName}.`);
+        // delete the local temp file
+        fs.unlink(local_path, (err) => {
+            if (err) return res.status(500).end(err.message);
+            console.log(`${local_path} was deleted`);
+            res.status(200).end(`The file ${req.params.imageid}.pdf has already been saved`);
+        });
+    })
+    .catch(err => {
+        return res.status(500).end(err.message);
+    });
+});
+
+// unsave the pdf file
+app.get('/api/report/unsave/:imageid/', function (req, res) {
+    let local_path = `uploads/${req.params.imageid}.pdf`;
+    fs.unlink(local_path, (err) => {
+        if (err) return res.status(500).end(err.message);
+        console.log(`${local_path} was deleted`);
+        res.status(200).end(`The file ${req.params.imageid}.pdf has already been removed`);
     });
 });
 
@@ -291,6 +315,7 @@ app.post('/signin/', function (req, res, next) {
         });
     });
 });
+
 // signout
 app.get('/signout/', function (req, res, next) {
     res.setHeader('Set-Cookie', cookie.serialize('username', '', {
@@ -331,9 +356,6 @@ app.post('/reset/', function (req, res, next) {
         });
     });
 });
-
-
-
 
 // upload image and return text
 app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
@@ -489,6 +511,7 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
     });
 });
 
+// fuzzy search
 app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
     if (!req.params.keyword) return res.json([]);
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
@@ -515,7 +538,7 @@ app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
     });
 });
 
-
+// insert new nutrient
 app.post('/api/nutrients/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
