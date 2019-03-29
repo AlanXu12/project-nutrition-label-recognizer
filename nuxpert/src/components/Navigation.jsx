@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Cookies from 'js-cookie';
+import { Redirect } from 'react-router-dom';
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
 } from 'mdbreact';
@@ -56,14 +57,20 @@ class Navigation extends Component {
 
     handleSignout = async () => {
         console.log("before signout");
-        const response = await fetch('/signout/', {
+        await fetch('/signout/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        });
-        console.log("after signout", response, Cookies.get());
+        }).then( res => {
+            console.log("after signout", this);
+            const location = {
+                pathname: '/',
+                state: this.state
+              }
+              this.props.history.push(location);
+        })
     }
 
     renderVisitor = () => (
@@ -87,7 +94,7 @@ class Navigation extends Component {
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
                     <MDBDropdownItem href="/history">History report</MDBDropdownItem>
-                    <MDBDropdownItem href="/" onClick = {this.handleSignout}>Signout</MDBDropdownItem>
+                    <MDBDropdownItem href ='#' onClick = {this.handleSignout}>Signout</MDBDropdownItem>
                 </MDBDropdownMenu>
             </MDBDropdown>
         </MDBNavItem>

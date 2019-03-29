@@ -33,7 +33,7 @@ export class Search extends Component {
         })
         return (
             <div className="container">
-                <Navigation/>
+                <Navigation {...this.props}/>
                 <br />
                 <br />
                 <h1>related result(s) for: {this.state.nutrient}</h1>
