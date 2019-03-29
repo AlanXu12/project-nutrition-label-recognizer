@@ -13,7 +13,8 @@ export class Search extends Component {
         this.state = {
             nutrient: this.props.location.state.keyword,
             info: "Details about this nutritien",
-            fuzzyResults: this.props.location.state.result
+            fuzzyResults: this.props.location.state.result,
+            username:this.props.history.location.state ? this.props.history.location.state.username : null
         };
         console.log(this.state);
         

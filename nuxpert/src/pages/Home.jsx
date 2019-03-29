@@ -3,29 +3,22 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
+import Cookies from 'js-cookie';
 
 
 class Home extends Component {
 
     constructor(props) {
+        console.log("home page got props:", props);
         super(props);
         this.state = {
             image: 'image',
             keyword: ' ',
             result: {},
-            fuzzy_result: {},
-            username:''
+            fuzzy_result: {}
         }
-        this.props.location.state = this.state;
     }
 
-    state = {
-        image: 'image',
-        keyword: ' ',
-        result: {},
-        fuzzy_result: {},
-        username:''
-    }
 
 
     onFileSelect(e) {
