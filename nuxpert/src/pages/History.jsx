@@ -26,6 +26,7 @@ class History extends Component {
     // get corresponding pdf report from backend
     // const response = await fetch('/api/report/' + imageId + '/');
     console.log("In history page, imageId: ", imageId);
+    // TODO: needs to request the corresponding report using the current imageId
     const response = await fetch('/api/report/');
     console.log("response: ", response);
     // const body = await response.json();
