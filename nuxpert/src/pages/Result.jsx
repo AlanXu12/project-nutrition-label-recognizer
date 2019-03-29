@@ -215,6 +215,7 @@ class Result extends Component {
         </div>
       );
     } else {
+      const pdfReportHref = "data:application/pdf;base64,[" + this.state.reportPdf + "]"
       displayView = (
         <div>
           <div>
@@ -233,11 +234,19 @@ class Result extends Component {
             >
               Save
             </button>
+            {/*
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              href={ this.state.reportPdf }
+              href={ pdfReportHref }
               download="Report"
               alter="Download this report"
+            >
+              Download
+            </a>
+            */}
+            <a
+              className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
+              href={ this.state.reportPdf.url }
             >
               Download
             </a>
