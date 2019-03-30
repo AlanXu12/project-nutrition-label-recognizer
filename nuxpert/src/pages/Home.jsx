@@ -3,7 +3,6 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
-import Cookies from 'js-cookie';
 
 
 class Home extends Component {
@@ -89,7 +88,3 @@ class Home extends Component {
 }
 
 export default Home;
-
-// credit:
-// react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
-// drag and drop: http://react-dnd.github.io/react-dnd/about

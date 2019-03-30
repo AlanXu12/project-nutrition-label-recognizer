@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Cookies from 'js-cookie';
-import { Redirect } from 'react-router-dom';
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
 } from 'mdbreact';
