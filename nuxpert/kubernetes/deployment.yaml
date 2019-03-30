@@ -24,30 +24,13 @@ spec:
         - name: nuxpert
           image: gcr.io/kubernetes-221921/nuxpert:latest
           ports:
-            - containerPort: 3000
+            - containerPort: 5000
           env:
           - name: "BACKEND_IP"
             valueFrom:
               configMapKeyRef:
                 key: "BACKEND_IP"
                 name: "backend-address"
-
-
-# ---
-# kind: Service
-# apiVersion: v1
-# metadata:
-#   name: node-app-service
-# spec:
-#   selector:
-#     app: node-app
-#   ports:
-#     - protocol: "TCP"
-#       port: 8080
-#       targetPort: 8080
-#       nodePort: 30000
-#   type: LoadBalancer
-
 ---
 apiVersion: "v1"
 kind: "Service"
@@ -59,8 +42,8 @@ metadata:
 spec:
   ports:
   - protocol: "TCP"
-    port: 3000
-    targetPort: 3000
+    port: 5000
+    targetPort: 5000
   selector:
     app: "nuxpert"
   type: "ClusterIP"
@@ -93,5 +76,5 @@ spec:
   - route:
     - destination:
         port:
-          number: 3000
+          number: 5000
         host: nuxpert-service
