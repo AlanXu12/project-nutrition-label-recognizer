@@ -10,6 +10,7 @@ import {
 import { Redirect } from 'react-router-dom';
 import { PDFReader } from 'react-read-pdf';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import './Result.css';
 // import './styles.css';
@@ -48,7 +49,8 @@ class Result extends Component {
       reportPdf: samplePdf,
       reportPdfDowload: null,
       reportSaved: false,
-      msgBox: ""
+      msgBox: "",
+      username: Cookies.get('username')
     };
     console.log(this.state);
   }
@@ -230,9 +232,23 @@ class Result extends Component {
     const showPdf = this.state.showPdf;
     let displayView;
     if(!showPdf) {
+      let reportButton = (<div></div>);
+      console.log("before determining reportButton display, this.state: ", this.state);
+      if (this.state.username) {
+        console.log("username == null => somes user logged in...");
+        reportButton = (
+          <button
+            className="btn btn-primary btn-lg mt-2 btn-report"
+            type="button"
+            onClick={ this.showReport }
+          >
+            Report
+          </button>
+        );
+      }
       displayView = (
         <div>
-          <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={ this.showReport }>Report</button>
+          { reportButton }
           <div className="row row-eq-height mt-2">
 
             <div className="col-sm-12 col-md-7">
@@ -292,6 +308,7 @@ class Result extends Component {
               href={ this.state.reportPdfDowload }
               download="Report.pdf"
               alter="Download this report"
+              target="_blank"
             >
               Download
             </a>
