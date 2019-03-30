@@ -2,12 +2,12 @@ import React, { Component } from 'react'
 import '../styles.scss'
 import Collapsible from 'react-collapsible';
 import Navigation from '../components/Navigation'
-import "./Search.css"
+import './Collapsible.scss'
 
 export class Search extends Component {
 
     constructor(props) {
-        
+
         super(props);
         console.log(this.props);
         this.state = {
@@ -16,7 +16,7 @@ export class Search extends Component {
             fuzzyResults: this.props.location.state.result
         };
         console.log(this.state);
-        
+
     }
 
     render() {
@@ -24,19 +24,26 @@ export class Search extends Component {
         const fuzzyResultsList = data.map((nutrient) => {
             return (
                 <div key={nutrient.name}>
-                <Collapsible className="nutrient" trigger={' > '+nutrient.name+':  '} >
-                    <p className="nutrient">{nutrient.details}</p>
-                </Collapsible>
-                <br />
+                    <Collapsible
+                        className="nutrient"
+                        trigger={' > ' + nutrient.name + ':  '}
+                        triggerClassName="CustomTriggerCSS"
+                        triggerOpenedClassName="CustomTriggerCSS--open"
+                        contentOuterClassName="CustomOuterContentCSS"
+                        contentInnerClassName="CustomInnerContentCSS"
+                    >
+                        <p className="nutrient">{nutrient.details}</p>
+                    </Collapsible>
+                    <br />
                 </div>
             );
         })
         return (
             <div className="container">
-                <Navigation {...this.props}/>
+                <Navigation {...this.props} />
                 <br />
                 <br />
-                <h1>related result(s) for: {this.state.nutrient}</h1>
+                <h1>Top 5 related results for: {this.state.nutrient}</h1>
                 {fuzzyResultsList}
             </div>
         )
