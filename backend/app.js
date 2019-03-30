@@ -6,7 +6,7 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(fileUpload());
-app.use(express.static('static'));
+app.use(express.static('../nuxpert/build'));
 
 // const cors = require('cors');
 // app.use(cors());
@@ -694,9 +694,6 @@ app.post('/api/nutrients/', isAuthenticated, function (req, res, next) {
     });
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello world\n');
-});
 
 const http = require('http');
 const PORT = 8080;
