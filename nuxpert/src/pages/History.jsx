@@ -204,7 +204,14 @@ class History extends Component {
           let reportObj = reportObjArr[reportKey];
           let imageId = reportObj.imageId;
           let image = reportObj.image;
-          let time = reportObj.time;
+          let origTime = reportObj.time;
+          // format time to YYYY-MM-DD
+          let timeDateObj = new Date(origTime);
+          let timeYear = timeDateObj.getFullYear();
+          let timeMonth = timeDateObj.getMonth();
+          let timeDate = timeDateObj.getDate();
+          let time = timeYear + '-' + timeMonth + '-' + timeDate;
+          console.log("after reformating, time: ", time);
           console.log("each time before creation, reportKey: ", reportKey);
           console.log("each time before creation, reportObj: ", reportObj);
           console.log("each time before creation, imageId: ", imageId);
@@ -234,31 +241,6 @@ class History extends Component {
         displayView = (
           <div className="card-columns">
             { reportCards }
-            {/*
-              Object.keys(reportObjArr).some((reportObj, index) => {
-                // create ReportCard using the current reportObj contains
-                // TODO: needs to check if this expression works or not
-                return (
-                  <ReportCard
-                    showReportFromParant={ this.showReport }
-                    deleteReportFromParent={ this.sendDeleteReportRequest }
-                    imageId={ reportObj.imageId }
-                    image={ reportObj.image }
-                    time={ reportObj.time }
-                  />
-                )
-              })
-            */}
-            {/*
-              <ReportCard showReportFromParant={this.showReport} imageId="TEST_IMAGE_ID"/>
-              <ReportCard image={"https://stephanieclairmont.com/wp-content/uploads/2015/03/rsz_nutrition_label.gif"}/>
-              <ReportCard image={"https://www.khlaw.com/webfiles/Nutrition%20Label.jpg"}/>
-              <ReportCard image={"http://www.dreamfoods.com/wp-content/uploads/2014/07/ItalianVolcano_LemonJuice_NutritionFacts.jpg"}/>
-              <ReportCard image={"https://www.free-power-point-templates.com/articles/wp-content/uploads/2013/03/nutrition-facts-label-template.jpg"}/>
-              <ReportCard image={"http://hallskitchen.ca/wp-content/uploads/Bangkok-Coconut-Curry-Soup-Nutrition-Label-2013.jpg"}/>
-              <ReportCard />
-              <ReportCard image={"https://ncsweetpotatoes.com/wp-content/uploads/2018/06/Sweet-Potato-Medium-Label-507x1024.jpg"}/>
-            */}
           </div>
         );
       } else {
