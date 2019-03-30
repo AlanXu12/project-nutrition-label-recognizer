@@ -33,8 +33,8 @@ class Result extends Component {
     console.log(prevState);
     this.state = {
       redirect: false,
-      title: "Default Title",
-      details: "Defualt details Defualt details Defualt details Defualt details",
+      title: "Introduction",
+      details: "1. All the nutrients that have been detected can be clicked (e.g. fat). After clicking, the detailed information about that nutrient will be shown.\n 2. If some nutrient you want to know more has not been detected, you can always use the key word search on the navigation bar.",
       x: 0,
       y: 0,
       nutriRangeArr: prevState.result,
@@ -232,7 +232,11 @@ class Result extends Component {
     const showPdf = this.state.showPdf;
     let displayView;
     if(!showPdf) {
-      let reportButton = (<div></div>);
+      let reportButton = (
+        <p className="msg-box">
+          Please log in to get the ability of generating a PDF report.
+        </p>
+      );
       console.log("before determining reportButton display, this.state: ", this.state);
       if (this.state.username) {
         console.log("username == null => somes user logged in...");
@@ -242,7 +246,7 @@ class Result extends Component {
             type="button"
             onClick={ this.showReport }
           >
-            Report
+            Generate PDF Report
           </button>
         );
       }
@@ -271,8 +275,15 @@ class Result extends Component {
               <div className="card bg-secondary border border-primary">
                 <div className="card-body text-center">
                   <div className="container">
-                    <h2 className="card-title">{this.state.title}</h2>
-                    <p className="card-text text-left">{this.state.details}</p>
+                    <h2 className="card-title">{ this.state.title.toUpperCase() }</h2>
+                    <br/>
+                    <p className="card-text text-left">
+                    {
+                      this.state.details.split('\n').map((paragraph, key) => {
+                        return <span key={key}>{paragraph}<br/><br/></span>
+                      })
+                    }
+                    </p>
                   </div>
                 </div>
               </div>
@@ -312,7 +323,7 @@ class Result extends Component {
             >
               Download
             </a>
-            <p id="msg-box">{ this.state.msgBox }</p>
+            <p className="msg-box">{ this.state.msgBox }</p>
           </div>
           <div className="btn-flex-container">
             <button

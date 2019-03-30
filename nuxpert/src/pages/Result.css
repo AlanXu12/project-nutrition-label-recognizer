@@ -38,6 +38,7 @@ canvas {
   max-width: inherit !important;
 }
 
-#msg-box {
+.msg-box {
   color: red;
+  font-weight: bold;
 }
