@@ -9,6 +9,8 @@ import {
 // import {BrowserRouter as Router, Route} from 'react-router-dom';
 import { Redirect } from 'react-router-dom';
 import { PDFReader } from 'react-read-pdf';
+import axios from 'axios';
+
 import './Result.css';
 // import './styles.css';
 
@@ -129,14 +131,36 @@ class Result extends Component {
   showReport = async () => {
     console.log("showReport is hitted...");
     // get corresponding pdf report from backend
-    const response = await fetch('/api/report/make/' + this.state.imageId + '/');
-    console.log("response: ", response);
-    // const body = await response.json();
-    if (response.status !== 200) throw Error("something wrong...");
-    this.setState({
-      showPdf: true,
-      reportPdf: response
-    });
+    // const response = await fetch('/api/report/make/' + this.state.imageId + '/', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //     // 'credentials': 'include'
+    //   }
+    // });
+    // console.log("response: ", response);
+    // console.log("response.body: ", response.body);
+    // // const body = await response.json();
+    // if (response.status !== 200) throw Error("something wrong...");
+    // this.setState({
+    //   showPdf: true,
+    //   reportPdf: response.url
+    // });
+    // console.log("after requesting backend, this.state: ", this.state);
+    axios.defaults.withCredentials=true;
+    await axios.get('/api/report/make/' + this.state.imageId + '/')
+        .then(res => {
+          console.log("response: ", res);
+          console.log(res.data);
+          this.setState({
+            showPdf: true,
+            reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data
+          });
+          console.log("after requesting backend, this.state: ", this.state);
+        }).then(err => {
+          console.log(err);
+        });
   }
 
   // handler for back button clicking on scanning result page
@@ -206,7 +230,7 @@ class Result extends Component {
     if(!showPdf) {
       displayView = (
         <div>
-          <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={this.showReport}>Report</button>
+          <button className="btn btn-primary btn-lg mt-2 btn-report" type="button" onClick={ this.showReport }>Report</button>
           <div className="row row-eq-height mt-2">
 
             <div className="col-sm-12 col-md-7">
@@ -218,7 +242,7 @@ class Result extends Component {
 
                 <div className="card-body text-center">
                   {this.uploadNewRedirect()}
-                  <button className="btn btn-primary btn-reupload" type="button" name="button" onClick={this.setRedirect}>Upload New</button>
+                  <button className="btn btn-primary btn-reupload" type="button" name="button" onClick={ this.setRedirect }>Upload New</button>
                 </div>
               </div>
 
@@ -241,7 +265,7 @@ class Result extends Component {
         </div>
       );
     } else {
-      const pdfReportHref = "data:application/pdf;base64,[" + this.state.reportPdf + "]"
+      // const pdfReportHref = "data:application/pdf;base64,[" + this.state.reportPdf + "]"
       displayView = (
         <div>
           <div>
@@ -263,7 +287,7 @@ class Result extends Component {
             </button>
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              href={ pdfReportHref }
+              href={ this.state.reportPdf }
               download="Report"
               alter="Download this report"
             >
