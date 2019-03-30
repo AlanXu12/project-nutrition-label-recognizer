@@ -10,3 +10,8 @@
 .card-columns {
   padding: 50px;
 }
+
+.msg-box {
+  color: red;
+  font-weight: bold;
+}
