@@ -8,8 +8,8 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(express.static('static'));
 
-const cors = require('cors');
-app.use(cors());
+// const cors = require('cors');
+// app.use(cors());
 
 // Imports the Google Cloud client library
 const vision = require('@google-cloud/vision');
@@ -62,11 +62,19 @@ app.use(session({
 app.use(function (req, res, next){
     req.username = ('user' in req.session)? req.session.user.username : null;
     console.log("HTTP request", req.method, req.url, req.body);
+    console.log(`SessionID: ${req.sessionID}`);
+    if(req.session.user) console.log(`Session.user.username:  ${req.session.user.username}`);
     next();
 });
 
 let isAuthenticated = function(req, res, next) {
     if (!req.username) return res.status(401).end("access denied");
+    // console.log(req.get("Origin"));
+    // console.log(req.headers);
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials","true");
     next();
 };
 
@@ -213,7 +221,18 @@ app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next)
                             if (err) return res.status(500).end(err.code);
                             console.log(`${local_path} was deleted`);
                             console.log(`${bucket_path} uploaded to ${bucketName}.`);
-                            return res.json({'url': `${public_access_url}${bucket_path}`});    
+                            let result = {};
+                            result['url'] = `${public_access_url}${bucket_path}`;
+                            let url = `${public_access_url}${bucket_path}`;
+                            res.setHeader("Access-Control-Allow-Credentials","true");
+                            res.end(url)
+                            // res.json(result);
+                            // console.log(Object.keys(res));
+                            // console.log(res.end);
+                            // console.log(res.statusCode);
+                            // console.log(res.statusMessage);
+                            // console.log(res.body);
+                            // console.log(res.json);
                         });
                     })
                     .catch(err => {
@@ -244,6 +263,7 @@ app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next)
                 reports.updateOne({path: des_bucket_path},{ $set: {path: des_bucket_path, username: req.username, imageid: req.params.imageid, imagePath: image_path}}, {upsert: true}, function(err){
                     if (err) return res.status(500).end(err.message);
                     db.close();
+                    res.setHeader("Access-Control-Allow-Credentials","true");
                     return res.status(200).end(`The file ${req.params.imageid}.pdf has already been saved`);
                 }); 
             });    
@@ -262,6 +282,7 @@ app.get('/api/report/unsave/:imageid/', isAuthenticated, function (req, res, nex
     let bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
     storage.bucket(bucketName).file(bucket_path).delete()
     .then(() => {
+        res.setHeader("Access-Control-Allow-Credentials","true");
         return res.status(200).end(`The file ${req.params.imageid}.pdf has already been removed`);
     })
     .catch(err => {
@@ -287,7 +308,9 @@ app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
                 result['time'] = ObjectId(report._id).getTimestamp();
                 results.reportObjArr.push(result);
             });
-            return res.json(results);   
+            res.setHeader("Access-Control-Allow-Credentials","true");
+            res.json(results);
+            // console.log(res.body);
         });    
     });
 });
@@ -300,7 +323,11 @@ app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
             if (req.username != report.username) return res.status(401).end("access denied");
             let report_path = report.path;
             let result = {};
-            result['url'] = `${public_access_url}${report_path}`
+            result['url'] = `${public_access_url}${report_path}`;
+            // res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	        // res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH");
+            // res.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+            // res.setHeader("Access-Control-Allow-Credentials","true");
             return res.json(result);
         });    
     });
@@ -329,6 +356,7 @@ app.delete('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
                         // delete the report from the bucket
                         storage.bucket(bucketName).file(path).delete()
                         .then(() => {
+                            res.setHeader("Access-Control-Allow-Credentials","true");
                             return res.status(200).end(`The image with id ${req.params.imageid}  and its corresponding pdf have already been removed`);
                         })
                         .catch(err => {

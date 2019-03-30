@@ -10,11 +10,11 @@ RUN npm install
 
 RUN npm install serve -g
 
-RUN npm run build
-
 # Bundle app source
 COPY . .
 
-EXPOSE 5000
+# RUN npm run build
 
-ENTRYPOINT [ "npm", "start" ]
+EXPOSE 3000
+
+ENTRYPOINT [ "npm", "run", "dev"]

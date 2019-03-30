@@ -55,5 +55,5 @@
   "devDependencies": {
     "sass-loader": "^7.1.0"
   },
-  "proxy": "http://10.31.251.80:8080/"
+  "proxy": "http://node-app-service:8080/"
 }
