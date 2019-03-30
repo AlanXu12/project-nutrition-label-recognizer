@@ -205,12 +205,16 @@ class History extends Component {
           let imageId = reportObj.imageId;
           let image = reportObj.image;
           let origTime = reportObj.time;
-          // format time to YYYY-MM-DD
+          // format time to 'monthName DD, YYYY'
           let timeDateObj = new Date(origTime);
           let timeYear = timeDateObj.getFullYear();
           let timeMonth = timeDateObj.getMonth();
           let timeDate = timeDateObj.getDate();
-          let time = timeYear + '-' + timeMonth + '-' + timeDate;
+          let monthNames = [
+            "January", "February", "March", "April", "May", "June", "July",
+            "August", "September", "October", "November", "December"
+          ];
+          let time = monthNames[timeMonth] + ' ' + timeDate + ', ' + timeYear ;
           console.log("after reformating, time: ", time);
           console.log("each time before creation, reportKey: ", reportKey);
           console.log("each time before creation, reportObj: ", reportObj);
