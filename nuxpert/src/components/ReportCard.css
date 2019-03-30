@@ -1,0 +1,44 @@
+.show-image {
+  background-color: black;
+}
+
+.show-image:hover img{
+  opacity: 0.5;
+}
+
+.show-image:hover a {
+  display: flex;
+}
+
+.show-image a {
+  position: absolute;
+  display: none;
+}
+
+.show-image a.preview {
+  top:0;
+  left:0;
+  padding: 10%;
+}
+
+.show-image a.delete {
+  top:0;
+  right:0;
+  padding: 10%;
+}
+
+a.preview img, a.delete img {
+  max-height: 80px;
+  min-height: 10px;
+  max-width: 80px;
+  min-width: 10px;
+  opacity: 1 !important;
+}
+
+a.delete:hover img {
+  content: url('../media/delete-icon-hover.svg');
+}
+
+a.preview:hover img {
+  content: url('../media/preview-icon-hover.svg');
+}

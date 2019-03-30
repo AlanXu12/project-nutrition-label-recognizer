@@ -3,7 +3,6 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
-import Cookies from 'js-cookie';
 
 
 class Home extends Component {
@@ -46,7 +45,8 @@ class Home extends Component {
     fileUploadHandler = () => {
         let fd = new FormData();
         fd.append('image', this.state.image);
-        axios.post("http://localhost:8080/api/search/image/", fd)
+        axios.defaults.withCredentials=true;
+        axios.post("/api/search/image/", fd)
             .then(res => {
                 console.log(res.data);
                 this.setState({
@@ -89,7 +89,3 @@ class Home extends Component {
 }
 
 export default Home;
-
-// credit:
-// react framwork: https://github.com/MyNameIsURL/simple-react-router-demo/tree/master/src
-// drag and drop: http://react-dnd.github.io/react-dnd/about
