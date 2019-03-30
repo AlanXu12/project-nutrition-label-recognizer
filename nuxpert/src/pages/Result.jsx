@@ -46,6 +46,7 @@ class Result extends Component {
       pdfPageNum: 1,
       pdfPageNumMax: 1,
       reportPdf: samplePdf,
+      reportPdfDowload: null,
       reportSaved: false,
       msgBox: ""
     };
@@ -155,7 +156,8 @@ class Result extends Component {
         console.log(res.data);
         this.setState({
           showPdf: true,
-          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data
+          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
+          reportPdfDowload: res.data
         });
         console.log("after requesting backend, this.state: ", this.state);
       }).then(err => {
@@ -287,8 +289,8 @@ class Result extends Component {
             </button>
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              href={ this.state.reportPdf }
-              download="Report"
+              href={ this.state.reportPdfDowload }
+              download="Report.pdf"
               alter="Download this report"
             >
               Download

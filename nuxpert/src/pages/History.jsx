@@ -22,6 +22,7 @@ class History extends Component {
       pdfPageNum: 1,
       pdfPageNumMax: 1,
       reportPdf: samplePdf,
+      reportPdfDowload: null,
       imageId: null,
       username: Cookies.get('username'),
       reportObjArr: null
@@ -73,6 +74,7 @@ class History extends Component {
         this.setState({
           showPdf: true,
           reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data.url,
+          reportPdfDowload: res.data.url,
           imageId: imageId
         });
         console.log("after requesting backend, this.state: ", this.state);
@@ -290,9 +292,10 @@ class History extends Component {
             </button>
             <a
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
-              href={ this.state.reportPdf }
-              download="Report"
+              href={ this.state.reportPdfDowload }
+              download="Report.pdf"
               alter="Download this report"
+              target="_blank"
             >
               Download
             </a>
