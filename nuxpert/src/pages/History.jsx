@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 import { Redirect } from 'react-router-dom';
 import { PDFReader } from 'react-read-pdf';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 import NavBar from '../components/Navigation.jsx';
 import ReportCard from '../components/ReportCard.jsx';
@@ -45,27 +46,39 @@ class History extends Component {
     // get corresponding pdf report from backend
     console.log("In history page, imageId: ", imageId);
     // TODO: needs to request the corresponding report using the current imageId
-    const response = await fetch('/api/report/' + imageId + '/', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'credentials': 'include'
-      }
-    });
-    // const response = await fetch('/api/report/');
-    console.log("response: ", response);
-    if (response.status !== 200) throw Error("something wrong...");
-    // const body = await response.json();
-    // if (body) {
-      // ask History page to show the PDF report
-    this.setState({
-      showPdf: true,
-      reportPdf: response.url,
-      imageId: imageId
-    });
-    // }
-    console.log("response.url: ", response.url);
+    // const response = await fetch('/api/report/' + imageId + '/', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //     'credentials': 'include'
+    //   }
+    // });
+    // console.log("response: ", response);
+    // if (response.status !== 200) throw Error("something wrong...");
+    // // const body = await response.json();
+    // // if (body) {
+    //   // ask History page to show the PDF report
+    // this.setState({
+    //   showPdf: true,
+    //   reportPdf: response.url,
+    //   imageId: imageId
+    // });
+    // // }
+    axios.defaults.withCredentials=true;
+    await axios.get('/api/report/' + imageId + '/')
+      .then(res => {
+        console.log("response: ", res);
+        console.log("response.data: ", res.data);
+        this.setState({
+          showPdf: true,
+          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
+          imageId: imageId
+        });
+        console.log("after requesting backend, this.state: ", this.state);
+      }).then(err => {
+        console.log(err);
+      });
   }
 
   // handler for report delete button clicking on scanning result page
@@ -73,18 +86,26 @@ class History extends Component {
     console.log("sendDeleteReportRequest is called...");
     // delete corresponding pdf report from backend
     console.log("In history page, imageId: ", imageId);
-    const response = await fetch('/api/report/' + imageId + '/', {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      }
-    });
-    console.log("response: ", response);
-    if (response.status !== 200) throw Error("something wrong...");
-    // TODO: delete corresponding ReportCard / refresh the page?
-    // console.log("pretend refreshing page has been called...");
-    window.location.reload();
+    // const response = await fetch('/api/report/' + imageId + '/', {
+    //   method: 'DELETE',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //   }
+    // });
+    // console.log("response: ", response);
+    // if (response.status !== 200) throw Error("something wrong...");
+    // // TODO: delete corresponding ReportCard / refresh the page?
+    // // console.log("pretend refreshing page has been called...");
+    // window.location.reload();
+    axios.defaults.withCredentials=true;
+    await axios.delete('/api/report/' + imageId + '/')
+      .then(res => {
+        console.log("response: ", res);
+        window.location.reload();
+      }).then(err => {
+        console.log(err);
+      });
     // let index;
     // for(index=0; index<reportObjArr.length; index++) {
     //   if (reportObjArr[index].imageId == imageId) break;

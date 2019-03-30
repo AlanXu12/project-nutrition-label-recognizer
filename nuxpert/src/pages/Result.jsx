@@ -150,17 +150,17 @@ class Result extends Component {
     // console.log("after requesting backend, this.state: ", this.state);
     axios.defaults.withCredentials=true;
     await axios.get('/api/report/make/' + this.state.imageId + '/')
-        .then(res => {
-          console.log("response: ", res);
-          console.log(res.data);
-          this.setState({
-            showPdf: true,
-            reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data
-          });
-          console.log("after requesting backend, this.state: ", this.state);
-        }).then(err => {
-          console.log(err);
+      .then(res => {
+        console.log("response: ", res);
+        console.log(res.data);
+        this.setState({
+          showPdf: true,
+          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data
         });
+        console.log("after requesting backend, this.state: ", this.state);
+      }).then(err => {
+        console.log(err);
+      });
   }
 
   // handler for back button clicking on scanning result page
