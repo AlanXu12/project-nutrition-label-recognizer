@@ -11,10 +11,12 @@ class ReportCard extends Component {
     const displayImage = (this.props.image != null)? this.props.image : "https://www.eatright.org/-/media/eatrightimages/food/nutrition/nutritionfactsandfoodlabels/nutritionfacts2016.jpg?la=en&hash=CE6F2C9DBF73E50256EA72EABDBDF46E5396FD2E";
     const imageId = this.props.imageId;
     const time = this.props.time;
+    console.log("this.props: ", this.props);
     console.log("this.askParentShowReport: ", this.askParentShowReport);
+    console.log("this.askParentDeleteReport: ", this.askParentDeleteReport);
     console.log("this.props.deleteReportFromParent: ", this.props.deleteReportFromParent);
-    // this.deleteReportFromParent = this.props.deleteReportFromParent.bind(this);
-    // this.askParentShowReport = this.askParentShowReport.bind(this);
+    // this.deleteReportFromParent = this.askParentDeleteReport.bind(this);
+    this.askParentShowReport = this.askParentShowReport.bind(this);
     // console.log("image: ", image);
     this.state = {
       image: displayImage,
@@ -31,6 +33,11 @@ class ReportCard extends Component {
     this.props.showReportFromParant(this.state.imageId);
   }
 
+  // askParentDeleteReport = (e) => {
+  //   e.preventDefault();
+  //   this.props.deleteReportFromParent(this.state.imageId)
+  // }
+
   render() {
     return (
       <div className="card bg-secondary">
@@ -40,9 +47,11 @@ class ReportCard extends Component {
             <img src={require('../media/preview-icon.svg')} onClick={ this.askParentShowReport }/>
           </a>
           {/* TODO: replace href here to the URL that can delete the corresponding image and its report */}
-          <a className="delete" href="#">
-            <img src={require('../media/delete-icon.svg')} onClick={ this.deleteReportFromParent }/>
+          {/*
+          <a className="delete" href="">
+            <img src={require('../media/delete-icon.svg')} onClick={ this.askParentDeleteReport }/>
           </a>
+          */}
         </div>
         <div className="card-body">
           {/* <h3 className="card-title">{this.state.title}</h3> */}

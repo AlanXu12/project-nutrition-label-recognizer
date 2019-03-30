@@ -72,7 +72,7 @@ class History extends Component {
         console.log("response.data: ", res.data);
         this.setState({
           showPdf: true,
-          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
+          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data.url,
           imageId: imageId
         });
         console.log("after requesting backend, this.state: ", this.state);
@@ -86,6 +86,7 @@ class History extends Component {
     console.log("sendDeleteReportRequest is called...");
     // delete corresponding pdf report from backend
     console.log("In history page, imageId: ", imageId);
+    imageId = (imageId)? this.state.imageId : imageId;
     // const response = await fetch('/api/report/' + imageId + '/', {
     //   method: 'DELETE',
     //   headers: {
@@ -102,6 +103,7 @@ class History extends Component {
     await axios.delete('/api/report/' + imageId + '/')
       .then(res => {
         console.log("response: ", res);
+        // console.log("window.location.reload();");
         window.location.reload();
       }).then(err => {
         console.log(err);
@@ -208,7 +210,7 @@ class History extends Component {
           console.log("each time before creation, time: ", time);
           let newComponent = React.createElement(ReportCard, {
             showReportFromParant: fcnShowReport,
-            deleteReportFromParent: fcnSendDeleteReportRequest,
+            // deleteReportFromParent: fcnSendDeleteReportRequest,
             imageId: imageId,
             image: image,
             time: time
@@ -265,6 +267,7 @@ class History extends Component {
       }
       console.log("before inserting into return, displayView: ", displayView);
     } else {
+      const deleteReport = this.sendDeleteReportRequest;
       displayView = (
         <div>
           <div>
@@ -280,7 +283,7 @@ class History extends Component {
             <button
               className="btn btn-primary btn-lg mt-2 btn-preview-pdf"
               type="button"
-              onClick={ this.sendDeleteReportRequest(this.state.imageId) }
+              onClick={ deleteReport }
               alter="Delete from my report history"
             >
               Delete
