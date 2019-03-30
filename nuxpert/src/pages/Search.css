@@ -1,3 +1,21 @@
 .nutrient{
     font-size:20px;
+    
 }
+.CustomTriggerCSS {
+    background-color: lightcoral;
+    transition: background-color 200ms ease;
+    
+    
+  }
+
+.CustomTriggerCSS--open {
+    background-color: darkslateblue;
+  }
+  
+.Collapsible__custom-sibling {
+    padding: 5px;
+    font-size: 12px;
+    background-color: #CBB700;
+    color: black;
+  }
