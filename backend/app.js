@@ -514,10 +514,10 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             if(detail.length == 0){
                 detail = keywords.filter(keyword => keyword.description == nutrient+"\/");
             }
+            let ymin = height, ymax = 0, xmin = width, xmax = 0;
             // pack the nutrient with the coordinates
             if (detail.length != 0){
                 let vertices = detail[0].boundingPoly.vertices;
-                let ymin = height, ymax = 0, xmin = width, xmax = 0;
                 vertices.forEach(function(vertice) {
                     if (vertice.x > xmax) xmax = vertice.x;
                     if (vertice.x < xmin) xmin = vertice.x;
@@ -534,21 +534,50 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             }
             // handle the situation where the nutrient contains at least two words
             if(detail.length == 0){
-                // console.log(nutrient);
                 let splited = nutrient.split(" ");
                 for (let i = 0; i < keywords.length; i++){
                     if(splited[0] == keywords[i].description){
                         let j = 1, valid = true;
+                        let vertices = keywords[i].boundingPoly.vertices;
+                        vertices.forEach(function(vertice) {
+                            if (vertice.x > xmax) xmax = vertice.x;
+                            if (vertice.x < xmin) xmin = vertice.x;
+                            if (vertice.y > ymax) ymax = vertice.y;
+                            if (vertice.y < ymin) ymin = vertice.y;
+                        });
+    
                         while(j < splited.length && valid){
+                            vertices = keywords[i+j].boundingPoly.vertices;
                             if(splited[j] == keywords[i+j].description){
-                                // console.log(keywords[i+j]);
+                                vertices.forEach(function(vertice) {
+                                    if (vertice.x > xmax) xmax = vertice.x;
+                                    if (vertice.x < xmin) xmin = vertice.x;
+                                    if (vertice.y > ymax) ymax = vertice.y;
+                                    if (vertice.y < ymin) ymin = vertice.y;
+                                });
+                                j++;
+                            } else if(splited[j] == keywords[i+j].description.split('/')[0]){
+                                //handle the vitamin
+                                vertices.forEach(function(vertice) {
+                                    if (vertice.x > xmax) xmax = vertice.x;
+                                    if (vertice.x < xmin) xmin = vertice.x;
+                                    if (vertice.y > ymax) ymax = vertice.y;
+                                    if (vertice.y < ymin) ymin = vertice.y;
+                                });
                                 j++;
                             } else{
                                 valid = false; 
                             }
                         }
                         if(valid){
+                            let coordinates = {};
+                            coordinates["yMax"] = ymax;
+                            coordinates["yMin"] = ymin;
+                            coordinates["xMax"] = xmax;
+                            coordinates["xMin"] = xmin;            
                             console.log(`Successfully match ${nutrient}`)
+                            // console.log(coordinates);
+                            json_result[nutrient.split("/")[0].toLowerCase()] = coordinates;
                             break;
                         }
                     }
