@@ -45,7 +45,8 @@ class Home extends Component {
     fileUploadHandler = () => {
         let fd = new FormData();
         fd.append('image', this.state.image);
-        axios.post("http://localhost:8080/api/search/image/", fd)
+        axios.defaults.withCredentials=true;
+        axios.post("/api/search/image/", fd)
             .then(res => {
                 console.log(res.data);
                 this.setState({
