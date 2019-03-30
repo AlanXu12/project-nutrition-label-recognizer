@@ -24,6 +24,11 @@ class Credit extends Component {
           <li>The trigger to open style is generated from 
           <a href="https://github.com/glennflanagan/react-collapsible"> 'react-collapsible'</a></li>  
           </ul>
+          <h2>Signin/Signup form</h2>
+        <ul>
+          <li>These forms are generated using 
+          <a href="https://www.npmjs.com/package/react-signup-login-component">react-signup-login-component</a></li>  
+          </ul>
         <h2>Page Style</h2>
         <ul>
           <li>Sytle ideas are getten from CSCC09 Spring 2019 Lab02 and Lab03</li>
