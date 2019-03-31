@@ -36,9 +36,13 @@ class ReportCard extends Component {
     return (
       <div className="card bg-secondary">
         <div className="show-image">
-          <img className="card-img-top" src={ this.state.image } alt="Card image top"/>
+          <img className="card-img-top" src={ this.state.image } alt="Scanning preview"/>
           <a className="preview" href="#">
-            <img src={require('../media/preview-icon.svg')} onClick={ this.askParentShowReport }/>
+            <img
+              src={ require('../media/preview-icon.svg') }
+              onClick={ this.askParentShowReport }
+              alt="Preview icon"
+            />
           </a>
         </div>
         <div className="card-body">
