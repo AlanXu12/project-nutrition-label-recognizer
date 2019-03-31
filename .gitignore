@@ -13,6 +13,3 @@ JSON_Credential
 *.txt
 *.key
 *.crt
-
-# db config
-kubernetes/configmap.yaml
