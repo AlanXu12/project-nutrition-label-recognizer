@@ -1,8 +1,4 @@
 backend
-# backend/npm-debug.log
-# backend/uploads
-# backend/kubernetes
-# backend/JSON_Credential
 nuxpert/node_modules
 nuxpert/npm-debug.log
 nuxpert/build
@@ -25,3 +21,7 @@ nuxpert/*.sh
 # crt and key
 backend/*.crt
 backend/*.key
+
+# Docker file
+Dockerfile
+.dockerignore
