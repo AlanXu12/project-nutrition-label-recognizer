@@ -673,8 +673,9 @@ app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
                 ]
             };
             var fuse = new Fuse(nutrients_lst, options);
-            var result = fuse.search(req.params.keyword);     
-            return res.json(result);   
+            var result = fuse.search(req.params.keyword);
+            if (result.length > 5) result = result.slice(0,5);
+            return res.json(result);
         });
     });
 });
