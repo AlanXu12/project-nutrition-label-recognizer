@@ -5,10 +5,6 @@ import './SignUpForm.css';
 
 class SignUpForm extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   state = {
     errorMsg: '',
     username: null

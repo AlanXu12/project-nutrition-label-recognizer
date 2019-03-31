@@ -131,7 +131,6 @@ class History extends Component {
       // check if there is any saved report for the current user
       if (reportObjArr !== null && reportObjArr.length !== 0) {
         let fcnShowReport = this.showReport;
-        let fcnSendDeleteReportRequest = this.sendDeleteReportRequest;
         // loop through the imageIdArr to create corresponding ReportCards
         let reportCards = Object.keys(reportObjArr).map((reportKey, index) => {
           // get necessary data contains in reportObj for creating ReportCard
