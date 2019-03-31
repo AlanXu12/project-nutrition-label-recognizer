@@ -31,18 +31,20 @@ class History extends Component {
   showReport = async (imageId) => {
     // get corresponding pdf report from backend
     axios.defaults.withCredentials=true;
-    await axios.get('/api/report/' + imageId + '/')
-      .then(res => {
-        // record info given by backend to state for rendering usage
-        this.setState({
-          showPdf: true,
-          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data.url,
-          reportPdfDowload: res.data.url,
-          imageId: imageId
-        });
-      }).then(err => {
-        console.log(err);
-      });
+    try {
+      await axios.get('/api/report/' + imageId + '/')
+        .then(res => {
+          // record info given by backend to state for rendering usage
+          this.setState({
+            showPdf: true,
+            reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data.url,
+            reportPdfDowload: res.data.url,
+            imageId: imageId
+          });
+        })
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // handler for report delete button clicking on scanning result page
@@ -50,12 +52,14 @@ class History extends Component {
     // delete corresponding pdf report from backend
     imageId = (imageId)? this.state.imageId : imageId;
     axios.defaults.withCredentials=true;
-    await axios.delete('/api/report/' + imageId + '/')
-      .then(res => {
-        window.location.reload();
-      }).then(err => {
-        console.log(err);
-      });
+    try {
+      await axios.delete('/api/report/' + imageId + '/')
+        .then(res => {
+          window.location.reload();
+        })
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // handler for back button clicking on History page
