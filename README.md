@@ -1,7 +1,7 @@
 # CSCC09 Final Project Proposal
 
 1. __Project Title:__
-###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: Web URL: www.nuxpert.info
+###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info
 
 
 2. __Team Members:__
