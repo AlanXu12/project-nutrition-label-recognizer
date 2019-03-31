@@ -10,7 +10,31 @@ class Credit extends Component {
         <NavBar/>
 
         <h1>Credits</h1>
-
+        <h2>Google Cloud Storage</h2>
+        <ul>
+          <li>
+          <a href="https://cloud.google.com/nodejs/docs/reference/storage/2.3.x/">google-cloud storage</a> </li>
+        </ul>
+        <h2>Google Cloud Vision</h2>
+        <ul>
+          <li>
+          <a href=" https://cloud.google.com/nodejs/docs/reference/vision/0.24.x/">google-cloud vision</a> </li>
+        </ul>
+        <h2>MongoDB</h2>
+        <ul>
+          <li>
+          <a href="http://mongodb.github.io/node-mongodb-native/2.0/api/">mongodb </a> </li>
+        </ul>
+        <h2>pdfmake</h2>
+        <ul>
+          <li>
+          <a href="https://github.com/bpampuch/pdfmake/blob/0.1/dev-playground/server.js">pdfmake </a> </li>
+        </ul>
+        <h2>Fusejs</h2>
+        <ul>
+          <li>
+          <a href=" https://fusejs.io/">Fusejs </a> </li>
+        </ul>
         <h2>Navigation Bar</h2>
         <ul>
           <li>The css styles for navigation bar are generated using 

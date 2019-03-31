@@ -4,6 +4,7 @@ import axios from 'axios'
 import NotificationSystem from 'react-notification-system';
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
+import Credit from '../components/CreditPortal'
 
 
 class Home extends Component {
@@ -95,7 +96,7 @@ class Home extends Component {
                 <Intro />
                 <br></br>
                 <br></br>
-                <h3>Upload an nutrition label here:</h3>
+                <h3>Upload nutrition label here:</h3>
                 <br />
                 <br />
                 {/* 3. an file upload section for the user to upload the image. */}
@@ -109,11 +110,12 @@ class Home extends Component {
                     />
                     {/* button for file upload and redirection */}
                     <button onClick={this.fileUploadHandler}>See Report</button>
+                    <p>*Notice* uploading image other than nutrition label may cause no response </p>
                     <br></br>
                     <br></br>
                 </div>
-
                 <br></br>
+                <Credit />
             </div>
         );
     }
