@@ -22,7 +22,7 @@ class App extends Component {
           <Route exact path="/tmt" component = {TestMouseTracing}/>
           <Route exact path="/credit" component = {Credit}/>
           <Route exact path="/search/:keyword" component = {Search}/>
-          <Route exact path="/signup" component = {SignUp}/>
+          <Route exact path="/login" component = {SignUp}/>
           <Route exact path="/history" component = {History}/>
         </div>
       </Router>

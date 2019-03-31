@@ -79,7 +79,7 @@ class Navigation extends Component {
                     <span className="mr-2">User</span>
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
-                    <MDBDropdownItem href="/signup">Login</MDBDropdownItem>
+                    <MDBDropdownItem href="/login">Login</MDBDropdownItem>
                 </MDBDropdownMenu>
             </MDBDropdown>
         </MDBNavItem>
