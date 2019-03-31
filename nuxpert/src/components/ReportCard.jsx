@@ -26,7 +26,7 @@ class ReportCard extends Component {
     };
   }
 
-  // handler for report detail icon clicking
+  // handler for detailed report icon clicking
   askParentShowReport = (e) => {
     e.preventDefault();
     this.props.showReportFromParant(this.state.imageId);
