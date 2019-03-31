@@ -67,6 +67,7 @@ class Result extends Component {
     const zoomRatio = this.divElement.getBoundingClientRect().width / this.state.imageWidth;
     // find the corresponding factor that the user clicked on
     const nutrients = this.state.nutriRangeArr;
+    let requestSent = false;
     Object.keys(nutrients).some((nutrient, index) => {
       if (nutrient !== "height" && nutrient !== "width" && nutrient !== "id") {
         const nutri = nutrients[nutrient];
@@ -74,12 +75,14 @@ class Result extends Component {
           this.setState({
             curNutri: nutrient
           });
+          requestSent = true;
           this.getNutriDetails(nutrient);
           return;
         }
       }
     });
-    this.addSorryNotification('this one is not detected');
+    if (!requestSent) this.addSorryNotification('this one is not detected');
+
   }
 
   // request backend for the current clicked factor's nutrition details and display the info
@@ -97,6 +100,7 @@ class Result extends Component {
       // clean notifycation if this request is done successfully
       this.clearNotification();
     } else {
+      this.clearNotification();
       this.addSorryNotification("we don't have enough infomation for " + nutriName);
     }
   };
@@ -106,20 +110,22 @@ class Result extends Component {
     // notify user
     this.addNotification('Report is generating. Please wait for it..');
     axios.defaults.withCredentials=true;
-    await axios.get('/api/report/make/' + this.state.imageId + '/')
-      .then(res => {
-        this.setState({
-          showPdf: true,
-          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
-          reportPdfDowload: res.data
+    try {
+      await axios.get('/api/report/make/' + this.state.imageId + '/')
+        .then(res => {
+          this.setState({
+            showPdf: true,
+            reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
+            reportPdfDowload: res.data
+          });
+          // clean notifycation if this request is done successfully
+          this.clearNotification();
         });
-        // clean notifycation if this request is done successfully
-        this.clearNotification();
-      }).then(err => {
-        console.log(err);
-        // notify user
-        this.addErrorNotification();
-      });
+    } catch (err) {
+      console.log(err);
+      // notify user
+      this.addErrorNotification();
+    }
   }
 
   // handler for back button clicking on scanning result page
@@ -210,9 +216,6 @@ class Result extends Component {
 
   // helper for adding a notification when there is not enough support from DB
   addSorryNotification = (msg) => {
-    // // clean existing notifications first
-    // this.clearNotification();
-    // // add new notification
     const notification = this.notificationSystem.current;
     notification.addNotification({
       title: 'Sorry',

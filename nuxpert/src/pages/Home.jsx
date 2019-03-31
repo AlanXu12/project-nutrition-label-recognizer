@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import '../styles.scss'
 import axios from 'axios'
+import NotificationSystem from 'react-notification-system';
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
 
 
 class Home extends Component {
-    // When the seach image component is called, construct the state object 
+    // When the seach image component is called, construct the state object
     // to record the user input image and the result for this image from the backend.
     constructor(props) {
         console.log("home page got props:", props);
@@ -30,9 +31,11 @@ class Home extends Component {
         // wrap the image as form data inorder to send to the backend.
         let fd = new FormData();
         fd.append('image', this.state.image);
+        this.addNotification();
         axios.defaults.withCredentials = true;
         // use axios to send the post request
-        axios.post("/api/search/image/", fd)
+        try {
+          axios.post("/api/search/image/", fd)
             // upon request is success sent
             .then(res => {
                 // update result in the state.
@@ -46,18 +49,47 @@ class Home extends Component {
                 }
                 // redirect to result page
                 this.props.history.push(location);
-            }).then(err => {
-                console.log(err);
             });
+        } catch (err) {
+          console.log(err);
+          this.addErrorNotification();
+        }
     }
+
+    notificationSystem= React.createRef();
+
+    // helper for adding a notification
+    addNotification = () => {
+      const notification = this.notificationSystem.current;
+      notification.addNotification({
+        title: 'Waiting',
+        message: 'Image has been sent. Waiting for result...',
+        level: 'warning',
+        dismissible: 'none',
+        autoDismiss: 20,
+      });
+    };
+
+    // helper for adding an error notification when an error occurred
+    addErrorNotification = () => {
+      const notification = this.notificationSystem.current;
+      notification.addNotification({
+        title: 'Error',
+        message: 'Sorry, an error occurred. Please try again later...',
+        level: 'error',
+        dismissible: 'none',
+        autoDismiss: 0,
+      });
+    };
 
     render() {
         return (
             <div className="container">
-                {/* Home page contains three main components: 
+                {/* Home page contains three main components:
                  1. navigation bar on the top of the website
                  */}
                 <Navigation {...this.props} />
+                <NotificationSystem ref={this.notificationSystem}/>
                 <br></br>
                 {/* 2. Introduction about this web page */}
                 <Intro />
