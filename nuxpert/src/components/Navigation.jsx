@@ -56,6 +56,11 @@ class Navigation extends Component {
         });
     }
 
+    handleFuzzySearchOnSubmit(e){
+        e.preventDefault();
+        this.handleFuzzySearch();
+    }
+
     handleSignout = async () => {
         // send signout request to the backend and reset path to home page
         await fetch('/signout/', {
@@ -122,7 +127,7 @@ class Navigation extends Component {
                         </div>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>
-                        <MDBFormInline >
+                        <MDBFormInline onSubmit={(event) => this.handleFuzzySearchOnSubmit(event)}>
                             <div className="md-form my-0">
                                 <input
                                     className="form-control mr-sm-2"
