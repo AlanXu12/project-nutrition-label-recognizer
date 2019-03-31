@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
 import { PDFReader } from 'react-read-pdf';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -143,14 +141,14 @@ class History extends Component {
     if(!showPdf) {
       const reportObjArr = this.state.reportObjArr;
       // check if there is any saved report for the current user
-      if (reportObjArr != null && reportObjArr.length != 0) {
+      if (reportObjArr !== null && reportObjArr.length !== 0) {
         console.log("before render, reportObjArr: ", reportObjArr);
         let fcnShowReport = this.showReport;
         let fcnSendDeleteReportRequest = this.sendDeleteReportRequest;
         console.log("fcnShowReport: ", fcnShowReport);
         console.log("fcnSendDeleteReportRequest: ", fcnSendDeleteReportRequest);
         // loop through the imageIdArr to create corresponding ReportCards
-        let reportCards = Object.keys(reportObjArr).map((reportKey) => {
+        let reportCards = Object.keys(reportObjArr).map((reportKey, index) => {
           // get necessary data contains in reportObj for creating ReportCard
           let reportObj = reportObjArr[reportKey];
           let imageId = reportObj.imageId;
@@ -178,7 +176,8 @@ class History extends Component {
             // deleteReportFromParent: fcnSendDeleteReportRequest,
             imageId: imageId,
             image: image,
-            time: time
+            time: time,
+            key: index
           });
           console.log("after each creation, newComponent: ", newComponent);
           return newComponent;
@@ -224,6 +223,7 @@ class History extends Component {
               download="Report.pdf"
               alter="Download this report"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Download
             </a>
