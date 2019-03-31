@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { PDFReader } from 'react-read-pdf';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import NotificationSystem from 'react-notification-system';
 
 import './Result.css';
 
@@ -82,6 +83,8 @@ class Result extends Component {
 
   // request backend for the current clicked factor's nutrition details and display the info
   getNutriDetails = async (nutriName) => {
+    // notify user
+    this.addNotification('Query has been sent. Please wait for result...');
     const response = await fetch('/api/nutrient/' + nutriName + '/');
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -90,11 +93,15 @@ class Result extends Component {
         title: body.name,
         details: body.details
       });
+      // clean notifycation if this request is done successfully
+      this.clearNotification;
     }
   };
 
   // handler for report button clicking on scanning result page
   showReport = async () => {
+    // notify user
+    this.addNotification('Report is generating. Please wait for it..');
     axios.defaults.withCredentials=true;
     await axios.get('/api/report/make/' + this.state.imageId + '/')
       .then(res => {
@@ -103,8 +110,12 @@ class Result extends Component {
           reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
           reportPdfDowload: res.data
         });
+        // clean notifycation if this request is done successfully
+        this.clearNotification;
       }).then(err => {
         console.log(err);
+        // notify user
+        this.addErrorNotification;
       });
   }
 
@@ -167,6 +178,38 @@ class Result extends Component {
       pdfPageNumMax: totalPage
     });
   }
+
+  notificationSystem= React.createRef();
+
+  // helper for adding a notification
+  addNotification = (msg) => {
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      title: 'Waiting',
+      message: msg,
+      level: 'warning',
+      dismissible: 'none',
+      autoDismiss: 0,
+    });
+  };
+
+  // helper for adding an error notification when an error occurred
+  addErrorNotification = () => {
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      title: 'Waiting',
+      message: 'Sorry, an error occurred. Please try again later...',
+      level: 'error',
+      dismissible: 'none',
+      autoDismiss: 0,
+    });
+  };
+
+  // helper for clearing all notifications
+  clearNotification = () => {
+    const notification = this.notificationSystem.current;
+    notification.clearNotifications();
+  };
 
 
   render() {
@@ -301,6 +344,7 @@ class Result extends Component {
     return (
       <div className="container">
         <NavBar { ...this.props }/>
+        <NotificationSystem ref={this.notificationSystem} />
         { displayView }
         <CreditPortal />
       </div>
