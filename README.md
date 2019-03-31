@@ -45,6 +45,8 @@
     * Docker, Kubernetes, Istio
     * Cors
     * Superagent
+    * Service Worker
+    * Shell Code
     * Bootstrap Fileinput
     * React
     * React Native
@@ -56,6 +58,7 @@
     * React Autobind
     * MDBReact
     * Proxy
+    * Github
     
 
 
