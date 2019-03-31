@@ -92,10 +92,9 @@ class Result extends Component {
           });
           // console.log("new curNutri: ", nutrient);
           this.getNutriDetails(nutrient);
-          return true;
+          return;
         }
       }
-      return true;
     });
   }
 
