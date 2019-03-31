@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { PDFReader } from 'react-read-pdf';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import NotificationSystem from 'react-notification-system';
 
 import './Result.css';
 
@@ -66,6 +67,7 @@ class Result extends Component {
     const zoomRatio = this.divElement.getBoundingClientRect().width / this.state.imageWidth;
     // find the corresponding factor that the user clicked on
     const nutrients = this.state.nutriRangeArr;
+    let requestSent = false;
     Object.keys(nutrients).some((nutrient, index) => {
       if (nutrient !== "height" && nutrient !== "width" && nutrient !== "id") {
         const nutri = nutrients[nutrient];
@@ -73,15 +75,20 @@ class Result extends Component {
           this.setState({
             curNutri: nutrient
           });
+          requestSent = true;
           this.getNutriDetails(nutrient);
           return;
         }
       }
     });
+    if (!requestSent) this.addSorryNotification('this one is not detected');
+
   }
 
   // request backend for the current clicked factor's nutrition details and display the info
   getNutriDetails = async (nutriName) => {
+    // notify user
+    this.addNotification('Query has been sent. Please wait for result...');
     const response = await fetch('/api/nutrient/' + nutriName + '/');
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -90,22 +97,35 @@ class Result extends Component {
         title: body.name,
         details: body.details
       });
+      // clean notifycation if this request is done successfully
+      this.clearNotification();
+    } else {
+      this.clearNotification();
+      this.addSorryNotification("we don't have enough infomation for " + nutriName);
     }
   };
 
   // handler for report button clicking on scanning result page
   showReport = async () => {
+    // notify user
+    this.addNotification('Report is generating. Please wait for it..');
     axios.defaults.withCredentials=true;
-    await axios.get('/api/report/make/' + this.state.imageId + '/')
-      .then(res => {
-        this.setState({
-          showPdf: true,
-          reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
-          reportPdfDowload: res.data
+    try {
+      await axios.get('/api/report/make/' + this.state.imageId + '/')
+        .then(res => {
+          this.setState({
+            showPdf: true,
+            reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
+            reportPdfDowload: res.data
+          });
+          // clean notifycation if this request is done successfully
+          this.clearNotification();
         });
-      }).then(err => {
-        console.log(err);
-      });
+    } catch (err) {
+      console.log(err);
+      // notify user
+      this.addErrorNotification();
+    }
   }
 
   // handler for back button clicking on scanning result page
@@ -167,6 +187,51 @@ class Result extends Component {
       pdfPageNumMax: totalPage
     });
   }
+
+  notificationSystem= React.createRef();
+
+  // helper for adding a notification
+  addNotification = (msg) => {
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      title: 'Waiting',
+      message: msg,
+      level: 'warning',
+      dismissible: 'none',
+      autoDismiss: 20,
+    });
+  };
+
+  // helper for adding an error notification when an error occurred
+  addErrorNotification = () => {
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      title: 'Error',
+      message: 'Sorry, an error occurred. Please try again later...',
+      level: 'error',
+      dismissible: 'none',
+      autoDismiss: 0,
+    });
+  };
+
+  // helper for adding a notification when there is not enough support from DB
+  addSorryNotification = (msg) => {
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      title: 'Sorry',
+      message: 'Sorry, ' + msg + '. We will make nuXpert better...',
+      level: 'info',
+      dismissible: 'none',
+      autoDismiss: 3,
+    });
+  };
+
+
+  // helper for clearing all notifications
+  clearNotification = () => {
+    const notification = this.notificationSystem.current;
+    notification.clearNotifications();
+  };
 
 
   render() {
@@ -301,6 +366,7 @@ class Result extends Component {
     return (
       <div className="container">
         <NavBar { ...this.props }/>
+        <NotificationSystem ref={this.notificationSystem} />
         { displayView }
         <CreditPortal />
       </div>
