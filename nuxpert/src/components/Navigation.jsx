@@ -25,7 +25,6 @@ class Navigation extends Component {
 
     handleFuzzySearch = async () => {
         // send search to backend using fetch get
-        console.log("here?");
         const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
             headers: {
@@ -66,7 +65,6 @@ class Navigation extends Component {
                 'Content-Type': 'application/json',
             }
         }).then(res => {
-            console.log("after signout", this);
             const location = {
                 pathname: '/',
                 state: this.state
