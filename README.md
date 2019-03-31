@@ -58,6 +58,7 @@
     * React Notification System
     * React Read Pdf
     * React Scripts
+    * React production build
     * React Dom
     * React Signup Login Component
     * React Autobind
@@ -69,7 +70,7 @@
 
 8. __Description of the top 5 technical challenges:__
     * Image recognition and locating recognized item
-    * React deployment
+    * React production deployment
     * React routing and components communications
     * Docker, Kubernetes, Istio
     * Auto-generating a downloadable PDF report.
