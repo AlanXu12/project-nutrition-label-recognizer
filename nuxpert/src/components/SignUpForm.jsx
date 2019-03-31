@@ -44,7 +44,7 @@ class SignUpForm extends Component {
         });
         console.log("Successfully get response from backend...");
         console.log("this.props: ", this.props);
-        // TODO: update / redirect to some page
+        // redirect to History page
         window.location.reload();
       }
     }
@@ -80,7 +80,7 @@ class SignUpForm extends Component {
           errorMsg: '',
           username: username
         });
-        // TODO: update / redirect to some page
+        // redirect to Home page
         const location = {
           pathname: '/',
           state: this.state
@@ -113,11 +113,7 @@ class SignUpForm extends Component {
       const body = await response.json();
       if (body) {
         console.log("Successfully get response from backend...");
-        // clean up error message
-        // this.setState({
-        //   errorMsg: "Successfully reset your password to your username"
-        // });
-        // TODO: update / redirect to some page
+        // redirect to History page
         window.location.reload();
       }
     }
@@ -160,7 +156,7 @@ class SignUpForm extends Component {
       // get the user input
       const username = data.username;
       console.log(data);
-      // TODO: try to reset password by sending username to backend
+      // try to reset password by sending username to backend
       this.sendRecoverRequest(username);
     };
 
@@ -169,9 +165,9 @@ class SignUpForm extends Component {
         <p id="error-box">{ this.state.errorMsg }</p>
         <ReactSignupLoginComponent
           title="NuXpert"
-          handleSignup={signupWasClickedCallback}
-          handleLogin={loginWasClickedCallback}
-          handleRecoverPassword={recoverPasswordWasClickedCallback}
+          handleSignup={ signupWasClickedCallback }
+          handleLogin={ loginWasClickedCallback }
+          handleRecoverPassword={ recoverPasswordWasClickedCallback }
           submitLoginCustomLabel="Login"
           recoverPasswordCustomLabel="Forget password"
           goToLoginCustomLabel="cancel"
