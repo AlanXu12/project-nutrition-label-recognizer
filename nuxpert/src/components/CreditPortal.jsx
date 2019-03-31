@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 import { Redirect } from 'react-router-dom';
-import Home from '../pages/Home.jsx'
 import './CreditPortal.css';
 
 class CreditPortal extends Component {
@@ -26,8 +24,13 @@ class CreditPortal extends Component {
   render() {
     return (
       <div>
-        {this.creditPageRedirect()}
-        <div className="text-center text-grey credit-portal" onClick={this.setRedirect} >credits</div>
+        { this.creditPageRedirect() }
+        <div
+          className="text-center text-grey credit-portal"
+          onClick={this.setRedirect}
+        >
+          credits
+        </div>
       </div>
     );
   }

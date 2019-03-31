@@ -1,27 +1,30 @@
 import React, { Component } from 'react';
 import Cookies from 'js-cookie';
+import './Navigation.css'
 import {
-    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBFormInline
-} from 'mdbreact';
+    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink,
+    MDBNavbarToggler, MDBCollapse, MDBDropdown, MDBDropdownMenu,
+    MDBDropdownToggle, MDBDropdownItem, MDBFormInline, MDBBtn
+} from 'mdbreact'
 
 class Navigation extends Component {
     constructor(props) {
-        console.log("nav got props:", props);
-        console.log("nav got Cookies.get:", Cookies.get());
+        // inherit props from parent.
         super(props);
         this.state = {
-            keyword: '_',
-            fuzzy_result: {},
             collapseID: '',
-            username: Cookies.get('username') 
+            keyword: '_',
+            fuzzy_result: {}
         }
     }
 
     toggleCollapse = () => {
+        // activate collapsed content
         this.setState({ isOpen: !this.state.isOpen });
     }
 
     handleFuzzySearch = async () => {
+        // send search to backend using fetch get
         const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
             headers: {
@@ -29,6 +32,7 @@ class Navigation extends Component {
                 'Content-Type': 'application/json',
             }
         });
+        // update state with response infomation
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         if (body) {
@@ -36,7 +40,7 @@ class Navigation extends Component {
                 keyword: this.state.keyword,
                 result: body
             });
-            console.log("new search...", this.state);
+            // and redirect to the search page.
             const location = {
                 pathname: '/search/' + this.state.keyword,
                 state: this.state
@@ -48,30 +52,33 @@ class Navigation extends Component {
 
     handleInputChange = () => {
         this.setState({
-            keyword: this.search.value,
-            result: {}
+            keyword: this.search.value
         });
-        console.log("new keyword:", this.state.keyword);
+    }
+
+    handleFuzzySearchOnSubmit(e){
+        e.preventDefault();
+        this.handleFuzzySearch();
     }
 
     handleSignout = async () => {
-        console.log("before signout");
+        // send signout request to the backend and reset path to home page
         await fetch('/signout/', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then( res => {
-            console.log("after signout", this);
+        }).then(res => {
             const location = {
                 pathname: '/',
                 state: this.state
-              }
-              this.props.history.push(location);
+            }
+            this.props.history.push(location);
         })
     }
 
+    // if no user logged in, show login button
     renderVisitor = () => (
         <MDBNavItem id="visitor">
             <MDBDropdown>
@@ -85,6 +92,7 @@ class Navigation extends Component {
         </MDBNavItem>
     )
 
+    // if user logged in, show logout and history button.
     renderUser = () => (
         <MDBNavItem id="user">
             <MDBDropdown>
@@ -93,20 +101,19 @@ class Navigation extends Component {
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
                     <MDBDropdownItem href="/history">History report</MDBDropdownItem>
-                    <MDBDropdownItem href ='#' onClick = {this.handleSignout}>Signout</MDBDropdownItem>
+                    <MDBDropdownItem href='#' onClick={this.handleSignout}>Signout</MDBDropdownItem>
                 </MDBDropdownMenu>
             </MDBDropdown>
         </MDBNavItem>
-
     )
 
     render() {
-        console.log("does user exist?", Cookies.get('username'));
         return (
-            <MDBNavbar color="default-color" expand="md">
+            <MDBNavbar color="default-color" light expand="md">
                 <MDBNavbarBrand>
                     <strong className="white-text">nuXpert</strong>
                 </MDBNavbarBrand>
+                {/* toggler to see more choices */}
                 <MDBNavbarToggler onClick={this.toggleCollapse} />
                 <MDBCollapse id="navbarCollapse3" isOpen={this.state.isOpen} navbar>
                     <MDBNavbarNav left>
@@ -114,11 +121,13 @@ class Navigation extends Component {
                             <MDBNavLink to="/">Home</MDBNavLink>
                         </MDBNavItem>
                         <div>
+                            {/* check if there is a user info inside web's cookie to 
+                                show different content */}
                             {Cookies.get('username') ? this.renderUser() : this.renderVisitor()}
                         </div>
                     </MDBNavbarNav>
                     <MDBNavbarNav right>
-                        <MDBFormInline waves>
+                        <MDBFormInline onSubmit={(event) => this.handleFuzzySearchOnSubmit(event)}>
                             <div className="md-form my-0">
                                 <input
                                     className="form-control mr-sm-2"
@@ -129,7 +138,10 @@ class Navigation extends Component {
                                 />
                             </div>
                         </MDBFormInline>
-                        <button onClick={this.handleFuzzySearch}>Search</button>
+                        <button
+                            type="submit"
+                            onClick={this.handleFuzzySearch}
+                            className="fuzzySearchButton" >Search</button>
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
