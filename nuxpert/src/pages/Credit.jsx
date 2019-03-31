@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
-import Home from './Home.jsx';
 import NavBar from '../components/Navigation.jsx';
 
 class Credit extends Component {
@@ -36,7 +33,7 @@ class Credit extends Component {
         <h2>Icons</h2>
         <ul>
           <li>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0"
-              target="_blank">CC 3.0 BY</a></li>
+              target="_blank" rel="noopener noreferrer">CC 3.0 BY</a></li>
         </ul>
         <h2>Buttons</h2>
         <ul>
