@@ -3,9 +3,12 @@ import axios from 'axios'
 import '../styles.scss'
 import Navigation from '../components/Navigation'
 import Intro from '../components/Intro'
+import NotificationSystem from 'react-notification-system';
 
 
 class Home extends Component {
+
+  notificationSystem = React.createRef();
 
     constructor(props) {
         console.log("home page got props:", props);
@@ -45,6 +48,7 @@ class Home extends Component {
     fileUploadHandler = () => {
         let fd = new FormData();
         fd.append('image', this.state.image);
+        this.addNotification();
         axios.defaults.withCredentials=true;
         axios.post("/api/search/image/", fd)
             .then(res => {
@@ -64,10 +68,30 @@ class Home extends Component {
             });
     }
 
+    addNotification = () => {
+      const notification = this.notificationSystem.current;
+      notification.addNotification({
+        title: 'Waiting',
+        message: 'Image has been sent. Waiting for result...',
+        level: 'error',
+        dismissible: 'none',
+        autoDismiss: 0,
+      });
+    };
+
     render() {
+      let style = {
+        NotificationItem: { // Override the notification item
+          DefaultStyle: { // Applied to every notification, regardless of the notification level
+            margin: '10px 5px 2px 1px',
+            color: 'red',
+          }
+        }
+      }
         return (
             <div className="container">
                 <Navigation {...this.props} />
+                <NotificationSystem ref={this.notificationSystem} style={style}/>
                 <br></br>
                 <Intro />
                 <br></br>
