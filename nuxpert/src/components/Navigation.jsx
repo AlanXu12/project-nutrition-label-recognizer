@@ -102,7 +102,6 @@ class Navigation extends Component {
                 </MDBDropdownMenu>
             </MDBDropdown>
         </MDBNavItem>
-
     )
 
     render() {
@@ -134,7 +133,6 @@ class Navigation extends Component {
                             </div>
                             <button className="fuzzySearchButton" onClick={this.handleFuzzySearch}>Search</button>
                         </MDBFormInline>
-                        
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
