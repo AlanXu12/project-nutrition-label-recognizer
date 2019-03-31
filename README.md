@@ -2,6 +2,7 @@
 
 1. __Project Title:__
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info
+##### Video:  
 
 
 2. __Team Members:__
@@ -27,7 +28,7 @@
 
 6. __Description of additional features that will be complete by the Final version:__
     * Downloadable pdf report for input nutrition label 
-    * Searching certain nutrition fact information by name
+    * Fuzzy search information about nutrients
     * History reports for logged-in user
     * Notification for upload progress
     * Login system
@@ -38,6 +39,7 @@
     * Express
     * Node Sass
     * JS Cookie
+    * Fuzzy Search
     * Google Cloud Platform 
     * Axios 
     * Docker, Kubernetes, Istio
