@@ -1,21 +1,21 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: node-app
+  name: nuxpert
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: node-app
+        app: nuxpert
     spec:
       volumes:
       - name: gcloud-key
         secret:
           secretName: cloudvision-key
       containers:
-        - name: node-app
-          image: gcr.io/kubernetes-221921/node-app:latest
+        - name: nuxpert
+          image: gcr.io/kubernetes-221921/nuxpert:latest
           volumeMounts:
           - name: gcloud-key
             mountPath: /var/secrets/google
@@ -24,20 +24,50 @@ spec:
             value: /var/secrets/google/key.json
           ports:
             - containerPort: 8080
-
 ---
 apiVersion: "v1"
 kind: "Service"
 metadata:
-  name: "node-app-service"
+  name: "nuxpert-service"
   namespace: "default"
   labels:
-    app: "node-app"
+    app: "nuxpert"
 spec:
   ports:
   - protocol: "TCP"
     port: 8080
     targetPort: 8080
   selector:
-    app: "node-app"
+    app: "nuxpert"
   type: "ClusterIP"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: http-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: nuxpert-microservice
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - http-gateway
+  http:
+  - route:
+    - destination:
+        port:
+          number: 8080
+        host: nuxpert-service

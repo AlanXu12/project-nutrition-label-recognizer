@@ -1,0 +1,27 @@
+backend
+# backend/npm-debug.log
+# backend/uploads
+# backend/kubernetes
+# backend/JSON_Credential
+nuxpert/node_modules
+nuxpert/npm-debug.log
+nuxpert/build
+
+# system file
+*.DS_Store
+
+# git file
+*.gitignore
+*.git
+
+# README
+README.md
+
+# shell script
+*.sh
+backend/*.sh
+nuxpert/*.sh
+
+# crt and key
+backend/*.crt
+backend/*.key

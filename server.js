@@ -6,7 +6,31 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(fileUpload());
-app.use(express.static('../nuxpert/build'));
+app.use(express.static('nuxpert/build'));
+
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname, 'nuxpert','build', 'index.html'));
+});
+
+app.get('/result', function(req, res) {
+    res.sendFile(path.join(__dirname, 'nuxpert','build', 'index.html'));
+});
+
+app.get('/credit', function(req, res) {
+    res.sendFile(path.join(__dirname, 'nuxpert','build', 'index.html'));
+});
+
+app.get('/search/:keyword', function(req, res) {
+    res.sendFile(path.join(__dirname, 'nuxpert','build', 'index.html'));
+});
+
+app.get('/login', function(req, res) {
+    res.sendFile(path.join(__dirname, 'nuxpert','build', 'index.html'));
+});
+
+app.get('/history', function(req, res) {
+    res.sendFile(path.join(__dirname, 'nuxpert','build', 'index.html'));
+});
 
 // const cors = require('cors');
 // app.use(cors());
@@ -250,7 +274,7 @@ app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next)
     let local_path = `uploads/${req.params.imageid}.pdf`;
     let org_bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
     let des_bucket_path = `${req.username}/${req.params.imageid}.pdf`;
-    storage.bucket(bucketName).file(org_bucket_path).move(des_bucket_path)
+    storage.bucket(bucketName).file(org_bucket_path).copy(des_bucket_path)
     .then(() => {
         console.log(`${org_bucket_path} moved to ${des_bucket_path}.`);
         // insert the saved pdf info
