@@ -7,7 +7,6 @@ class SignUpForm extends Component {
 
   constructor(props) {
     super(props);
-    console.log(this.props);
   }
 
   state = {
@@ -42,8 +41,6 @@ class SignUpForm extends Component {
         this.setState({
           errorMsg: ''
         });
-        console.log("Successfully get response from backend...");
-        console.log("this.props: ", this.props);
         // redirect to History page
         window.location.reload();
       }
@@ -52,7 +49,6 @@ class SignUpForm extends Component {
 
   // helper function for sending signin info to backend
   sendSignInRequest = async (username, password) => {
-    console.log("username password: ", username, password);
     const response = await fetch('/signin/', {
       method: 'POST',
       headers: {
@@ -74,7 +70,6 @@ class SignUpForm extends Component {
     } else {
       const body = await response.json();
       if (body) {
-        console.log("Successfully get response from backend...");
         // clean up error message
         this.setState({
           errorMsg: '',
@@ -112,7 +107,6 @@ class SignUpForm extends Component {
     } else {
       const body = await response.json();
       if (body) {
-        console.log("Successfully get response from backend...");
         // redirect to History page
         window.location.reload();
       }
@@ -136,14 +130,12 @@ class SignUpForm extends Component {
         });
       } else {
         // send username and password to the backend
-        console.log(username, password, passwordConfirmation);
         this.sendSignUpRequest(username, password);
       }
     };
 
     // the handler function for login
     const loginWasClickedCallback = (data) => {
-      console.log(data);
       // get all user inputs
       const username = data.username;
       const password = data.password;
@@ -155,7 +147,6 @@ class SignUpForm extends Component {
     const recoverPasswordWasClickedCallback = (data) => {
       // get the user input
       const username = data.username;
-      console.log(data);
       // try to reset password by sending username to backend
       this.sendRecoverRequest(username);
     };

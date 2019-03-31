@@ -14,9 +14,7 @@ class Result extends Component {
   constructor(props) {
     super(props);
     // get all saved data
-    console.log(this.props);
     const prevState = this.props.location.state;
-    console.log(prevState);
     this.state = {
       redirect: false,
       title: "Introduction",
@@ -38,7 +36,6 @@ class Result extends Component {
       msgBox: "",
       username: Cookies.get('username')
     };
-    console.log(this.state);
   }
 
   // turn redirect flag to true
@@ -61,36 +58,21 @@ class Result extends Component {
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY
     });
-    // console.log("curX: ", this.state.x);
-    // console.log("curY: ", this.state.y);
   }
 
   // find the corresponding factor of the user's mouse click from the scan result(nutriRangeArr)
   displayNutriInfo = () => {
     // get the current size of the result picture to find the zooming in/out ratio
     const zoomRatio = this.divElement.getBoundingClientRect().width / this.state.imageWidth;
-    console.log("zoomRatio: ", zoomRatio);
-    console.log("nutriRangeArr: ", this.state.nutriRangeArr);
     // find the corresponding factor that the user clicked on
-    // console.log(typeof nutriRangeArr);
     const nutrients = this.state.nutriRangeArr;
     Object.keys(nutrients).some((nutrient, index) => {
-      // console.log("clicked X: ", this.state.x);
-      // console.log("clicked Y: ", this.state.y);
-      // console.log("zoomRatio: ", zoomRatio);
-      // console.log("relative Y: ", this.state.y / zoomRatio);
       if (nutrient !== "height" && nutrient !== "width" && nutrient !== "id") {
         const nutri = nutrients[nutrient];
-        // console.log("nutrient: ", nutrient);
-        // console.log("nutri: ", nutri);
-        // console.log("nutri.yMin: ", nutri.yMin);
-        // console.log("nutri.yMax: ", nutri.yMax);
         if (nutri.yMin <= (this.state.y / zoomRatio) && (this.state.y / zoomRatio) <= nutri.yMax) {
-          // console.log("nutrient: ", nutrient);
           this.setState({
             curNutri: nutrient
           });
-          // console.log("new curNutri: ", nutrient);
           this.getNutriDetails(nutrient);
           return;
         }
@@ -100,35 +82,27 @@ class Result extends Component {
 
   // request backend for the current clicked factor's nutrition details and display the info
   getNutriDetails = async (nutriName) => {
-    console.log("In getNutriDetails, nutriName: ", nutriName);
-    console.log("In getNutriDetails, url: ", '/api/nutrient/' + nutriName + '/');
     const response = await fetch('/api/nutrient/' + nutriName + '/');
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
-    console.log("In getNutriDetails, body: ", body);
     if (body) {
       this.setState({
         title: body.name,
         details: body.details
       });
     }
-    console.log("this.state: ", this.state);
   };
 
   // handler for report button clicking on scanning result page
   showReport = async () => {
-    console.log("showReport is hitted...");
     axios.defaults.withCredentials=true;
     await axios.get('/api/report/make/' + this.state.imageId + '/')
       .then(res => {
-        console.log("response: ", res);
-        console.log(res.data);
         this.setState({
           showPdf: true,
           reportPdf: 'https://cors-anywhere.herokuapp.com/' + res.data,
           reportPdfDowload: res.data
         });
-        console.log("after requesting backend, this.state: ", this.state);
       }).then(err => {
         console.log(err);
       });
@@ -205,9 +179,7 @@ class Result extends Component {
           Please log in to get the ability of generating a PDF report.
         </p>
       );
-      console.log("before determining reportButton display, this.state: ", this.state);
       if (this.state.username) {
-        console.log("username == null => somes user logged in...");
         reportButton = (
           <button
             className="btn btn-primary btn-lg mt-2 btn-report"

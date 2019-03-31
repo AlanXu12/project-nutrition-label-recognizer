@@ -25,19 +25,14 @@ class History extends Component {
     }
     // request backend to get all the saved reports' corresponding imageIds
     this.getAllSavedReportsRequest();
-    console.log("after cosntructor finished its work, this.state: ", this.state);
   }
 
   // handler for report button clicking on scanning result page
   showReport = async (imageId) => {
-    console.log("showReport is called...");
     // get corresponding pdf report from backend
-    console.log("In history page, imageId: ", imageId);
     axios.defaults.withCredentials=true;
     await axios.get('/api/report/' + imageId + '/')
       .then(res => {
-        console.log("response: ", res);
-        console.log("response.data: ", res.data);
         // record info given by backend to state for rendering usage
         this.setState({
           showPdf: true,
@@ -45,7 +40,6 @@ class History extends Component {
           reportPdfDowload: res.data.url,
           imageId: imageId
         });
-        console.log("after requesting backend, this.state: ", this.state);
       }).then(err => {
         console.log(err);
       });
@@ -53,15 +47,11 @@ class History extends Component {
 
   // handler for report delete button clicking on scanning result page
   sendDeleteReportRequest = async (imageId) => {
-    console.log("sendDeleteReportRequest is called...");
     // delete corresponding pdf report from backend
-    console.log("In history page, imageId: ", imageId);
     imageId = (imageId)? this.state.imageId : imageId;
     axios.defaults.withCredentials=true;
     await axios.delete('/api/report/' + imageId + '/')
       .then(res => {
-        console.log("response: ", res);
-        // console.log("window.location.reload();");
         window.location.reload();
       }).then(err => {
         console.log(err);
@@ -107,7 +97,6 @@ class History extends Component {
 
   // request backend to get all the saved reports' corresponding imageIds
   getAllSavedReportsRequest = async () => {
-    console.log("getAllSavedReportsRequest is called, this.state.username: ", this.state.username);
     const response = await fetch('/api/report/history/', {
       method: 'POST',
       headers: {
@@ -118,7 +107,6 @@ class History extends Component {
         username: this.state.username
       })
     });
-    console.log("after calling getAllSavedReportsRequest, response: ", response);
     // backend server response errors
     if (response.status !== 200) {
       return null;
@@ -142,11 +130,8 @@ class History extends Component {
       const reportObjArr = this.state.reportObjArr;
       // check if there is any saved report for the current user
       if (reportObjArr !== null && reportObjArr.length !== 0) {
-        console.log("before render, reportObjArr: ", reportObjArr);
         let fcnShowReport = this.showReport;
         let fcnSendDeleteReportRequest = this.sendDeleteReportRequest;
-        console.log("fcnShowReport: ", fcnShowReport);
-        console.log("fcnSendDeleteReportRequest: ", fcnSendDeleteReportRequest);
         // loop through the imageIdArr to create corresponding ReportCards
         let reportCards = Object.keys(reportObjArr).map((reportKey, index) => {
           // get necessary data contains in reportObj for creating ReportCard
@@ -164,12 +149,6 @@ class History extends Component {
             "August", "September", "October", "November", "December"
           ];
           let time = monthNames[timeMonth] + ' ' + timeDate + ', ' + timeYear ;
-          console.log("after reformating, time: ", time);
-          console.log("each time before creation, reportKey: ", reportKey);
-          console.log("each time before creation, reportObj: ", reportObj);
-          console.log("each time before creation, imageId: ", imageId);
-          console.log("each time before creation, image: ", image);
-          console.log("each time before creation, time: ", time);
           // create ReportCard using the current reportObj contains
           let newComponent = React.createElement(ReportCard, {
             showReportFromParant: fcnShowReport,
@@ -179,10 +158,8 @@ class History extends Component {
             time: time,
             key: index
           });
-          console.log("after each creation, newComponent: ", newComponent);
           return newComponent;
         });
-        console.log("before inserting into return, reportCards:", reportCards);
         // create report cards one by one
         displayView = (
           <div className="card-columns">
@@ -195,7 +172,6 @@ class History extends Component {
           <p className="msg-box">There is no report saved yet.</p>
         );
       }
-      console.log("before inserting into return, displayView: ", displayView);
     } else {
       const deleteReport = this.sendDeleteReportRequest;
       displayView = (
