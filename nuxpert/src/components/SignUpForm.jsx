@@ -5,11 +5,6 @@ import './SignUpForm.css';
 
 class SignUpForm extends Component {
 
-  constructor(props) {
-    super(props);
-    console.log(this.props);
-  }
-
   state = {
     errorMsg: '',
     username: null
@@ -29,10 +24,10 @@ class SignUpForm extends Component {
       })
     });
     if (response.status !== 200) {
-      if (response.status == 409) this.setState({
+      if (response.status === 409) this.setState({
         errorMsg: "Username has been taken..."
       });
-      if (response.status == 500) this.setState({
+      if (response.status === 500) this.setState({
         errorMsg: "Server side error, please try again later..."
       });
     } else {
@@ -42,9 +37,7 @@ class SignUpForm extends Component {
         this.setState({
           errorMsg: ''
         });
-        console.log("Successfully get response from backend...");
-        console.log("this.props: ", this.props);
-        // TODO: update / redirect to some page
+        // redirect to History page
         window.location.reload();
       }
     }
@@ -52,7 +45,6 @@ class SignUpForm extends Component {
 
   // helper function for sending signin info to backend
   sendSignInRequest = async (username, password) => {
-    console.log("username password: ", username, password);
     const response = await fetch('/signin/', {
       method: 'POST',
       headers: {
@@ -65,22 +57,21 @@ class SignUpForm extends Component {
       })
     });
     if (response.status !== 200) {
-      if (response.status == 401) this.setState({
+      if (response.status === 401) this.setState({
         errorMsg: "Username or password not correct..."
       });
-      if (response.status == 500) this.setState({
+      if (response.status === 500) this.setState({
         errorMsg: "Server side error, please try again later..."
       });
     } else {
       const body = await response.json();
       if (body) {
-        console.log("Successfully get response from backend...");
         // clean up error message
         this.setState({
           errorMsg: '',
           username: username
         });
-        // TODO: update / redirect to some page
+        // redirect to Home page
         const location = {
           pathname: '/',
           state: this.state
@@ -103,21 +94,16 @@ class SignUpForm extends Component {
       })
     });
     if (response.status !== 200) {
-      if (response.status == 401) this.setState({
+      if (response.status === 401) this.setState({
         errorMsg: "Username does not exist..."
       });
-      if (response.status == 500) this.setState({
+      if (response.status === 500) this.setState({
         errorMsg: "Server side error, please try again later..."
       });
     } else {
       const body = await response.json();
       if (body) {
-        console.log("Successfully get response from backend...");
-        // clean up error message
-        // this.setState({
-        //   errorMsg: "Successfully reset your password to your username"
-        // });
-        // TODO: update / redirect to some page
+        // redirect to History page
         window.location.reload();
       }
     }
@@ -140,14 +126,12 @@ class SignUpForm extends Component {
         });
       } else {
         // send username and password to the backend
-        console.log(username, password, passwordConfirmation);
         this.sendSignUpRequest(username, password);
       }
     };
 
     // the handler function for login
     const loginWasClickedCallback = (data) => {
-      console.log(data);
       // get all user inputs
       const username = data.username;
       const password = data.password;
@@ -159,8 +143,7 @@ class SignUpForm extends Component {
     const recoverPasswordWasClickedCallback = (data) => {
       // get the user input
       const username = data.username;
-      console.log(data);
-      // TODO: try to reset password by sending username to backend
+      // try to reset password by sending username to backend
       this.sendRecoverRequest(username);
     };
 
@@ -169,9 +152,9 @@ class SignUpForm extends Component {
         <p id="error-box">{ this.state.errorMsg }</p>
         <ReactSignupLoginComponent
           title="NuXpert"
-          handleSignup={signupWasClickedCallback}
-          handleLogin={loginWasClickedCallback}
-          handleRecoverPassword={recoverPasswordWasClickedCallback}
+          handleSignup={ signupWasClickedCallback }
+          handleLogin={ loginWasClickedCallback }
+          handleRecoverPassword={ recoverPasswordWasClickedCallback }
           submitLoginCustomLabel="Login"
           recoverPasswordCustomLabel="Forget password"
           goToLoginCustomLabel="cancel"

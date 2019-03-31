@@ -1,3 +1,4 @@
+kubectl delete -f kubernetes/deployment.yaml
 docker build -t node-app .
 # docker run -v ~/.config/gcloud:/root/.config/gcloud -p 8080:8080 -d --name node-app node-app
 # docker run -p 8080:8080 -d --name node-app node-app

@@ -6,10 +6,10 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(fileUpload());
-app.use(express.static('static'));
+app.use(express.static('../nuxpert/build'));
 
-const cors = require('cors');
-app.use(cors());
+// const cors = require('cors');
+// app.use(cors());
 
 // Imports the Google Cloud client library
 const vision = require('@google-cloud/vision');
@@ -21,6 +21,7 @@ const {Storage} = require('@google-cloud/storage');
 const storage = new Storage();
 // The name for the bucket
 const bucketName = 'nuxpert';
+const public_access_url = `http://storage.googleapis.com/${bucketName}/`
 
 
 var Nutrient = (function(){
@@ -54,18 +55,26 @@ function generateHash (password, salt){
 
 const session = require('express-session');
 app.use(session({
-    secret: 'please change this secret',
+    secret: 'nuxpertinfo',
     resave: false,
     saveUninitialized: true,
 }));
 app.use(function (req, res, next){
     req.username = ('user' in req.session)? req.session.user.username : null;
     console.log("HTTP request", req.method, req.url, req.body);
+    console.log(`SessionID: ${req.sessionID}`);
+    if(req.session.user) console.log(`Session.user.username:  ${req.session.user.username}`);
     next();
 });
 
 let isAuthenticated = function(req, res, next) {
     if (!req.username) return res.status(401).end("access denied");
+    // console.log(req.get("Origin"));
+    // console.log(req.headers);
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials","true");
     next();
 };
 
@@ -151,30 +160,14 @@ async function sendEmail(){
   
 console.log(makeCode(5));
 
-// upload file to the bucket
-// let filename = 'resources/s1.png';
-// storage.bucket(bucketName).upload(filename, {
-//     destination: filename,
-//     metadata: {
-//       // Enable long-lived HTTP caching headers
-//       // Use only if the contents of the file will never change
-//       // (If the contents will change, use cacheControl: 'no-cache')
-//       cacheControl: 'public, max-age=31536000',
-//     },
-// })
-// .then(() => {
-//     console.log(`${filename} uploaded to ${bucketName}.`);
-// })
-// .catch(err => {
-//     console.error('ERROR:', err);
-// });
-  
+
 // make pdf part
 const pdfMake = require("./node_modules/pdfmake/build/pdfmake.js");
 const pdfFonts = require("./node_modules/pdfmake/build/vfs_fonts.js");
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // cited page: https://github.com/bpampuch/pdfmake/blob/0.1/dev-playground/server.js
-app.get('/api/report/:imageid/', function (req, res) {
+// create the pdf file
+app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next) {
     // initialize the docDefinition
     var docDefinition = {
         content: [
@@ -182,6 +175,7 @@ app.get('/api/report/:imageid/', function (req, res) {
     };
     // get the imageId from the request URL
     let id = req.params.imageid;
+    // console.log(id);
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
         // get two collections
@@ -205,13 +199,14 @@ app.get('/api/report/:imageid/', function (req, res) {
                 pdfDoc.getBase64((data) => {
                     // convert the pdf to base64-encoded
                     const base64Data = Buffer.from(data.toString('utf-8'), 'base64');
-                    let local_path = "uploads/test.pdf";
+                    let local_path = `uploads/${req.params.imageid}.pdf`;
                     // generate the local temp file
                     fs.writeFile(local_path, base64Data, 'base64', function(err) {
                         if(err) return res.status(500).end(err.message);
                     });
                     // upload the file to the cloud bucket
-                    let bucket_path = 'usr1/test1.pdf';
+                    let bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
+                    // console.log(bucket_path);
                     storage.bucket(bucketName).upload(local_path, {
                         destination: bucket_path,
                         metadata: {
@@ -222,22 +217,161 @@ app.get('/api/report/:imageid/', function (req, res) {
                         },
                     })
                     .then(() => {
-                        console.log(`${bucket_path} uploaded to ${bucketName}.`);
-                        res.contentType('application/pdf');
-                        res.end(base64Data);
                         fs.unlink(local_path, (err) => {
-                            if (err) return res.status(500).end(err.message);
+                            if (err) return res.status(500).end(err.code);
                             console.log(`${local_path} was deleted`);
+                            console.log(`${bucket_path} uploaded to ${bucketName}.`);
+                            let result = {};
+                            result['url'] = `${public_access_url}${bucket_path}`;
+                            let url = `${public_access_url}${bucket_path}`;
+                            res.setHeader("Access-Control-Allow-Credentials","true");
+                            res.end(url)
+                            // res.json(result);
+                            // console.log(Object.keys(res));
+                            // console.log(res.end);
+                            // console.log(res.statusCode);
+                            // console.log(res.statusMessage);
+                            // console.log(res.body);
+                            // console.log(res.json);
                         });
                     })
                     .catch(err => {
-                        console.error('ERROR:', err);
+                        return res.status(500).end(err.code);
                     });
                 });
             });
         });
     });
 });
+
+// save the pdf file
+app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next) {
+    // upload the file to the cloud bucket
+    let local_path = `uploads/${req.params.imageid}.pdf`;
+    let org_bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
+    let des_bucket_path = `${req.username}/${req.params.imageid}.pdf`;
+    storage.bucket(bucketName).file(org_bucket_path).move(des_bucket_path)
+    .then(() => {
+        console.log(`${org_bucket_path} moved to ${des_bucket_path}.`);
+        // insert the saved pdf info
+        mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+            if (err) return res.status(500).end(err.message);
+            let reports = db.db('cscc09').collection('reports');
+            let images =  db.db('cscc09').collection('images'); 
+            images.findOne({_id: ObjectId(req.params.imageid)}, {projection: {_id: 0, path: 1}}, function(err, image) {
+                let image_path = image.path;
+                reports.updateOne({path: des_bucket_path},{ $set: {path: des_bucket_path, username: req.username, imageid: req.params.imageid, imagePath: image_path}}, {upsert: true}, function(err){
+                    if (err) return res.status(500).end(err.message);
+                    db.close();
+                    res.setHeader("Access-Control-Allow-Credentials","true");
+                    return res.status(200).end(`The file ${req.params.imageid}.pdf has already been saved`);
+                }); 
+            });    
+        });
+
+    })
+    .catch(err => {
+        return res.status(500).end(err.code);
+    });
+});
+
+// unsave the pdf file
+app.get('/api/report/unsave/:imageid/', isAuthenticated, function (req, res, next) {
+    let local_path = `uploads/${req.params.imageid}.pdf`;
+    // delete the file from the cloud bucket
+    let bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
+    storage.bucket(bucketName).file(bucket_path).delete()
+    .then(() => {
+        res.setHeader("Access-Control-Allow-Credentials","true");
+        return res.status(200).end(`The file ${req.params.imageid}.pdf has already been removed`);
+    })
+    .catch(err => {
+        console.error('ERROR:', err);
+    });  
+});
+
+// get history page
+// need to use session with get method
+app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
+    let results = {'reportObjArr':[]};
+    let username = req.body.username;
+    // let username = req.username;
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let reports = db.db('cscc09').collection('reports');  
+        // console.log(username);
+        reports.find({username: username}).project({imagePath: 1, imageid: 1}).toArray(function(err, report_lst) {
+            report_lst.forEach(function(report) {
+                let result = {};
+                result['image'] = `${public_access_url}${report.imagePath}`;
+                result['imageId'] = report.imageid;
+                result['time'] = ObjectId(report._id).getTimestamp();
+                results.reportObjArr.push(result);
+            });
+            res.setHeader("Access-Control-Allow-Credentials","true");
+            res.json(results);
+            // console.log(res.body);
+        });    
+    });
+});
+
+app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let reports = db.db('cscc09').collection('reports');
+        reports.findOne({imageid: req.params.imageid}, {projection: {_id: 0, path: 1, username: 1}}, function(err, report) {
+            if (req.username != report.username) return res.status(401).end("access denied");
+            let report_path = report.path;
+            let result = {};
+            result['url'] = `${public_access_url}${report_path}`;
+            // res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	        // res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH");
+            // res.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+            // res.setHeader("Access-Control-Allow-Credentials","true");
+            return res.json(result);
+        });    
+    });
+});
+
+app.delete('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
+    // delete image and report entry from mongodb
+    mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
+        if (err) return res.status(500).end(err.message);
+        let reports = db.db('cscc09').collection('reports');
+        let images =  db.db('cscc09').collection('images');
+        reports.findOne({imageid: req.params.imageid}, {projection: {username: 1}}, function(err, report) {
+            if (err) return res.status(500).end(err.message);
+            // check if the user is deleting others reports
+            if (req.username != report.username) return res.status(401).end("access denied");
+            images.findOneAndDelete({_id: ObjectId(req.params.imageid)}, {projection: {path: 1}}, function(err, image) {
+                if (err) return res.status(500).end(err.message);
+                reports.findOneAndDelete({imageid: req.params.imageid}, {projection: {_id: 1, path: 1, imagePath: 1}}, function(err, report) {
+                    if (err) return res.status(500).end(err.message);
+                    // delete image and report file from bucket
+                    let image_path = report.value.imagePath;
+                    let path = report.value.path;
+                    // delete the image from the bucket
+                    storage.bucket(bucketName).file(image_path).delete()
+                    .then(() => {
+                        // delete the report from the bucket
+                        storage.bucket(bucketName).file(path).delete()
+                        .then(() => {
+                            res.setHeader("Access-Control-Allow-Credentials","true");
+                            return res.status(200).end(`The image with id ${req.params.imageid}  and its corresponding pdf have already been removed`);
+                        })
+                        .catch(err => {
+                            return res.status(500).end(err.code);
+                        });
+                    })
+                    .catch(err => {
+                        return res.status(500).end(err.code);
+                    });
+                });
+            });
+        });
+    });
+});
+
 
 // sign up
 app.post('/signup/', function (req, res, next) {
@@ -291,14 +425,17 @@ app.post('/signin/', function (req, res, next) {
         });
     });
 });
+
 // signout
 app.get('/signout/', function (req, res, next) {
+    let username = req.username;
     res.setHeader('Set-Cookie', cookie.serialize('username', '', {
           path : '/', 
           maxAge: 60 * 60 * 24 * 7 // 1 week in number of seconds
     }));
     req.session.destroy();
-    return res.json("user " + username + " signed out");
+    res.redirect('/');
+    // return res.json("user " + username + " signed out");
 });
 
 
@@ -331,9 +468,6 @@ app.post('/reset/', function (req, res, next) {
         });
     });
 });
-
-
-
 
 // upload image and return text
 app.post('/api/search/image/', upload.single('image'), function (req, res, next) {
@@ -380,10 +514,10 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             if(detail.length == 0){
                 detail = keywords.filter(keyword => keyword.description == nutrient+"\/");
             }
+            let ymin = height, ymax = 0, xmin = width, xmax = 0;
             // pack the nutrient with the coordinates
             if (detail.length != 0){
                 let vertices = detail[0].boundingPoly.vertices;
-                let ymin = height, ymax = 0, xmin = width, xmax = 0;
                 vertices.forEach(function(vertice) {
                     if (vertice.x > xmax) xmax = vertice.x;
                     if (vertice.x < xmin) xmin = vertice.x;
@@ -400,21 +534,50 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             }
             // handle the situation where the nutrient contains at least two words
             if(detail.length == 0){
-                // console.log(nutrient);
                 let splited = nutrient.split(" ");
                 for (let i = 0; i < keywords.length; i++){
                     if(splited[0] == keywords[i].description){
                         let j = 1, valid = true;
+                        let vertices = keywords[i].boundingPoly.vertices;
+                        vertices.forEach(function(vertice) {
+                            if (vertice.x > xmax) xmax = vertice.x;
+                            if (vertice.x < xmin) xmin = vertice.x;
+                            if (vertice.y > ymax) ymax = vertice.y;
+                            if (vertice.y < ymin) ymin = vertice.y;
+                        });
+    
                         while(j < splited.length && valid){
+                            vertices = keywords[i+j].boundingPoly.vertices;
                             if(splited[j] == keywords[i+j].description){
-                                // console.log(keywords[i+j]);
+                                vertices.forEach(function(vertice) {
+                                    if (vertice.x > xmax) xmax = vertice.x;
+                                    if (vertice.x < xmin) xmin = vertice.x;
+                                    if (vertice.y > ymax) ymax = vertice.y;
+                                    if (vertice.y < ymin) ymin = vertice.y;
+                                });
+                                j++;
+                            } else if(splited[j] == keywords[i+j].description.split('/')[0]){
+                                //handle the vitamin
+                                vertices.forEach(function(vertice) {
+                                    if (vertice.x > xmax) xmax = vertice.x;
+                                    if (vertice.x < xmin) xmin = vertice.x;
+                                    if (vertice.y > ymax) ymax = vertice.y;
+                                    if (vertice.y < ymin) ymin = vertice.y;
+                                });
                                 j++;
                             } else{
                                 valid = false; 
                             }
                         }
                         if(valid){
+                            let coordinates = {};
+                            coordinates["yMax"] = ymax;
+                            coordinates["yMin"] = ymin;
+                            coordinates["xMax"] = xmax;
+                            coordinates["xMin"] = xmin;            
                             console.log(`Successfully match ${nutrient}`)
+                            // console.log(coordinates);
+                            json_result[nutrient.split("/")[0].toLowerCase()] = coordinates;
                             break;
                         }
                     }
@@ -489,6 +652,7 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
     });
 });
 
+// fuzzy search
 app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
     if (!req.params.keyword) return res.json([]);
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
@@ -509,14 +673,15 @@ app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
                 ]
             };
             var fuse = new Fuse(nutrients_lst, options);
-            var result = fuse.search(req.params.keyword);     
-            return res.json(result);   
+            var result = fuse.search(req.params.keyword);
+            if (result.length > 5) result = result.slice(0,5);
+            return res.json(result);
         });
     });
 });
 
-
-app.post('/api/nutrients/', function (req, res, next) {
+// insert new nutrient
+app.post('/api/nutrients/', isAuthenticated, function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
         if (err) return res.status(500).end(err.message);
         let nutrients = db.db('cscc09').collection('nutrients');
@@ -530,9 +695,6 @@ app.post('/api/nutrients/', function (req, res, next) {
     });
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello world\n');
-});
 
 const http = require('http');
 const PORT = 8080;

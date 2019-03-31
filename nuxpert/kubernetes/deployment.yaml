@@ -1,9 +1,20 @@
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "backend-address"
+  namespace: "default"
+  labels:
+    app: "nuxpert"
+data:
+  BACKEND_IP: "10.31.241.147:8080"
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: nuxpert
 spec:
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -13,23 +24,13 @@ spec:
         - name: nuxpert
           image: gcr.io/kubernetes-221921/nuxpert:latest
           ports:
-            - containerPort: 5000
-
-# ---
-# kind: Service
-# apiVersion: v1
-# metadata:
-#   name: node-app-service
-# spec:
-#   selector:
-#     app: node-app
-#   ports:
-#     - protocol: "TCP"
-#       port: 8080
-#       targetPort: 8080
-#       nodePort: 30000
-#   type: LoadBalancer
-
+            - containerPort: 3000
+          env:
+          - name: "BACKEND_IP"
+            valueFrom:
+              configMapKeyRef:
+                key: "BACKEND_IP"
+                name: "backend-address"
 ---
 apiVersion: "v1"
 kind: "Service"
@@ -41,8 +42,8 @@ metadata:
 spec:
   ports:
   - protocol: "TCP"
-    port: 5000
-    targetPort: 5000
+    port: 3000
+    targetPort: 3000
   selector:
     app: "nuxpert"
   type: "ClusterIP"
@@ -75,5 +76,5 @@ spec:
   - route:
     - destination:
         port:
-          number: 5000
+          number: 3000
         host: nuxpert-service

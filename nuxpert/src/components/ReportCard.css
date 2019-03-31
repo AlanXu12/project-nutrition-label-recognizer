@@ -21,22 +21,12 @@
   padding: 10%;
 }
 
-.show-image a.delete {
-  top:0;
-  right:0;
-  padding: 10%;
-}
-
-a.preview img, a.delete img {
+a.preview img {
   max-height: 80px;
   min-height: 10px;
   max-width: 80px;
   min-width: 10px;
   opacity: 1 !important;
-}
-
-a.delete:hover img {
-  content: url('../media/delete-icon-hover.svg');
 }
 
 a.preview:hover img {
