@@ -6,21 +6,23 @@ import './Collapsible.scss'
 
 export class Search extends Component {
 
+    // when search page is loaded, set up state.
     constructor(props) {
 
         super(props);
-        console.log(this.props);
+        // recieve information from parent state.
         this.state = {
             nutrient: this.props.location.state.keyword,
             info: "Details about this nutritien",
             fuzzyResults: this.props.location.state.result
         };
-        console.log(this.state);
 
     }
 
     render() {
+        // devided return html into two parts
         const data = this.state.fuzzyResults;
+        // for each result information, return a collapsible html
         const fuzzyResultsList = data.map((nutrient) => {
             return (
                 <div key={nutrient.name}>
@@ -40,10 +42,12 @@ export class Search extends Component {
         })
         return (
             <div className="container">
+                {/* call navibation bar component and pass this props for future page redirection */}
                 <Navigation {...this.props} />
                 <br />
                 <br />
                 <h1>Top 5 related results for: {this.state.nutrient}</h1>
+                {/* genearte result htmls from other function */}
                 {fuzzyResultsList}
             </div>
         )
