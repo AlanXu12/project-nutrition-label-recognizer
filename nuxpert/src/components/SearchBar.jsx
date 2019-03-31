@@ -15,6 +15,7 @@ export class SearchBar extends Component {
 
     handleFuzzySearch = async () => {
         // send search to backend using fetch get
+        console.log("here?");
         const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
             method: 'GET',
             headers: {
@@ -41,6 +42,7 @@ export class SearchBar extends Component {
     }
 
     handleInputChange = () => {
+        console.log("onchange?", this.state.keyword);
         this.setState({
             keyword: this.search.value,
             result: {}
