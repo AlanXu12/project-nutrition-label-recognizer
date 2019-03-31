@@ -4,7 +4,7 @@ start_time=`date +%s`
 docker rmi nuxpert
 docker rmi gcr.io/kubernetes-221921/nuxpert
 kubectl delete -f kubernetes/deployment.yaml
-docker build -t nuxpert .
+docker build --no-cache -t nuxpert . 
 
 # docker run -p 8080:8080 -d --name nuxpert nuxpert
 # docker exec -it nuxpert bash
