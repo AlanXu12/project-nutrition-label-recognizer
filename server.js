@@ -120,7 +120,7 @@ app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next)
     // get the imageId from the request URL
     let id = req.params.imageid;
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         // get two collections
         let images = db.db('cscc09').collection('images');
         let nutrients = db.db('cscc09').collection('nutrients');
@@ -145,7 +145,7 @@ app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next)
                     let local_path = `uploads/${req.params.imageid}.pdf`;
                     // generate the local temp file
                     fs.writeFile(local_path, base64Data, 'base64', function(err) {
-                        if(err) return res.status(500).end(err.message);
+                        if(err) return res.status(500).end("Oppps!Serer side error!");
                     });
                     // upload the file to the cloud bucket
                     let bucket_path = `${req.username}/tempPdf/${req.params.imageid}.pdf`;
@@ -160,7 +160,7 @@ app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next)
                     })
                     .then(() => {
                         fs.unlink(local_path, (err) => {
-                            if (err) return res.status(500).end(err.code);
+                            if (err) return res.status(500).end("Oppps!Serer side error!");
                             console.log(`${local_path} was deleted`);
                             console.log(`${bucket_path} uploaded to ${bucketName}.`);
                             let result = {};
@@ -171,7 +171,7 @@ app.get('/api/report/make/:imageid/', isAuthenticated, function (req, res, next)
                         });
                     })
                     .catch(err => {
-                        return res.status(500).end(err.code);
+                        return res.status(500).end("Oppps!Serer side error!");
                     });
                 });
             });
@@ -190,13 +190,13 @@ app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next)
         console.log(`${org_bucket_path} copied to ${des_bucket_path}.`);
         // insert the saved pdf info
         mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-            if (err) return res.status(500).end(err.message);
+            if (err) return res.status(500).end("Oppps!Serer side error!");
             let reports = db.db('cscc09').collection('reports');
             let images =  db.db('cscc09').collection('images'); 
             images.findOne({_id: ObjectId(req.params.imageid)}, {projection: {_id: 0, path: 1}}, function(err, image) {
                 let image_path = image.path;
                 reports.updateOne({path: des_bucket_path},{ $set: {path: des_bucket_path, username: req.username, imageid: req.params.imageid, imagePath: image_path}}, {upsert: true}, function(err){
-                    if (err) return res.status(500).end(err.message);
+                    if (err) return res.status(500).end("Oppps!Serer side error!");
                     db.close();
                     res.setHeader("Access-Control-Allow-Credentials","true");
                     return res.status(200).end(`The file ${req.params.imageid}.pdf has already been saved`);
@@ -206,7 +206,7 @@ app.get('/api/report/save/:imageid/', isAuthenticated, function (req, res, next)
 
     })
     .catch(err => {
-        return res.status(500).end(err.code);
+        return res.status(500).end("Oppps!Serer side error!");
     });
 });
 
@@ -231,7 +231,7 @@ app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
     let results = {'reportObjArr':[]};
     let username = req.body.username;
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let reports = db.db('cscc09').collection('reports');  
         reports.find({username: username}).project({imagePath: 1, imageid: 1}).toArray(function(err, report_lst) {
             report_lst.forEach(function(report) {
@@ -249,7 +249,7 @@ app.post('/api/report/history/', isAuthenticated, function (req, res, next) {
 
 app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let reports = db.db('cscc09').collection('reports');
         reports.findOne({imageid: req.params.imageid}, {projection: {_id: 0, path: 1, username: 1}}, function(err, report) {
             if (req.username != report.username) return res.status(401).end("access denied");
@@ -268,17 +268,17 @@ app.get('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
 app.delete('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
     // delete image and report entry from mongodb
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let reports = db.db('cscc09').collection('reports');
         let images =  db.db('cscc09').collection('images');
         reports.findOne({imageid: req.params.imageid}, {projection: {username: 1}}, function(err, report) {
-            if (err) return res.status(500).end(err.message);
+            if (err) return res.status(500).end("Oppps!Serer side error!");
             // check if the user is deleting others reports
             if (req.username != report.username) return res.status(401).end("access denied");
             images.findOneAndDelete({_id: ObjectId(req.params.imageid)}, {projection: {path: 1}}, function(err, image) {
-                if (err) return res.status(500).end(err.message);
+                if (err) return res.status(500).end("Oppps!Serer side error!");
                 reports.findOneAndDelete({imageid: req.params.imageid}, {projection: {_id: 1, path: 1, imagePath: 1}}, function(err, report) {
-                    if (err) return res.status(500).end(err.message);
+                    if (err) return res.status(500).end("Oppps!Serer side error!");
                     // delete image and report file from bucket
                     let image_path = report.value.imagePath;
                     let path = report.value.path;
@@ -292,11 +292,11 @@ app.delete('/api/report/:imageid/', isAuthenticated, function (req, res, next) {
                             return res.status(200).end(`The image with id ${req.params.imageid}  and its corresponding pdf have already been removed`);
                         })
                         .catch(err => {
-                            return res.status(500).end(err.code);
+                            return res.status(500).end("Oppps!Serer side error!");
                         });
                     })
                     .catch(err => {
-                        return res.status(500).end(err.code);
+                        return res.status(500).end("Oppps!Serer side error!");
                     });
                 });
             });
@@ -310,17 +310,17 @@ app.post('/signup/', function (req, res, next) {
     let username = req.body.username;
     let password = req.body.password;
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let users = db.db('cscc09').collection('users');   
         // console.log(username);
         users.findOne({username: username}, {projection: {_id: 0, username: 1}}, function(err, user) {
-            if (err) return res.status(500).end(err.message);
+            if (err) return res.status(500).end("Oppps!Serer side error!");
             if (user) return res.status(409).end("username " + username + " already exists");
             let salt = generateSalt();
             let hash = generateHash(password, salt);
             // update the db
             users.updateOne({username: username},{ $set: {username: username, hash: hash, salt: salt}}, {upsert: true}, function(err){
-                if (err) return res.status(500).end(err.message);
+                if (err) return res.status(500).end("Oppps!Serer side error!");
                 // initialize cookie
                 res.setHeader('Set-Cookie', cookie.serialize('username', username, {
                       path : '/', 
@@ -338,11 +338,11 @@ app.post('/signin/', function (req, res, next) {
     let username = req.body.username;
     let password = req.body.password;
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let users = db.db('cscc09').collection('users');   
         // console.log(username);
         users.findOne({username: username}, {projection: {_id: 0, username: 1, hash: 1, salt: 1}}, function(err, user) {
-            if (err) return res.status(500).end(err.message);
+            if (err) return res.status(500).end("Oppps!Serer side error!");
             if (!user) return res.status(401).end("access denied");
             if (user.hash !== generateHash(password, user.salt)) return res.status(401).end("access denied"); 
             // initialize cookie
@@ -375,17 +375,17 @@ app.post('/reset/', function (req, res, next) {
     // reset the password to the same as the username
     let password = req.body.username;
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let users = db.db('cscc09').collection('users');   
         users.findOne({username: username}, {projection: {_id: 0, username: 1, hash: 1, salt: 1}}, function(err, user) {
-            if (err) return res.status(500).end(err.message);
+            if (err) return res.status(500).end("Oppps!Serer side error!");
             if (!user) return res.status(401).end("access denied");
             // generate the new password
             let salt = generateSalt();
             let hash = generateHash(password, salt);
             // update the db
             users.updateOne({username: username},{ $set: {username: username, hash: hash, salt: salt}}, {upsert: true}, function(err){
-                if (err) return res.status(500).end(err.message);
+                if (err) return res.status(500).end("Oppps!Serer side error!");
                 db.close();
                 return res.json("user " + username + "'s password has been reset");
             });
@@ -528,11 +528,11 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
             console.log(`${bucket_path} uploaded to ${bucketName}.`);
             // store the image info into db
             mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-                if (err) return res.status(500).end(err.message);
+                if (err) return res.status(500).end("Oppps!Serer side error!");
                 let images = db.db('cscc09').collection('images');
                 // insert bucket path and the scanning result into the db
                 images.updateOne({path: bucket_path}, {$set: {path: bucket_path, result: Object.keys(json_result).slice(0, -2)}},  {upsert: true}, function(err){
-                    if (err) return res.status(500).end(err.message);
+                    if (err) return res.status(500).end("Oppps!Serer side error!");
                     // get the imageID
                     images.findOne({path: bucket_path}, {projection: {_id: 1}}, function(err, image) {
                         db.close();
@@ -560,7 +560,7 @@ app.post('/api/search/image/', upload.single('image'), function (req, res, next)
 // need to update the method
 app.get('/api/nutrient/:name/', function (req, res, next) {
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let nutrients = db.db('cscc09').collection('nutrients');
         nutrients.findOne({name: req.params.name}, {projection: {_id: 0, name: 1, details: 1}}, function(err, nutrient) {
             db.close();
@@ -573,7 +573,7 @@ app.get('/api/nutrient/:name/', function (req, res, next) {
 app.get('/api/fuzzy/nutrient/:keyword/', function (req, res, next) {
     if (!req.params.keyword) return res.json([]);
     mongoClient.connect(dbUrl, {useNewUrlParser: true}, function(err, db) {
-        if (err) return res.status(500).end(err.message);
+        if (err) return res.status(500).end("Oppps!Serer side error!");
         let nutrients = db.db('cscc09').collection('nutrients');
         nutrients.find().project({_id: 0, name: 1, details: 1}).toArray(function(err, nutrients_lst) {
             db.close();
