@@ -19,6 +19,41 @@ export class Search extends Component {
 
     }
 
+    handleFuzzySearch = async () => {
+        // send search to backend using fetch get
+        const response = await fetch('/api/fuzzy/nutrient/' + this.state.keyword + '/', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+        // update state with response infomation
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        if (body) {
+            this.setState({
+                keyword: this.state.keyword,
+                result: body
+            });
+            // and redirect to the search page.
+            const location = {
+                pathname: '/search/' + this.state.keyword,
+                state: this.state
+            }
+            this.props.history.push(location);
+            window.location.reload();
+        }
+    }
+
+    handleInputChange = () => {
+        this.setState({
+            keyword: this.search.value,
+            result: {}
+        });
+    }
+
+
     render() {
         // devided return html into two parts
         const data = this.state.fuzzyResults;
