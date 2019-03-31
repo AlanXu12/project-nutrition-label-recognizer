@@ -2,7 +2,7 @@
 
 1. __Project Title:__
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info
-##### Video:  
+###### Video:  
 
 
 2. __Team Members:__
@@ -28,10 +28,11 @@
 
 6. __Description of additional features that will be complete by the Final version:__
     * Downloadable pdf report for input nutrition label 
-    * Fuzzy search information about nutrients
+    * Fuzzy search
     * History reports for logged-in user
-    * Notification for upload progress
+    * Pop notification for upload progress
     * Login system
+    * Fully responsive mobile website
 
 7. __Description of the technology that you used:__
     * Optical Character Recognition (OCR)
@@ -40,7 +41,11 @@
     * Node Sass
     * JS Cookie
     * Fuzzy Search
-    * Google Cloud Platform 
+    * Google Cloud Platform
+    * Google Cloud Storage
+    * Google Cloud Vision
+    * pdfmake
+    * Fusejs
     * Axios 
     * Docker, Kubernetes, Istio
     * Cors
