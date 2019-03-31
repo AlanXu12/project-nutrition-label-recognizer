@@ -24,8 +24,13 @@ class CreditPortal extends Component {
   render() {
     return (
       <div>
-        {this.creditPageRedirect()}
-        <div className="text-center text-grey credit-portal" onClick={this.setRedirect} >credits</div>
+        { this.creditPageRedirect() }
+        <div
+          className="text-center text-grey credit-portal"
+          onClick={this.setRedirect}
+        >
+          credits
+        </div>
       </div>
     );
   }

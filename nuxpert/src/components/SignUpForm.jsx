@@ -29,10 +29,10 @@ class SignUpForm extends Component {
       })
     });
     if (response.status !== 200) {
-      if (response.status == 409) this.setState({
+      if (response.status === 409) this.setState({
         errorMsg: "Username has been taken..."
       });
-      if (response.status == 500) this.setState({
+      if (response.status === 500) this.setState({
         errorMsg: "Server side error, please try again later..."
       });
     } else {
@@ -65,10 +65,10 @@ class SignUpForm extends Component {
       })
     });
     if (response.status !== 200) {
-      if (response.status == 401) this.setState({
+      if (response.status === 401) this.setState({
         errorMsg: "Username or password not correct..."
       });
-      if (response.status == 500) this.setState({
+      if (response.status === 500) this.setState({
         errorMsg: "Server side error, please try again later..."
       });
     } else {
@@ -103,10 +103,10 @@ class SignUpForm extends Component {
       })
     });
     if (response.status !== 200) {
-      if (response.status == 401) this.setState({
+      if (response.status === 401) this.setState({
         errorMsg: "Username does not exist..."
       });
-      if (response.status == 500) this.setState({
+      if (response.status === 500) this.setState({
         errorMsg: "Server side error, please try again later..."
       });
     } else {

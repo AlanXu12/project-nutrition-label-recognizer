@@ -79,7 +79,7 @@ class Result extends Component {
       // console.log("clicked Y: ", this.state.y);
       // console.log("zoomRatio: ", zoomRatio);
       // console.log("relative Y: ", this.state.y / zoomRatio);
-      if (nutrient != "height" && nutrient != "width" && nutrient != "id") {
+      if (nutrient !== "height" && nutrient !== "width" && nutrient !== "id") {
         const nutri = nutrients[nutrient];
         // console.log("nutrient: ", nutrient);
         // console.log("nutri: ", nutri);
@@ -92,9 +92,10 @@ class Result extends Component {
           });
           // console.log("new curNutri: ", nutrient);
           this.getNutriDetails(nutrient);
-          return;
+          return true;
         }
       }
+      return true;
     });
   }
 
@@ -292,6 +293,7 @@ class Result extends Component {
               download="Report.pdf"
               alter="Download this report"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Download
             </a>
