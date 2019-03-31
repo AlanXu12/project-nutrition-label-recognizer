@@ -79,6 +79,7 @@ class Result extends Component {
         }
       }
     });
+    this.addSorryNotification('this one is not detected');
   }
 
   // request backend for the current clicked factor's nutrition details and display the info
@@ -94,7 +95,9 @@ class Result extends Component {
         details: body.details
       });
       // clean notifycation if this request is done successfully
-      this.clearNotification;
+      this.clearNotification();
+    } else {
+      this.addSorryNotification("we don't have enough infomation for " + nutriName);
     }
   };
 
@@ -111,11 +114,11 @@ class Result extends Component {
           reportPdfDowload: res.data
         });
         // clean notifycation if this request is done successfully
-        this.clearNotification;
+        this.clearNotification();
       }).then(err => {
         console.log(err);
         // notify user
-        this.addErrorNotification;
+        this.addErrorNotification();
       });
   }
 
@@ -189,7 +192,7 @@ class Result extends Component {
       message: msg,
       level: 'warning',
       dismissible: 'none',
-      autoDismiss: 0,
+      autoDismiss: 20,
     });
   };
 
@@ -197,13 +200,29 @@ class Result extends Component {
   addErrorNotification = () => {
     const notification = this.notificationSystem.current;
     notification.addNotification({
-      title: 'Waiting',
+      title: 'Error',
       message: 'Sorry, an error occurred. Please try again later...',
       level: 'error',
       dismissible: 'none',
       autoDismiss: 0,
     });
   };
+
+  // helper for adding a notification when there is not enough support from DB
+  addSorryNotification = (msg) => {
+    // // clean existing notifications first
+    // this.clearNotification();
+    // // add new notification
+    const notification = this.notificationSystem.current;
+    notification.addNotification({
+      title: 'Sorry',
+      message: 'Sorry, ' + msg + '. We will make nuXpert better...',
+      level: 'info',
+      dismissible: 'none',
+      autoDismiss: 3,
+    });
+  };
+
 
   // helper for clearing all notifications
   clearNotification = () => {
