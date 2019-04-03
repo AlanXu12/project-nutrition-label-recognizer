@@ -1,20 +1,21 @@
 FROM node:8
 
+
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
 COPY package*.json ./
 
+# Install app dependencies
 RUN npm install
-
-RUN npm install serve -g
 
 # Bundle app source
 COPY . .
 
-# RUN npm run build
+RUN npm run front-end-install
 
-EXPOSE 3000
+RUN npm run front-end-build
 
-ENTRYPOINT [ "npm", "run", "dev"]
+EXPOSE 8080
+
+ENTRYPOINT [ "npm", "start" ]
