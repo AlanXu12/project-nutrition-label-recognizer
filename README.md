@@ -2,7 +2,7 @@
 
 1. __Project Title:__
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info
-##### Video:  
+###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video:  https://youtu.be/EZmEdJBANLo
 
 
 2. __Team Members:__
