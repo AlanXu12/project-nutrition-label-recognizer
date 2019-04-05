@@ -3,6 +3,7 @@
 1. __Project Title:__
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video:  https://youtu.be/EZmEdJBANLo
+###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;API Doc(included in the root dir with name API.md):  https://github.com/UTSCC09/project-nutrition-label-recognizer/blob/master/API.md
 
 
 2. __Team Members:__
