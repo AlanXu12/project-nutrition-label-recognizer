@@ -1,16 +1,17 @@
-# CSCC09 Final Project Proposal
+# CSCC09 Final Project
 
 1. __Project Title:__
-###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info (currently offline)
+###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NuXpert: www.nuxpert.info (currently offline to save budget)
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Video:  https://youtu.be/EZmEdJBANLo
 ###### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;API Doc:  https://github.com/UTSCC09/project-nutrition-label-recognizer/blob/master/API.md
 **&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Note:API doc is included in the root dir with name API.md!**
 
 
 2. __Team Members:__
-   * Wanjing Huang
-   * Siyang Shen
    * Pingfan Xu
+   * Siyang Shen
+   * Wanjing Huang
+   
 
 3. __Description of the web application:__
 >We see nutrition labels everywhere everyday, but from reading the label not all people really understand the nutrition facts: what they do to your body, what is the suggested daily amount for your body. Thus here we want to provide a tool that helps people comprehend the nutrition label easily and more precisely.
